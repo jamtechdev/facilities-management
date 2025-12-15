@@ -1,0 +1,318 @@
+/* Timesheet Styles */
+
+/* Timesheet Header */
+.timesheet-header {
+    background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(132, 195, 115, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.timesheet-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.timesheet-header-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* Modern Tabs */
+.timesheet-tabs {
+    border-bottom: 2px solid rgba(132, 195, 115, 0.2);
+    margin-bottom: 2rem;
+}
+
+.timesheet-tabs .nav-link {
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-right: 2rem;
+    padding: 1rem 0;
+    font-weight: 600;
+    color: #6c757d;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.timesheet-tabs .nav-link:hover {
+    color: #84c373;
+    border-bottom-color: rgba(132, 195, 115, 0.5);
+}
+
+.timesheet-tabs .nav-link.active {
+    color: #84c373;
+    border-bottom-color: #84c373;
+}
+
+/* Stat Cards */
+.timesheet-stat-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(132, 195, 115, 0.15);
+    transition: all 0.3s ease;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.timesheet-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #84c373 0%, #6ba85a 100%);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.timesheet-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(132, 195, 115, 0.2);
+}
+
+.timesheet-stat-card:hover::before {
+    transform: scaleX(1);
+}
+
+.stat-icon-box {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 28px;
+    margin-bottom: 1rem;
+    box-shadow: 0 6px 20px rgba(132, 195, 115, 0.3);
+}
+
+.stat-value-large {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1a1f2e;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label-small {
+    font-size: 0.75rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+/* Assignment Card */
+.assignment-card-modern {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(132, 195, 115, 0.15);
+    overflow: hidden;
+    height: 100%;
+}
+
+.assignment-card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    padding: 1.5rem;
+    border-bottom: 2px solid rgba(132, 195, 115, 0.2);
+}
+
+.assignment-card-body {
+    padding: 1.5rem;
+}
+
+.assignment-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6c757d;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.assignment-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1f2e;
+    margin-bottom: 0.5rem;
+}
+
+.assignment-address {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+}
+
+.assignment-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.meta-item {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(132, 195, 115, 0.05);
+    border-radius: 12px;
+}
+
+.meta-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.meta-value {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #84c373;
+}
+
+/* Status Card */
+.status-card-modern {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(132, 195, 115, 0.15);
+    overflow: hidden;
+    height: 100%;
+}
+
+.status-badge-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.status-badge-modern.active {
+    background: linear-gradient(135deg, #d3f9d8 0%, #b2f2bb 100%);
+    color: #37b24d;
+}
+
+.status-badge-modern.inactive {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #f59f00;
+}
+
+/* Clock In/Out Form */
+.clock-form-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(132, 195, 115, 0.15);
+    overflow: hidden;
+}
+
+.clock-form-header {
+    background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
+    padding: 1.5rem;
+    color: white;
+}
+
+.clock-form-body {
+    padding: 1.5rem;
+}
+
+.photo-upload-area {
+    border: 2px dashed rgba(132, 195, 115, 0.5);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    background: rgba(132, 195, 115, 0.05);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.photo-upload-area:hover {
+    border-color: #84c373;
+    background: rgba(132, 195, 115, 0.1);
+}
+
+.photo-upload-area i {
+    font-size: 3rem;
+    color: #84c373;
+    margin-bottom: 1rem;
+}
+
+/* History Table */
+.history-table {
+    margin: 0;
+}
+
+.history-table thead th {
+    background: #f8f9fa;
+    border: none;
+    padding: 1rem;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6c757d;
+}
+
+.history-table tbody td {
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid #f1f3f5;
+    vertical-align: middle;
+}
+
+.history-table tbody tr:hover {
+    background: rgba(132, 195, 115, 0.05);
+}
+
+/* Activity List */
+.activity-list-item {
+    padding: 1rem;
+    border-left: 4px solid #84c373;
+    background: rgba(132, 195, 115, 0.05);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.activity-list-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(132, 195, 115, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .timesheet-header {
+        padding: 1.5rem;
+    }
+
+    .assignment-meta-grid {
+        grid-template-columns: 1fr;
+    }
+}
+

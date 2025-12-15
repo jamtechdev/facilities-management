@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade');
             $table->foreignId('client_id')->constrained('clients')->onDelete('cascade');
             $table->date('work_date');
-            $table->time('clock_in_time');
-            $table->time('clock_out_time')->nullable();
+            $table->timestamp('clock_in_time');
+            $table->timestamp('clock_out_time')->nullable();
             $table->decimal('hours_worked', 5, 2)->nullable(); // Calculated hours
             $table->decimal('payable_hours', 5, 2)->nullable(); // Hours to be paid (max assigned hours)
             $table->text('notes')->nullable();

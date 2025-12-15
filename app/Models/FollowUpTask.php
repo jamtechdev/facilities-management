@@ -27,9 +27,9 @@ class FollowUpTask extends Model
     ];
 
     // Reminder day constants
-    const DAY_30 = 30;
-    const DAY_60 = 60;
-    const DAY_90 = 90;
+    const DAY_30 = '30';
+    const DAY_60 = '60';
+    const DAY_90 = '90';
 
     // Relationships
     public function lead(): BelongsTo

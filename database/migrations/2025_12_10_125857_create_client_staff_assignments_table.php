@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('client_id')->constrained('clients')->onDelete('cascade');
             $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade');
-            $table->integer('assigned_weekly_hours')->default(0);
-            $table->integer('assigned_monthly_hours')->default(0);
+            $table->decimal('assigned_weekly_hours', 8, 2)->default(0);
+            $table->decimal('assigned_monthly_hours', 8, 2)->default(0);
             $table->date('assignment_start_date');
             $table->date('assignment_end_date')->nullable();
             $table->boolean('is_active')->default(true);

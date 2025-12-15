@@ -19,32 +19,41 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
+        <div class="col-12">
+            <div class="form-card">
+                <div class="form-card-header">
+                    <h5><i class="bi bi-person-plus me-2"></i>Lead Information</h5>
+                </div>
+                <div class="form-card-body">
                     <form id="createLeadForm" method="POST" action="{{ route('admin.leads.store') }}">
                         @csrf
 
-                        <div class="row g-3">
+                        <div class="row g-4">
                             <div class="col-md-6">
-                                <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
+                                <label for="name" class="form-label">
+                                    <i class="bi bi-person me-1"></i>Name <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" placeholder="Enter full name" required>
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-md-6">
-                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required>
+                                <label for="email" class="form-label">
+                                    <i class="bi bi-envelope me-1"></i>Email <span class="text-danger">*</span>
+                                </label>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" placeholder="example@email.com" required>
                                 @error('email')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-md-6">
-                                <label for="company" class="form-label">Company</label>
-                                <input type="text" class="form-control @error('company') is-invalid @enderror" id="company" name="company" value="{{ old('company') }}">
+                                <label for="company" class="form-label">
+                                    <i class="bi bi-building me-1"></i>Company
+                                </label>
+                                <input type="text" class="form-control @error('company') is-invalid @enderror" id="company" name="company" value="{{ old('company') }}" placeholder="Company name">
                                 @error('company')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -59,8 +68,10 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label for="phone" class="form-label">Phone</label>
-                                <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') }}">
+                                <label for="phone" class="form-label">
+                                    <i class="bi bi-telephone me-1"></i>Phone
+                                </label>
+                                <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') }}" placeholder="+1 234 567 8900">
                                 @error('phone')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -75,15 +86,26 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label for="source" class="form-label">Source</label>
-                                <input type="text" class="form-control @error('source') is-invalid @enderror" id="source" name="source" value="{{ old('source') }}" placeholder="Website, Campaign, Referral, etc.">
+                                <label for="source" class="form-label">
+                                    <i class="bi bi-funnel me-1"></i>Source
+                                </label>
+                                <select class="form-select @error('source') is-invalid @enderror" id="source" name="source">
+                                    <option value="">Select source</option>
+                                    <option value="Website" {{ old('source') == 'Website' ? 'selected' : '' }}>Website</option>
+                                    <option value="Referral" {{ old('source') == 'Referral' ? 'selected' : '' }}>Referral</option>
+                                    <option value="Cold Call" {{ old('source') == 'Cold Call' ? 'selected' : '' }}>Cold Call</option>
+                                    <option value="LinkedIn" {{ old('source') == 'LinkedIn' ? 'selected' : '' }}>LinkedIn</option>
+                                    <option value="Other" {{ old('source') == 'Other' ? 'selected' : '' }}>Other</option>
+                                </select>
                                 @error('source')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-md-6">
-                                <label for="stage" class="form-label">Stage <span class="text-danger">*</span></label>
+                                <label for="stage" class="form-label">
+                                    <i class="bi bi-diagram-3 me-1"></i>Stage <span class="text-danger">*</span>
+                                </label>
                                 <select class="form-select @error('stage') is-invalid @enderror" id="stage" name="stage" required>
                                     <option value="new_lead" {{ old('stage') == 'new_lead' ? 'selected' : '' }}>New Lead</option>
                                     <option value="in_progress" {{ old('stage') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
@@ -97,7 +119,9 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label for="assigned_staff_id" class="form-label">Assigned Staff</label>
+                                <label for="assigned_staff_id" class="form-label">
+                                    <i class="bi bi-person-check me-1"></i>Assigned Staff
+                                </label>
                                 <select class="form-select @error('assigned_staff_id') is-invalid @enderror" id="assigned_staff_id" name="assigned_staff_id">
                                     <option value="">Select Staff</option>
                                     @foreach($staff as $s)
@@ -112,20 +136,22 @@
                             </div>
 
                             <div class="col-12">
-                                <label for="notes" class="form-label">Notes</label>
-                                <textarea class="form-control @error('notes') is-invalid @enderror" id="notes" name="notes" rows="4">{{ old('notes') }}</textarea>
+                                <label for="notes" class="form-label">
+                                    <i class="bi bi-sticky me-1"></i>Notes
+                                </label>
+                                <textarea class="form-control @error('notes') is-invalid @enderror" id="notes" name="notes" rows="4" placeholder="Additional notes about this lead...">{{ old('notes') }}</textarea>
                                 @error('notes')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
 
-                        <div class="mt-4">
+                        <div class="form-actions">
                             <button type="submit" class="btn btn-primary" id="submitBtn">
                                 <i class="bi bi-check-circle me-2"></i>Create Lead
                             </button>
                             <a href="{{ route('admin.leads.index') }}" class="btn btn-outline-secondary">
-                                Cancel
+                                <i class="bi bi-x-circle me-2"></i>Cancel
                             </a>
                         </div>
                     </form>
@@ -137,56 +163,6 @@
 @endsection
 
 @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('createLeadForm');
-        const submitBtn = document.getElementById('submitBtn');
-
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(form);
-            const submitBtnText = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
-
-            // Clear previous errors
-            document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-            document.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
-
-            axios.post(form.action, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            })
-            .then(function(response) {
-                if (response.data.success) {
-                    window.location.href = response.data.redirect;
-                }
-            })
-            .catch(function(error) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = submitBtnText;
-
-                if (error.response?.status === 422) {
-                    const errors = error.response.data.errors;
-                    Object.keys(errors).forEach(field => {
-                        const input = document.querySelector(`[name="${field}"]`);
-                        if (input) {
-                            input.classList.add('is-invalid');
-                            const errorDiv = document.createElement('div');
-                            errorDiv.className = 'invalid-feedback';
-                            errorDiv.textContent = errors[field][0];
-                            input.parentNode.appendChild(errorDiv);
-                        }
-                    });
-                } else {
-                    alert(error.response?.data?.message || 'Failed to create lead');
-                }
-            });
-        });
-    });
-</script>
+    @vite(['resources/js/forms.js'])
 @endpush
 

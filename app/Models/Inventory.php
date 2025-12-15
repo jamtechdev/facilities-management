@@ -11,6 +11,8 @@ class Inventory extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $table = 'inventory';
+
     protected $fillable = [
         'name',
         'description',

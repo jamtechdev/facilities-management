@@ -22,6 +22,10 @@ class EnsureStaffRole
         $user = auth()->user();
 
         // Redirect other roles to their dashboards
+        if ($user->hasRole('SuperAdmin')) {
+            return redirect()->route('superadmin.dashboard');
+        }
+
         if ($user->hasRole('Admin')) {
             return redirect()->route('admin.dashboard');
         }

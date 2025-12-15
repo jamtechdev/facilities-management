@@ -22,6 +22,10 @@ class EnsureAdminRole
         $user = auth()->user();
 
         // Redirect other roles to their dashboards
+        if ($user->hasRole('SuperAdmin')) {
+            return redirect()->route('superadmin.dashboard');
+        }
+
         if ($user->hasRole('Staff')) {
             return redirect()->route('staff.dashboard');
         }
@@ -34,7 +38,7 @@ class EnsureAdminRole
             return redirect()->route('lead.dashboard');
         }
 
-        if (!$user->hasRole('Admin')) {
+        if (!$user->hasAnyRole(['Admin', 'SuperAdmin'])) {
             abort(403, 'Unauthorized access.');
         }
 

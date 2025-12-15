@@ -19,14 +19,17 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
+        <div class="col-lg-10">
+            <div class="form-card">
+                <div class="form-card-header">
+                    <h5><i class="bi bi-pencil-square me-2"></i>Edit Staff Information</h5>
+                </div>
+                <div class="form-card-body">
                     <form id="updateStaffForm" method="POST" action="{{ route('admin.staff.update', $staff) }}">
                         @csrf
                         @method('PUT')
 
-                        <div class="row g-3">
+                        <div class="row g-4">
                             <div class="col-md-6">
                                 <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $staff->name) }}" required>
@@ -93,12 +96,12 @@
                             </div>
                         </div>
 
-                        <div class="mt-4">
+                        <div class="form-actions">
                             <button type="submit" class="btn btn-primary" id="submitBtn">
                                 <i class="bi bi-check-circle me-2"></i>Update Staff
                             </button>
                             <a href="{{ route('admin.staff.show', $staff) }}" class="btn btn-outline-secondary">
-                                Cancel
+                                <i class="bi bi-x-circle me-2"></i>Cancel
                             </a>
                         </div>
                     </form>

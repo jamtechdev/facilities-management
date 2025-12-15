@@ -22,6 +22,8 @@ class ClientStaffAssignment extends Model
     ];
 
     protected $casts = [
+        'assigned_weekly_hours' => 'decimal:2',
+        'assigned_monthly_hours' => 'decimal:2',
         'assignment_start_date' => 'date',
         'assignment_end_date' => 'date',
         'is_active' => 'boolean',

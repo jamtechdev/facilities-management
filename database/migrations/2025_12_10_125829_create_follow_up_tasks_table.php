@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('follow_up_tasks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('lead_id')->constrained('leads')->onDelete('cascade');
-            $table->enum('reminder_day', [30, 60, 90]);
+            $table->enum('reminder_day', ['30', '60', '90']);
             $table->text('suggestion')->nullable(); // Suggested action
             $table->boolean('is_completed')->default(false);
             $table->timestamp('due_date');

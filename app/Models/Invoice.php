@@ -57,4 +57,12 @@ class Invoice extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    // Accessor for billing_period
+    public function getBillingPeriodAttribute(): string
+    {
+        $start = $this->billing_period_start?->format('M d, Y') ?? 'N/A';
+        $end = $this->billing_period_end?->format('M d, Y') ?? 'N/A';
+        return "{$start} - {$end}";
+    }
 }

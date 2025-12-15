@@ -34,10 +34,7 @@ class ClientController extends Controller
      */
     public function create()
     {
-        $leads = Lead::where('stage', 'qualified')
-            ->whereNull('converted_to_client_id')
-            ->get();
-        return view('admin.clients.create', compact('leads'));
+        return view('admin.clients.create');
     }
 
     /**
@@ -86,13 +83,7 @@ class ClientController extends Controller
      */
     public function edit(Client $client)
     {
-        $leads = Lead::where('stage', 'qualified')
-            ->where(function($q) use ($client) {
-                $q->whereNull('converted_to_client_id')
-                  ->orWhere('converted_to_client_id', $client->id);
-            })
-            ->get();
-        return view('admin.clients.edit', compact('client', 'leads'));
+        return view('admin.clients.edit', compact('client'));
     }
 
     /**

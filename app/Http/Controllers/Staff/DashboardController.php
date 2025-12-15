@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Timesheet;
 use App\Models\Client;
 use Carbon\Carbon;
@@ -16,7 +17,8 @@ class DashboardController extends Controller
         $staff = $user->staff;
 
         if (!$staff) {
-            return redirect()->route('welcome')->with('error', 'Staff profile not found.');
+            Auth::logout();
+            return redirect()->route('login')->with('error', 'Staff profile not found. Please contact administrator.');
         }
 
         // Get today's stats

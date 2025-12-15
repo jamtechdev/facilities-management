@@ -19,24 +19,31 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
+        <div class="col-12">
+            <div class="form-card">
+                <div class="form-card-header">
+                    <h5><i class="bi bi-building-add me-2"></i>Client Information</h5>
+                </div>
+                <div class="form-card-body">
                     <form id="createClientForm" method="POST" action="{{ route('admin.clients.store') }}">
                         @csrf
 
-                        <div class="row g-3">
+                        <div class="row g-4">
                             <div class="col-md-6">
-                                <label for="company_name" class="form-label">Company Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('company_name') is-invalid @enderror" id="company_name" name="company_name" value="{{ old('company_name') }}" required>
+                                <label for="company_name" class="form-label">
+                                    <i class="bi bi-building me-1"></i>Company Name <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control @error('company_name') is-invalid @enderror" id="company_name" name="company_name" value="{{ old('company_name') }}" placeholder="Enter company name" required>
                                 @error('company_name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-md-6">
-                                <label for="contact_person" class="form-label">Contact Person <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('contact_person') is-invalid @enderror" id="contact_person" name="contact_person" value="{{ old('contact_person') }}" required>
+                                <label for="contact_person" class="form-label">
+                                    <i class="bi bi-person me-1"></i>Contact Person <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control @error('contact_person') is-invalid @enderror" id="contact_person" name="contact_person" value="{{ old('contact_person') }}" placeholder="Contact person name" required>
                                 @error('contact_person')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -112,20 +119,6 @@
                                 @enderror
                             </div>
 
-                            <div class="col-md-6">
-                                <label for="lead_id" class="form-label">Converted From Lead</label>
-                                <select class="form-select @error('lead_id') is-invalid @enderror" id="lead_id" name="lead_id">
-                                    <option value="">Select Lead (Optional)</option>
-                                    @foreach($leads as $lead)
-                                        <option value="{{ $lead->id }}" {{ old('lead_id') == $lead->id ? 'selected' : '' }}>
-                                            {{ $lead->name }} - {{ $lead->company }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('lead_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
 
                             <div class="col-md-6">
                                 <div class="form-check mt-4">
@@ -145,12 +138,12 @@
                             </div>
                         </div>
 
-                        <div class="mt-4">
+                        <div class="form-actions">
                             <button type="submit" class="btn btn-primary" id="submitBtn">
                                 <i class="bi bi-check-circle me-2"></i>Create Client
                             </button>
                             <a href="{{ route('admin.clients.index') }}" class="btn btn-outline-secondary">
-                                Cancel
+                                <i class="bi bi-x-circle me-2"></i>Cancel
                             </a>
                         </div>
                     </form>
@@ -162,55 +155,6 @@
 @endsection
 
 @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('createClientForm');
-        const submitBtn = document.getElementById('submitBtn');
-
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(form);
-            const submitBtnText = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
-
-            document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-            document.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
-
-            axios.post(form.action, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            })
-            .then(function(response) {
-                if (response.data.success) {
-                    window.location.href = response.data.redirect;
-                }
-            })
-            .catch(function(error) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = submitBtnText;
-
-                if (error.response?.status === 422) {
-                    const errors = error.response.data.errors;
-                    Object.keys(errors).forEach(field => {
-                        const input = document.querySelector(`[name="${field}"]`);
-                        if (input) {
-                            input.classList.add('is-invalid');
-                            const errorDiv = document.createElement('div');
-                            errorDiv.className = 'invalid-feedback';
-                            errorDiv.textContent = errors[field][0];
-                            input.parentNode.appendChild(errorDiv);
-                        }
-                    });
-                } else {
-                    alert(error.response?.data?.message || 'Failed to create client');
-                }
-            });
-        });
-    });
-</script>
+    @vite(['resources/js/forms.js'])
 @endpush
 

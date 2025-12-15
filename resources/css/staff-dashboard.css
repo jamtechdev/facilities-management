@@ -1,0 +1,400 @@
+/* Staff Dashboard Styles */
+
+/* Staff Dashboard Header */
+.staff-dashboard-header {
+    background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(132, 195, 115, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.staff-dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.staff-dashboard-header-content {
+    position: relative;
+    z-index: 1;
+}
+
+.staff-greeting {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.staff-subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+.staff-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-top: 1rem;
+}
+
+.staff-status-badge i {
+    width: 8px;
+    height: 8px;
+    background: #ffffff;
+    border-radius: 50%;
+    animation: blink 2s infinite;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Modern Stat Cards */
+.staff-stat-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(132, 195, 115, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.staff-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--card-accent) 0%, var(--card-accent-dark) 100%);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.staff-stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    border-color: rgba(132, 195, 115, 0.3);
+}
+
+.staff-stat-card:hover::before {
+    transform: scaleX(1);
+}
+
+.staff-stat-card.primary { --card-accent: #84c373; --card-accent-dark: #6ba85a; }
+.staff-stat-card.success { --card-accent: #51cf66; --card-accent-dark: #37b24d; }
+.staff-stat-card.info { --card-accent: #84c373; --card-accent-dark: #6ba85a; }
+.staff-stat-card.warning { --card-accent: #ffd43b; --card-accent-dark: #fcc419; }
+
+.stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.stat-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, var(--card-accent) 0%, var(--card-accent-dark) 100%);
+    color: white;
+}
+
+.staff-stat-card:hover .stat-icon-wrapper {
+    transform: scale(1.15) rotate(5deg);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+}
+
+.stat-value {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #1a1f2e;
+    margin-bottom: 0.25rem;
+    line-height: 1.1;
+    letter-spacing: -1px;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.stat-description {
+    font-size: 0.875rem;
+    color: #868e96;
+    margin: 0;
+}
+
+/* Task Card */
+.task-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(132, 195, 115, 0.15);
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.task-card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    padding: 1.5rem;
+    border-bottom: 2px solid rgba(132, 195, 115, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.task-card-header i {
+    font-size: 1.5rem;
+    color: #84c373;
+}
+
+.task-card-header h5 {
+    margin: 0;
+    font-weight: 700;
+    color: #1a1f2e;
+    font-size: 1.125rem;
+}
+
+.task-card-body {
+    padding: 1.5rem;
+    flex: 1;
+}
+
+.task-table {
+    margin: 0;
+}
+
+.task-table thead th {
+    background: #f8f9fa;
+    border: none;
+    padding: 1rem;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6c757d;
+}
+
+.task-table tbody td {
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid #f1f3f5;
+    vertical-align: middle;
+}
+
+.task-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.task-table tbody tr:hover {
+    background: rgba(132, 195, 115, 0.05);
+    transform: translateX(4px);
+    border-left: 3px solid #84c373;
+}
+
+.task-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.client-name {
+    font-weight: 600;
+    color: #1a1f2e;
+}
+
+.work-date {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.hours-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: linear-gradient(135deg, #e8f5e4 0%, #c8e9bd 100%);
+    color: #5a8a4d;
+    padding: 0.375rem 0.75rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.status-badge-modern {
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge-modern.approved {
+    background: linear-gradient(135deg, #d3f9d8 0%, #b2f2bb 100%);
+    color: #37b24d;
+}
+
+.status-badge-modern.pending {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #f59f00;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-state-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, #e8f5e4 0%, #c8e9bd 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: #84c373;
+}
+
+.empty-state-text {
+    color: #868e96;
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Profile Card */
+.profile-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(132, 195, 115, 0.15);
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-card-header {
+    background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
+    padding: 1.5rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.profile-card-header i {
+    font-size: 1.5rem;
+}
+
+.profile-card-header h5 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.125rem;
+}
+
+.profile-card-body {
+    padding: 1.5rem;
+    flex: 1;
+}
+
+.profile-info-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid #f1f3f5;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.profile-info-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.profile-info-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #868e96;
+    font-weight: 600;
+    margin: 0;
+}
+
+.profile-info-value {
+    font-size: 1rem;
+    color: #1a1f2e;
+    font-weight: 600;
+    margin: 0;
+}
+
+.profile-info-value.highlight {
+    color: #84c373;
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+/* Staff Dashboard Content Spacing */
+.staff-dashboard-content {
+    padding-top: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .staff-dashboard-header {
+        padding: 1.5rem;
+    }
+
+    .staff-greeting {
+        font-size: 1.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+    }
+
+    .stat-icon-wrapper {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+}
+

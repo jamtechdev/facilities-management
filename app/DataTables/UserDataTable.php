@@ -120,6 +120,19 @@ class UserDataTable extends DataTable
                 'scrollY' => '50vh',
                 'scrollX' => true,
                 'scrollCollapse' => true,
+                'responsive' => [
+                    'details' => [
+                        'type' => 'column',
+                        'target' => -1
+                    ]
+                ],
+                'language' => [
+                    'emptyTable' => 'No users found',
+                    'zeroRecords' => 'No matching users found',
+                    'info' => 'Showing _START_ to _END_ of _TOTAL_ users',
+                    'infoEmpty' => 'Showing 0 to 0 of 0 users',
+                    'infoFiltered' => '(filtered from _MAX_ total users)',
+                ],
                 'initComplete' => 'function () {
                     var selectedIds = [];
                     function logSelectedIds() {

@@ -18,7 +18,7 @@
                     <h5 class="mb-0">All Users</h5>
                 </div>
                 <div class="card-body">
-                    {{ $dataTable->table() }}
+                    {!! $dataTable->table(['class' => 'table table-striped table-hover table-responsive', 'style' => 'width:100%']) !!}
                 </div>
             </div>
         </div>

@@ -19,24 +19,31 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
+        <div class="col-12">
+            <div class="form-card">
+                <div class="form-card-header">
+                    <h5><i class="bi bi-person-plus me-2"></i>Staff Information</h5>
+                </div>
+                <div class="form-card-body">
                     <form id="createStaffForm" method="POST" action="{{ route('admin.staff.store') }}">
                         @csrf
 
-                        <div class="row g-3">
+                        <div class="row g-4">
                             <div class="col-md-6">
-                                <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
+                                <label for="name" class="form-label">
+                                    <i class="bi bi-person me-1"></i>Name <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" placeholder="Enter full name" required>
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-md-6">
-                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required>
+                                <label for="email" class="form-label">
+                                    <i class="bi bi-envelope me-1"></i>Email <span class="text-danger">*</span>
+                                </label>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" placeholder="example@email.com" required>
                                 @error('email')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -92,12 +99,12 @@
                             </div>
                         </div>
 
-                        <div class="mt-4">
+                        <div class="form-actions">
                             <button type="submit" class="btn btn-primary" id="submitBtn">
                                 <i class="bi bi-check-circle me-2"></i>Create Staff
                             </button>
                             <a href="{{ route('admin.staff.index') }}" class="btn btn-outline-secondary">
-                                Cancel
+                                <i class="bi bi-x-circle me-2"></i>Cancel
                             </a>
                         </div>
                     </form>

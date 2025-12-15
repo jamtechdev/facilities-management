@@ -3,225 +3,278 @@
 @section('title', 'Admin Dashboard')
 
 @push('styles')
-    @vite(['resources/css/dashboard.css'])
+    @vite(['resources/css/admin-dashboard.css'])
 @endpush
 
 @section('content')
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="h3 mb-0">Admin Dashboard</h1>
-            <p class="text-muted">Welcome to the admin dashboard</p>
+<div class="container-fluid admin-dashboard-content">
+    <!-- Welcome Header -->
+    <div class="admin-dashboard-header">
+        <div class="admin-dashboard-header-content">
+            <h1 class="admin-greeting">Welcome back, {{ auth()->user()->name }}! 👋</h1>
+            <p class="admin-subtitle">Here's what's happening in your system today</p>
+            <div class="admin-status-badge">
+                <i></i>
+                <span>{{ auth()->user()->hasRole('SuperAdmin') ? 'Super Admin' : 'Admin' }} Dashboard</span>
+        </div>
         </div>
     </div>
 
+    <!-- Primary Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="admin-stat-card">
+                <div class="stat-header">
+                <div class="stat-content">
+                        <div class="stat-label">Total Leads</div>
+                    <div class="stat-value">{{ number_format($stats['total_leads']) }}</div>
+                        <p class="stat-description">{{ number_format($stats['new_leads']) }} new today</p>
+                    </div>
+                    <div class="stat-icon-wrapper">
+                        <i class="bi bi-person-lines-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="admin-stat-card">
+                <div class="stat-header">
+                <div class="stat-content">
+                        <div class="stat-label">Active Clients</div>
+                    <div class="stat-value">{{ number_format($stats['total_clients']) }}</div>
+                        <p class="stat-description">Currently active</p>
+                    </div>
+                    <div class="stat-icon-wrapper">
+                        <i class="bi bi-building"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="admin-stat-card">
+                <div class="stat-header">
+                <div class="stat-content">
+                        <div class="stat-label">Active Staff</div>
+                    <div class="stat-value">{{ number_format($stats['total_staff']) }}</div>
+                        <p class="stat-description">On duty</p>
+                    </div>
+                    <div class="stat-icon-wrapper">
+                        <i class="bi bi-people"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="admin-stat-card">
+                <div class="stat-header">
+                <div class="stat-content">
+                    <div class="stat-label">Total Revenue</div>
+                        <div class="stat-value">£{{ number_format($stats['revenue'], 0) }}</div>
+                        <p class="stat-description">{{ number_format($stats['total_invoices']) }} invoices</p>
+                    </div>
+                    <div class="stat-icon-wrapper">
+                        <i class="bi bi-currency-pound"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Secondary Stats Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="admin-stat-card">
+                <div class="stat-header">
+                <div class="stat-content">
+                        <div class="stat-label">Qualified Leads</div>
+                    <div class="stat-value">{{ number_format($stats['qualified_leads']) }}</div>
+                        <a href="{{ route('admin.leads.index', ['stage' => 'qualified']) }}" class="stat-link">
+                            View all <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                    <div class="stat-icon-wrapper">
+                        <i class="bi bi-star-fill"></i>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="admin-stat-card">
+                <div class="stat-header">
+                <div class="stat-content">
+                        <div class="stat-label">New Leads Today</div>
+                    <div class="stat-value">{{ number_format($stats['new_leads']) }}</div>
+                        <a href="{{ route('admin.leads.index', ['stage' => 'new_lead']) }}" class="stat-link">
+                            View all <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                    <div class="stat-icon-wrapper">
+                        <i class="bi bi-plus-circle-fill"></i>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="admin-stat-card">
+                <div class="stat-header">
+                <div class="stat-content">
+                        <div class="stat-label">Total Invoices</div>
+                    <div class="stat-value">{{ number_format($stats['total_invoices']) }}</div>
+                        <a href="{{ route('admin.invoices.index') }}" class="stat-link">
+                            View all <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                    <div class="stat-icon-wrapper">
+                        <i class="bi bi-receipt-cutoff"></i>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Follow-up Reminders and Recent Activity -->
     <div class="row g-4">
-        <div class="col-md-3">
-            <x-stats-card 
-                icon="bi-person-lines-fill"
-                iconColor="primary"
-                label="Total Leads"
-                :value="number_format($stats['total_leads'])"
-            />
-        </div>
-
-        <div class="col-md-3">
-            <x-stats-card 
-                icon="bi-building"
-                iconColor="primary"
-                label="Active Clients"
-                :value="number_format($stats['total_clients'])"
-            />
-        </div>
-
-        <div class="col-md-3">
-            <x-stats-card 
-                icon="bi-people"
-                iconColor="primary"
-                label="Active Staff"
-                :value="number_format($stats['total_staff'])"
-            />
-        </div>
-
-        <div class="col-md-3">
-            <x-stats-card 
-                icon="bi-receipt"
-                iconColor="primary"
-                label="Total Invoices"
-                :value="number_format($stats['total_invoices'])"
-            />
-        </div>
-    </div>
-
-    <div class="row g-4 mt-2">
-        <div class="col-md-3">
-            <x-stats-card 
-                icon="bi-star-fill"
-                iconColor="primary"
-                label="Qualified Leads"
-                :value="number_format($stats['qualified_leads'])"
-            />
-        </div>
-
-        <div class="col-md-3">
-            <x-stats-card 
-                icon="bi-plus-circle"
-                iconColor="primary"
-                label="New Leads Today"
-                :value="number_format($stats['new_leads'])"
-            />
-        </div>
-
-        <div class="col-md-3">
-            <x-stats-card 
-                icon="bi-currency-pound"
-                iconColor="primary"
-                label="Revenue"
-                :value="'£' . number_format($stats['revenue'], 2)"
-            />
-        </div>
-
-        <div class="col-md-3">
-            <x-stats-card 
-                icon="bi-shield-check"
-                iconColor="danger"
-                label="Role"
-                :badge="['text' => 'Admin', 'color' => 'danger']"
-            />
-        </div>
-    </div>
-
-    <div class="row mt-4">
-        <div class="col">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">Admin Information</h5>
+        <!-- Automated Follow-up Reminders -->
+        <div class="col-lg-6 col-md-12">
+            <div class="activity-card">
+                <div class="activity-card-header">
+                    <h5>
+                        <i class="bi bi-bell-fill"></i>
+                        Automated Follow-up Reminders
+                        </h5>
+                    @if($followUpReminders->count() > 0)
+                        <span class="badge" style="background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%); color: white;">{{ $followUpReminders->count() }}</span>
+                    @endif
                 </div>
-                <div class="card-body">
-                    <table class="table table-bordered">
-                        <tbody>
-                            <tr>
-                                <th width="200">Name</th>
-                                <td>{{ auth()->user()->name }}</td>
-                            </tr>
-                            <tr>
-                                <th>Email</th>
-                                <td>{{ auth()->user()->email }}</td>
-                            </tr>
-                            <tr>
-                                <th>Role</th>
-                                <td>
-                                    @foreach(auth()->user()->roles as $role)
-                                        <span class="badge bg-danger">{{ $role->name }}</span>
-                                    @endforeach
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Registered</th>
-                                <td>{{ auth()->user()->created_at->format('F d, Y') }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">Admin Features</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted">As an administrator, you have access to all system features and can manage users, roles, and permissions.</p>
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>
-                        This is a protected admin area. Only users with the Admin role can access this dashboard.
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">Quick Actions</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="{{ route('admin.leads.index') }}" class="btn btn-primary">
-                            <i class="bi bi-person-lines-fill me-2"></i>Manage Leads
-                        </a>
-                        <a href="{{ route('admin.leads.create') }}" class="btn btn-outline-primary">
-                            <i class="bi bi-plus-circle me-2"></i>Create New Lead
-                        </a>
-                        <a href="{{ route('admin.clients.index') }}" class="btn btn-primary">
-                            <i class="bi bi-building me-2"></i>Manage Clients
-                        </a>
-                        <a href="{{ route('admin.staff.index') }}" class="btn btn-primary">
-                            <i class="bi bi-people me-2"></i>Manage Staff
-                        </a>
-                        <a href="{{ route('admin.users.index') }}" class="btn btn-primary">
-                            <i class="bi bi-person-gear me-2"></i>Manage Users
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row mt-4">
-        <div class="col">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">Spatie Permissions Status</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Your Roles:</h6>
-                            <div class="mb-3">
-                                @foreach(auth()->user()->roles as $role)
-                                    <span class="badge bg-danger me-2">{{ $role->name }}</span>
-                                @endforeach
+                <div class="activity-card-body">
+                    @if($followUpReminders->count() > 0)
+                            @foreach($followUpReminders->take(8) as $reminder)
+                                @php
+                                    $isOverdue = $reminder->due_date->isPast();
+                                    $daysUntil = $reminder->due_date->diffInDays(\Carbon\Carbon::now(), false);
+                                    $daysUntilRounded = round(abs($daysUntil));
+                                $itemClass = $isOverdue ? 'activity-item overdue' : ($daysUntil <= 3 ? 'activity-item urgent' : 'activity-item');
+                                @endphp
+                                <div class="{{ $itemClass }}">
+                                    <div class="item-title">
+                                        <a href="{{ route('admin.leads.show', $reminder->lead) }}">
+                                            <i class="bi bi-person me-2"></i>{{ $reminder->lead->name }}
+                                        </a>
+                                    </div>
+                                    <div class="item-description">
+                                        {{ Str::limit($reminder->suggestion, 70) }}
+                                    </div>
+                                    <div class="item-meta">
+                                        <div class="item-meta-item">
+                                            <i class="bi bi-calendar-event"></i>
+                                            <span>Day {{ $reminder->reminder_day }}</span>
+                                        </div>
+                                        <div class="item-meta-item">
+                                            <i class="bi bi-clock"></i>
+                                            <span>{{ $reminder->due_date->format('M d, Y') }}</span>
+                                        </div>
+                                        @if($isOverdue)
+                                            <span class="badge bg-danger activity-badge">
+                                                <i class="bi bi-exclamation-triangle me-1"></i>{{ $daysUntilRounded }} days overdue
+                                            </span>
+                                        @elseif($daysUntil <= 3)
+                                            <span class="badge bg-warning activity-badge text-dark">
+                                                <i class="bi bi-clock-history me-1"></i>{{ $daysUntilRounded }} days left
+                                            </span>
+                                        @else
+                                        <span class="badge activity-badge" style="background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%); color: white;">
+                                                <i class="bi bi-check-circle me-1"></i>{{ $daysUntilRounded }} days left
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                            @if($followUpReminders->count() > 8)
+                                <div class="text-center pt-2">
+                                <a href="{{ route('admin.leads.index') }}" class="btn btn-sm" style="background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%); color: white; border: none;">
+                                        <i class="bi bi-arrow-right me-1"></i>View all reminders ({{ $followUpReminders->count() }})
+                                    </a>
+                                </div>
+                            @endif
+                    @else
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-check-circle"></i>
                             </div>
-                            <h6>Role Check Methods:</h6>
-                            <ul class="list-unstyled">
-                                <li><code>hasRole('Admin')</code>: 
-                                    <span class="badge bg-{{ auth()->user()->hasRole('Admin') ? 'success' : 'danger' }}">
-                                        {{ auth()->user()->hasRole('Admin') ? 'true' : 'false' }}
-                                    </span>
-                                </li>
-                                <li><code>hasRole('User')</code>: 
-                                    <span class="badge bg-{{ auth()->user()->hasRole('User') ? 'success' : 'danger' }}">
-                                        {{ auth()->user()->hasRole('User') ? 'true' : 'false' }}
-                                    </span>
-                                </li>
-                            </ul>
+                            <p class="empty-state-text">No upcoming follow-up reminders</p>
                         </div>
-                        <div class="col-md-6">
-                            <h6>All System Roles:</h6>
-                            @php
-                                $allRoles = \Spatie\Permission\Models\Role::all();
-                            @endphp
-                            <div class="mb-3">
-                                @foreach($allRoles as $role)
-                                    <span class="badge bg-{{ $role->name === 'Admin' ? 'danger' : 'primary' }} me-2">
-                                        {{ $role->name }} 
-                                        <small>({{ $role->users->count() }} users)</small>
-                                    </span>
-                                @endforeach
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="col-lg-6 col-md-12">
+            <div class="activity-card">
+                <div class="activity-card-header">
+                    <h5>
+                        <i class="bi bi-clock-history"></i>
+                        Recent Activity
+                        </h5>
+                    <a href="{{ route('admin.leads.index') }}" class="btn btn-sm" style="background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%); color: white; border: none;">
+                        View All
+                    </a>
+                </div>
+                <div class="activity-card-body">
+                    @if($recentActivity->count() > 0)
+                            @foreach($recentActivity->take(8) as $activity)
+                                @php
+                                    $stageColors = [
+                                        'qualified' => 'success',
+                                        'new_lead' => 'primary',
+                                        'in_progress' => 'info',
+                                        'not_qualified' => 'warning',
+                                        'junk' => 'danger'
+                                    ];
+                                    $stageColor = $stageColors[$activity->stage] ?? 'secondary';
+                                @endphp
+                                <div class="activity-item">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="item-title flex-grow-1">
+                                            <a href="{{ route('admin.leads.show', $activity) }}">
+                                                <i class="bi bi-person me-2"></i>{{ $activity->name }}
+                                            </a>
+                                        </div>
+                                    <span class="badge activity-badge" style="background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%); color: white;">
+                                            {{ ucfirst(str_replace('_', ' ', $activity->stage)) }}
+                                        </span>
+                                    </div>
+                                    <div class="item-description">
+                                        <i class="bi bi-building me-2"></i>{{ $activity->company ?? 'No Company' }}
+                                    </div>
+                                    <div class="item-meta">
+                                        <div class="item-meta-item">
+                                            <i class="bi bi-clock"></i>
+                                            <span>{{ $activity->created_at->diffForHumans() }}</span>
+                                        </div>
+                                        @if($activity->assignedStaff)
+                                            <div class="item-meta-item">
+                                                <i class="bi bi-person"></i>
+                                                <span>{{ $activity->assignedStaff->name }}</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                    @else
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-inbox"></i>
                             </div>
-                            <div class="alert alert-success">
-                                <i class="bi bi-check-circle me-2"></i>
-                                <strong>Spatie Laravel Permission</strong> is properly configured and working!
-                            </div>
+                            <p class="empty-state-text">No recent activity</p>
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
 @endsection
-

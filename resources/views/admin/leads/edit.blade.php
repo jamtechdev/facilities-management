@@ -19,25 +19,32 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
+        <div class="col-12">
+            <div class="form-card">
+                <div class="form-card-header">
+                    <h5><i class="bi bi-pencil-square me-2"></i>Edit Lead Information</h5>
+                </div>
+                <div class="form-card-body">
                     <form id="updateLeadForm" method="POST" action="{{ route('admin.leads.update', $lead) }}">
                         @csrf
                         @method('PUT')
 
-                        <div class="row g-3">
+                        <div class="row g-4">
                             <div class="col-md-6">
-                                <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $lead->name) }}" required>
+                                <label for="name" class="form-label">
+                                    <i class="bi bi-person me-1"></i>Name <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $lead->name) }}" placeholder="Enter full name" required>
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-md-6">
-                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $lead->email) }}" required>
+                                <label for="email" class="form-label">
+                                    <i class="bi bi-envelope me-1"></i>Email <span class="text-danger">*</span>
+                                </label>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $lead->email) }}" placeholder="example@email.com" required>
                                 @error('email')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -76,8 +83,17 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label for="source" class="form-label">Source</label>
-                                <input type="text" class="form-control @error('source') is-invalid @enderror" id="source" name="source" value="{{ old('source', $lead->source) }}" placeholder="Website, Campaign, Referral, etc.">
+                                <label for="source" class="form-label">
+                                    <i class="bi bi-funnel me-1"></i>Source
+                                </label>
+                                <select class="form-select @error('source') is-invalid @enderror" id="source" name="source">
+                                    <option value="">Select source</option>
+                                    <option value="Website" {{ old('source', $lead->source) == 'Website' ? 'selected' : '' }}>Website</option>
+                                    <option value="Referral" {{ old('source', $lead->source) == 'Referral' ? 'selected' : '' }}>Referral</option>
+                                    <option value="Cold Call" {{ old('source', $lead->source) == 'Cold Call' ? 'selected' : '' }}>Cold Call</option>
+                                    <option value="LinkedIn" {{ old('source', $lead->source) == 'LinkedIn' ? 'selected' : '' }}>LinkedIn</option>
+                                    <option value="Other" {{ old('source', $lead->source) == 'Other' ? 'selected' : '' }}>Other</option>
+                                </select>
                                 @error('source')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -121,12 +137,12 @@
                             </div>
                         </div>
 
-                        <div class="mt-4">
+                        <div class="form-actions">
                             <button type="submit" class="btn btn-primary" id="submitBtn">
                                 <i class="bi bi-check-circle me-2"></i>Update Lead
                             </button>
                             <a href="{{ route('admin.leads.show', $lead) }}" class="btn btn-outline-secondary">
-                                Cancel
+                                <i class="bi bi-x-circle me-2"></i>Cancel
                             </a>
                         </div>
                     </form>
@@ -138,57 +154,6 @@
 @endsection
 
 @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('updateLeadForm');
-        const submitBtn = document.getElementById('submitBtn');
-
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(form);
-            const submitBtnText = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
-
-            // Clear previous errors
-            document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-            document.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
-
-            axios.post(form.action, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'X-HTTP-Method-Override': 'PUT'
-                }
-            })
-            .then(function(response) {
-                if (response.data.success) {
-                    window.location.href = response.data.redirect;
-                }
-            })
-            .catch(function(error) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = submitBtnText;
-
-                if (error.response?.status === 422) {
-                    const errors = error.response.data.errors;
-                    Object.keys(errors).forEach(field => {
-                        const input = document.querySelector(`[name="${field}"]`);
-                        if (input) {
-                            input.classList.add('is-invalid');
-                            const errorDiv = document.createElement('div');
-                            errorDiv.className = 'invalid-feedback';
-                            errorDiv.textContent = errors[field][0];
-                            input.parentNode.appendChild(errorDiv);
-                        }
-                    });
-                } else {
-                    alert(error.response?.data?.message || 'Failed to update lead');
-                }
-            });
-        });
-    });
-</script>
+    @vite(['resources/js/forms.js'])
 @endpush
 

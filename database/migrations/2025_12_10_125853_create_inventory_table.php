@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('min_stock_level')->default(0);
             $table->string('unit')->default('piece'); // piece, liter, kg, etc.
             $table->decimal('unit_cost', 10, 2)->nullable();
-            $table->morphs('assigned_to'); // Polymorphic: can be assigned to Staff or Client
+            $table->nullableMorphs('assigned_to'); // Polymorphic: can be assigned to Staff or Client (nullable for unassigned items)
             $table->enum('status', ['available', 'assigned', 'used', 'returned'])->default('available');
             $table->text('notes')->nullable();
             $table->timestamps();

@@ -114,7 +114,23 @@ class ClientDataTable extends DataTable
                 'ordering' => true,
                 'info' => true,
                 'autoWidth' => false,
-                'responsive' => true,
+                'responsive' => [
+                    'details' => [
+                        'type' => 'column',
+                        'target' => -1
+                    ]
+                ],
+                'pageLength' => 25,
+                'lengthMenu' => [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                'scrollX' => true,
+                'scrollCollapse' => true,
+                'language' => [
+                    'emptyTable' => 'No clients found',
+                    'zeroRecords' => 'No matching clients found',
+                    'info' => 'Showing _START_ to _END_ of _TOTAL_ clients',
+                    'infoEmpty' => 'Showing 0 to 0 of 0 clients',
+                    'infoFiltered' => '(filtered from _MAX_ total clients)',
+                ],
             ]);
     }
 
