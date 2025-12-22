@@ -134,7 +134,7 @@ class LeadController extends Controller
     public function convertToClient(Request $request, Lead $lead): JsonResponse
     {
         $user = auth()->user();
-        
+
         // Check permission - SuperAdmin or user with 'convert leads' permission
         if (!$user->hasRole('SuperAdmin') && !$user->can('convert leads')) {
             return response()->json([

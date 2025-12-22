@@ -50,7 +50,7 @@
                     @endif
                     @if($item->assignedTo)
                     <div class="mb-2">
-                        <strong>Assigned To:</strong> 
+                        <strong>Assigned To:</strong>
                         @if($item->assigned_to_type === 'App\Models\Staff')
                             Staff: {{ $item->assignedTo->name }}
                         @else

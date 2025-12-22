@@ -34,25 +34,60 @@ class UserDataTable extends DataTable
                 }
                 return new HtmlString($rolesHtml ?: '<span class="text-muted">No roles</span>');
             })
+            // ->addColumn('action', function (User $user) {
+            //     return '<div class="dropdown">
+            //                 <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            //                     <i class="bi bi-three-dots-vertical"></i>
+            //                 </button>
+            //                 <div class="dropdown-menu">
+            //                     <a class="dropdown-item view-user" href="' . route('admin.users.show', $user->id) . '" data-id="' . $user->id . '" data-bs-toggle="modal" data-bs-target="#viewUserModal">
+            //                         <i class="bi bi-eye me-1"></i> View
+            //                     </a>
+            //                     <a class="dropdown-item" href="' . route('admin.users.edit', $user->id) . '" data-id="' . $user->id . '">
+            //                         <i class="bi bi-pencil me-1"></i> Edit
+            //                     </a>
+            //                     <div class="dropdown-divider"></div>
+            //                     <a class="dropdown-item text-danger delete-user" href="' . route('admin.users.destroy', $user->id) . '" data-id="' . $user->id . '">
+            //                         <i class="bi bi-trash me-1"></i> Delete
+            //                     </a>
+            //                 </div>
+            //             </div>';
+            // })
             ->addColumn('action', function (User $user) {
-                return '<div class="dropdown">
-                            <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-three-dots-vertical"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item view-user" href="#" data-id="' . $user->id . '" data-bs-toggle="modal" data-bs-target="#viewUserModal">
-                                    <i class="bi bi-eye me-1"></i> View
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    <i class="bi bi-pencil me-1"></i> Edit
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-danger delete-user" href="#" data-id="' . $user->id . '">
-                                    <i class="bi bi-trash me-1"></i> Delete
-                                </a>
-                            </div>
-                        </div>';
+                $currentUser = auth()->user();
+                $canEditDelete = true;
+
+                if ($currentUser->hasRole('Admin')) {
+                    // Admin cannot edit/delete SuperAdmin or self
+                    if ($user->hasRole('SuperAdmin') || $user->id === $currentUser->id) {
+                        $canEditDelete = false;
+                    }
+                }
+
+                $actions = '<div class="dropdown">
+        <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+            <i class="bi bi-three-dots-vertical"></i>
+        </button>
+        <div class="dropdown-menu">
+            <a class="dropdown-item view-user" href="' . route('admin.users.show', $user->id) . '" data-id="' . $user->id . '" data-bs-toggle="modal" data-bs-target="#viewUserModal">
+                <i class="bi bi-eye me-1"></i> View
+            </a>';
+
+                if ($canEditDelete) {
+                    $actions .= '<a class="dropdown-item" href="' . route('admin.users.edit', $user->id) . '">
+                        <i class="bi bi-pencil me-1"></i> Edit
+                     </a>
+                     <a class="dropdown-item text-danger delete-user" href="' . route('admin.users.destroy', $user->id) . '">
+                        <i class="bi bi-trash me-1"></i> Delete
+                     </a>';
+                }
+
+                $actions .= '</div></div>';
+
+                return $actions;
             })
+
+
             ->addColumn('created_at', function (User $user): HtmlString|string {
                 if ($user->created_at === null) {
                     return 'n/A';
@@ -77,6 +112,14 @@ class UserDataTable extends DataTable
     public function query(User $model): QueryBuilder
     {
         return $model->newQuery()->with('roles');
+
+        if (auth()->user()->hasRole('Admin')) {
+            $query->whereDoesntHave('roles', function ($q) {
+                $q->where('name', 'SuperAdmin');
+            });
+        }
+
+        return $query;
     }
 
     /**
@@ -117,7 +160,7 @@ class UserDataTable extends DataTable
                     [5, 10, 25, 50, -1],
                     ['5', '10', '25', '50', 'Show all']
                 ],
-                'scrollY' => '50vh',
+                'scrollY' => true,
                 'scrollX' => true,
                 'scrollCollapse' => true,
                 'responsive' => [
@@ -212,4 +255,3 @@ class UserDataTable extends DataTable
         return 'Users_' . date('YmdHis');
     }
 }
-
