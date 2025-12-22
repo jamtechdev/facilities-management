@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ProfileController;
 
 // Root route - redirect to login
 Route::get('/', function () {
@@ -65,6 +66,11 @@ Route::middleware(['auth', 'role.staff'])->prefix('staff')->name('staff.')->grou
 // Client routes (Client role only)
 Route::middleware(['auth', 'role.client'])->prefix('client')->name('client.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Client\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [\App\Http\Controllers\Client\ProfileController::class, 'index'])->name('profile');
+    Route::put('/profile', [\App\Http\Controllers\Client\ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/documents', [\App\Http\Controllers\Client\ProfileController::class, 'uploadDocument'])->name('profile.documents.store');
+    Route::get('/profile/documents/{document}/download', [\App\Http\Controllers\Client\ProfileController::class, 'downloadDocument'])->name('profile.documents.download');
+    Route::delete('/profile/documents/{document}', [\App\Http\Controllers\Client\ProfileController::class, 'destroyDocument'])->name('profile.documents.destroy');
 });
 
 // Lead routes (Lead role only)
@@ -90,7 +96,7 @@ Route::middleware(['auth', 'role.admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/profile/documents', [\App\Http\Controllers\Admin\ProfileController::class, 'uploadDocument'])->name('profile.documents.store');
     Route::delete('/profile/documents/{document}', [\App\Http\Controllers\Admin\ProfileController::class, 'deleteDocument'])->name('profile.documents.destroy');
     Route::get('/profile/documents/{document}/download', [\App\Http\Controllers\Admin\ProfileController::class, 'downloadDocument'])->name('profile.documents.download');
-    Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->only(['index', 'create', 'show']);
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
     Route::resource('leads', \App\Http\Controllers\Admin\LeadController::class);
     Route::post('leads/{lead}/convert', [\App\Http\Controllers\Admin\LeadController::class, 'convertToClient'])->name('leads.convert');
     Route::resource('clients', \App\Http\Controllers\Admin\ClientController::class);

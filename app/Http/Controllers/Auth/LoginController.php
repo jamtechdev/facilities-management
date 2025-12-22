@@ -35,15 +35,15 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $user = Auth::user();
-            
+
             // Only allow Admin, SuperAdmin, and Staff to login
-            if (!$user->hasAnyRole(['Admin', 'SuperAdmin', 'Staff'])) {
+            if (!$user->hasAnyRole(['Admin', 'SuperAdmin', 'Staff', 'Client'])) {
                 Auth::logout();
                 throw ValidationException::withMessages([
                     'email' => ['Your account does not have permission to access this system. Only Admin and Staff can login.'],
                 ]);
             }
-            
+
             $request->session()->regenerate();
             return $this->redirectToDashboard();
         }
@@ -77,6 +77,10 @@ class LoginController extends Controller
 
         if ($user->hasRole('Staff')) {
             return redirect()->route('staff.dashboard');
+        }
+
+        if ($user->hasRole('Client')) {
+            return redirect()->route('client.dashboard');
         }
 
         // If user somehow doesn't have allowed role, logout and redirect to login

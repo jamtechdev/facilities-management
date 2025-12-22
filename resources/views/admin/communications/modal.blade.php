@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('addCommunicationForm');
     const typeSelect = document.getElementById('communication_type');
     const emailToField = document.getElementById('email_to_field');
-    
+
     // Show/hide email field based on type
     typeSelect.addEventListener('change', function() {
         if (this.value === 'email') {
@@ -62,17 +62,17 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('email_to').required = false;
         }
     });
-    
+
     if (form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const formData = new FormData(form);
             const submitBtn = form.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
-            
+
             axios.post('{{ route("admin.communications.store") }}', formData, {
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content

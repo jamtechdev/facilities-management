@@ -14,13 +14,13 @@ document.addEventListener('DOMContentLoaded', function() {
 function initFormSubmissions() {
     // Handle create forms
     const createForms = document.querySelectorAll('form[id$="Form"]');
-    
+
     createForms.forEach(form => {
         const submitBtn = form.querySelector('button[type="submit"]');
-        
+
         if (submitBtn && !form.dataset.initialized) {
             form.dataset.initialized = 'true';
-            
+
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 handleFormSubmit(form, submitBtn);
@@ -37,19 +37,19 @@ function handleFormSubmit(form, submitBtn) {
     const submitBtnText = submitBtn.innerHTML;
     const method = form.method.toUpperCase();
     const action = form.action;
-    
+
     // Disable submit button
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
-    
+
     // Clear previous validation errors
     clearValidationErrors(form);
-    
+
     // Determine HTTP method override
     const headers = {
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
     };
-    
+
     if (method === 'POST' && form.querySelector('input[name="_method"]')) {
         headers['X-HTTP-Method-Override'] = form.querySelector('input[name="_method"]').value;
         headers['Content-Type'] = 'multipart/form-data';
@@ -57,7 +57,7 @@ function handleFormSubmit(form, submitBtn) {
         headers['X-HTTP-Method-Override'] = method;
         headers['Content-Type'] = 'multipart/form-data';
     }
-    
+
     // Make AJAX request
     axios.post(action, formData, { headers })
         .then(function(response) {
@@ -74,12 +74,12 @@ function handleFormSubmit(form, submitBtn) {
             // Re-enable submit button
             submitBtn.disabled = false;
             submitBtn.innerHTML = submitBtnText;
-            
+
             // Handle validation errors
             if (error.response?.status === 422) {
                 displayValidationErrors(error.response.data.errors, form);
             } else {
-                alert(error.response?.data?.message || 'An error occurred. Please try again.');
+                //  alert(error.response?.data?.message || 'An error occurred. Please try again.');
             }
         });
 }
@@ -121,7 +121,7 @@ function initDeleteConfirmations() {
             e.preventDefault();
             const url = btn.getAttribute('data-delete-url');
             const message = btn.getAttribute('data-delete-message') || 'Are you sure you want to delete this item?';
-            
+
             if (confirm(message)) {
                 axios.delete(url, {
                     headers: {

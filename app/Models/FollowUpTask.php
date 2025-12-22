@@ -24,6 +24,7 @@ class FollowUpTask extends Model
         'due_date' => 'datetime',
         'completed_at' => 'datetime',
         'is_completed' => 'boolean',
+        'reminder_day' => 'string',
     ];
 
     // Reminder day constants

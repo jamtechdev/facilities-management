@@ -24,7 +24,7 @@ class StaffDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->setRowId('id')
             ->addColumn('status_badge', function (Staff $staff) {
-                $badge = $staff->is_active 
+                $badge = $staff->is_active
                     ? '<span class="badge bg-success">Active</span>'
                     : '<span class="badge bg-secondary">Inactive</span>';
                 return new HtmlString($badge);

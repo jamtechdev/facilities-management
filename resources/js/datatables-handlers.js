@@ -19,10 +19,10 @@
             // Generic delete handler for all DataTables
             $(document).on('click', '.delete-lead, .delete-client, .delete-staff, .delete-invoice', function(e) {
                 e.preventDefault();
-                
+
                 const $button = $(this);
                 let entityType, url;
-                
+
                 if ($button.hasClass('delete-lead')) {
                     entityType = 'lead';
                     url = `/admin/leads/${$button.data('id')}`;
@@ -38,13 +38,13 @@
                 } else {
                     return; // Unknown entity type
                 }
-                
+
                 const entityId = $button.data('id');
                 const entityName = $button.closest('tr').find('td:first').text().trim() || entityType;
                 const tableId = $button.closest('.dataTables_wrapper').find('table').attr('id');
-                
+
                 if (confirm(`Are you sure you want to delete ${entityType}: ${entityName}?`)) {
-                    
+
                     axios.delete(url, {
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

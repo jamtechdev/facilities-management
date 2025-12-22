@@ -18,14 +18,14 @@ class LeadService
     {
         return DB::transaction(function() use ($data) {
             $lead = Lead::create($data);
-            
+
             // Create automated follow-up tasks (30/60/90 days)
             $this->createFollowUpTasks($lead);
-            
+
             return $lead;
         });
     }
-    
+
     /**
      * Create automated follow-up tasks for a lead
      */
@@ -36,8 +36,9 @@ class LeadService
             FollowUpTask::DAY_60 => 'Send helpful content or schedule a 10-minute discovery call',
             FollowUpTask::DAY_90 => 'Send helpful content or schedule a 10-minute discovery call',
         ];
-        
+
         foreach ($reminderDays as $day => $suggestion) {
+
             FollowUpTask::create([
                 'lead_id' => $lead->id,
                 'reminder_day' => $day,
