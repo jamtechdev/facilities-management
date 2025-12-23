@@ -3,7 +3,7 @@
 @section('title', 'My Profile')
 
 @push('styles')
-    @vite(['resources/css/profile.css'])
+    @vite(['resources/css/utilities.css', 'resources/css/profile.css'])
 @endpush
 
 @section('content')
@@ -12,10 +12,10 @@
     <div class="profile-header">
         <div class="profile-header-content">
             <div class="profile-avatar">
-                {{ strtoupper(substr($user->name, 0, 1)) }}
+                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
             </div>
             <div class="profile-info">
-                <h1>{{ $user->name }}</h1>
+                <h1>{{ auth()->user()->name }}</h1>
                 <p>Update your personal information and manage your documents</p>
             </div>
         </div>
@@ -47,14 +47,15 @@
                         <div class="profile-card-body">
                             <form id="profileForm" class="profile-form">
                                 @csrf
+                                @method('PUT')
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label for="name" class="form-label">Name</label>
-                                        <input type="text" class="form-control" id="name" name="name" value="{{ $user->name }}" required>
+                                        <input type="text" class="form-control" id="name" name="name" value="{{ auth()->user()->name }}" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="email" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="email" name="email" value="{{ $user->email }}" required>
+                                        <input type="email" class="form-control" id="email" name="email" value="{{ auth()->user()->email }}" required>
                                     </div>
                                     <div class="col-12">
                                         <hr>
@@ -89,19 +90,13 @@
                             <div class="account-details-item">
                                 <p class="account-details-label">Role</p>
                                 <p class="account-details-value">
-                                    @if($user->hasRole('SuperAdmin'))
-                                        <span class="status-badge active">Super Admin</span>
-                                    @elseif($user->hasRole('Admin'))
-                                        <span class="status-badge active">Admin</span>
-                                    @else
-                                        <span class="status-badge inactive">User</span>
-                                    @endif
+                                    <span class="status-badge active">Admin</span>
                                 </p>
                             </div>
                             <div class="account-details-item">
                                 <p class="account-details-label">Email Verified</p>
                                 <p class="account-details-value">
-                                    @if($user->email_verified_at)
+                                    @if(auth()->user()->email_verified_at)
                                         <span class="status-badge active">Verified</span>
                                     @else
                                         <span class="status-badge inactive">Not Verified</span>
@@ -110,7 +105,7 @@
                             </div>
                             <div class="account-details-item">
                                 <p class="account-details-label">Member Since</p>
-                                <p class="account-details-value">{{ $user->created_at->format('M d, Y') }}</p>
+                                <p class="account-details-value">{{ auth()->user()->created_at->format('M d, Y') }}</p>
                             </div>
                         </div>
                     </div>
@@ -163,7 +158,7 @@
                     <div class="profile-card">
                         <div class="profile-card-header">
                             <h5><i class="bi bi-folder"></i> Your Files</h5>
-                            <span class="badge" style="background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%); color: white;">{{ $documents->count() }} files</span>
+                            <span class="badge badge-gradient-green">{{ $documents->count() }} files</span>
                         </div>
                         <div class="profile-card-body">
                             @forelse($documents as $document)
@@ -186,7 +181,7 @@
                                 </div>
                             @empty
                                 <div class="text-center py-4">
-                                    <i class="bi bi-inbox" style="font-size: 3rem; color: #868e96;"></i>
+                                    <i class="bi bi-inbox empty-state-icon-large"></i>
                                     <p class="text-muted mt-3 mb-0">No documents uploaded yet.</p>
                                 </div>
                             @endforelse
@@ -200,14 +195,26 @@
 
 @push('scripts')
 <script>
-    document.getElementById('profileForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        const btn = this.querySelector('button[type="submit"]');
-        const originalText = btn.innerHTML;
+    (function() {
+        let isSubmitting = false;
+        const profileForm = document.getElementById('profileForm');
         
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+        if (!profileForm) return;
+        
+        profileForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (isSubmitting) {
+                return;
+            }
+            
+            isSubmitting = true;
+            const formData = new FormData(this);
+            const btn = this.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
 
         try {
             const response = await fetch('{{ route("admin.profile.update") }}', {
@@ -219,30 +226,34 @@
                 }
             });
 
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const data = await response.json();
 
             if (data.success) {
-                showAlert('success', data.message);
+                if (typeof showToast !== 'undefined') {
+                    showToast('success', data.message);
+                }
             } else {
-                showAlert('danger', data.message);
+                if (typeof showToast !== 'undefined') {
+                    showToast('error', data.message || 'Failed to update profile');
+                }
             }
         } catch (error) {
-            showAlert('danger', 'Failed to update profile: ' + error.message);
+            if (typeof showToast !== 'undefined') {
+                showToast('error', 'Failed to update profile: ' + (error.message || 'Unknown error'));
+            }
         } finally {
+            isSubmitting = false;
             btn.disabled = false;
             btn.innerHTML = originalText;
         }
     });
+    })();
 
-    function showAlert(type, message) {
-        const alertContainer = document.getElementById('alert-container');
-        alertContainer.innerHTML = `
-            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        `;
-    }
+    // Use global showToast function (defined in app.js)
 
     const documentForm = document.getElementById('documentUploadForm');
     if (documentForm) {
@@ -264,15 +275,25 @@
                     }
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
                 if (data.success) {
-                    showAlert('success', data.message);
+                    if (typeof showToast !== 'undefined') {
+                    showToast('success', data.message);
+                }
                     setTimeout(() => location.reload(), 1000);
                 } else {
-                    showAlert('danger', data.message);
+                    if (typeof showToast !== 'undefined') {
+                        showToast('error', data.message || 'Failed to upload document');
+                    }
                 }
             } catch (error) {
-                showAlert('danger', 'Failed to upload document: ' + error.message);
+                if (typeof showToast !== 'undefined') {
+                    showToast('error', 'Failed to upload document: ' + (error.message || 'Unknown error'));
+                }
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalText;
@@ -298,13 +319,19 @@
                 });
                 const data = await response.json();
                 if (data.success) {
-                    showAlert('success', data.message);
+                    if (typeof showToast !== 'undefined') {
+                    showToast('success', data.message);
+                }
                     setTimeout(() => location.reload(), 500);
                 } else {
-                    showAlert('danger', data.message);
+                    if (typeof showToast !== 'undefined') {
+                    showToast('error', data.message);
+                }
                 }
             } catch (error) {
-                showAlert('danger', 'Failed to delete document: ' + error.message);
+                if (typeof showToast !== 'undefined') {
+                    showToast('error', 'Failed to delete document: ' + error.message);
+                }
             }
         });
     });

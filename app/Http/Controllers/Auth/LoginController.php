@@ -36,11 +36,14 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $user = Auth::user();
 
-            // Only allow Admin, SuperAdmin, and Staff to login
-            if (!$user->hasAnyRole(['Admin', 'SuperAdmin', 'Staff', 'Client'])) {
+            // Check if user has at least one dashboard permission
+            if (!$user->can('view admin dashboard') && 
+                !$user->can('view staff dashboard') && 
+                !$user->can('view client dashboard') && 
+                !$user->can('view lead dashboard')) {
                 Auth::logout();
                 throw ValidationException::withMessages([
-                    'email' => ['Your account does not have permission to access this system. Only Admin and Staff can login.'],
+                    'email' => ['Your account does not have permission to access this system.'],
                 ]);
             }
 
@@ -65,25 +68,34 @@ class LoginController extends Controller
     }
 
     /**
-     * Redirect user to their appropriate dashboard.
+     * Redirect user to their appropriate dashboard based on role.
      */
     protected function redirectToDashboard()
     {
         $user = auth()->user();
 
-        if ($user->hasAnyRole(['Admin', 'SuperAdmin'])) {
+        // Redirect based on dashboard permissions (priority order)
+        if ($user->can('view admin dashboard')) {
+            // Check if user can access superadmin features
+            if ($user->can('view roles')) {
+                return redirect()->route('superadmin.dashboard');
+            }
             return redirect()->route('admin.dashboard');
         }
 
-        if ($user->hasRole('Staff')) {
+        if ($user->can('view staff dashboard')) {
             return redirect()->route('staff.dashboard');
         }
 
-        if ($user->hasRole('Client')) {
+        if ($user->can('view client dashboard')) {
             return redirect()->route('client.dashboard');
         }
 
-        // If user somehow doesn't have allowed role, logout and redirect to login
+        if ($user->can('view lead dashboard')) {
+            return redirect()->route('lead.dashboard');
+        }
+
+        // If user somehow doesn't have any dashboard permission, logout and redirect to login
         Auth::logout();
         return redirect()->route('login')->with('error', 'You do not have permission to access this system.');
     }

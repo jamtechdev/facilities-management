@@ -4,9 +4,9 @@
 ])
 
 @php
-    // Check if user can convert leads - SuperAdmin or user with 'convert leads' permission
+    // Check if user can convert leads - Admin or user with 'convert leads' permission
     $user = auth()->user();
-    $hasConvertPermission = $user->hasRole('SuperAdmin') || $user->can('convert leads');
+    $hasConvertPermission = $user->hasRole('Admin') || $user->can('convert leads');
     $canConvertLead = $hasConvertPermission && $canConvert && !$lead->converted_to_client_id && $lead->stage == 'qualified';
 @endphp
 

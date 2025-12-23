@@ -23,13 +23,11 @@ class UserDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->setRowId('id')
-            ->editColumn('checkbox', function (User $user) {
-                return new HtmlString('<input type="checkbox" name="selected_user[]" class="row-checkbox" value="' . $user->id . '" />');
-            })
+            ->addIndexColumn()
             ->addColumn('roles', function (User $user) {
                 $rolesHtml = '';
                 foreach ($user->roles as $role) {
-                    $badgeClass = $role->name === 'Admin' ? 'danger' : 'primary';
+                $badgeClass = $role->name === 'SuperAdmin' ? 'danger' : 'primary';
                     $rolesHtml .= '<span class="badge bg-' . $badgeClass . ' me-1">' . $role->name . '</span>';
                 }
                 return new HtmlString($rolesHtml ?: '<span class="text-muted">No roles</span>');
@@ -54,53 +52,45 @@ class UserDataTable extends DataTable
             //             </div>';
             // })
             ->addColumn('action', function (User $user) {
-                $currentUser = auth()->user();
-                $canEditDelete = true;
+            $currentUser = auth()->user();
+            $actions = '<div class="btn-group btn-group-sm" role="group">';
 
-                if ($currentUser->hasRole('Admin')) {
-                    // Admin cannot edit/delete SuperAdmin or self
-                    if ($user->hasRole('SuperAdmin') || $user->id === $currentUser->id) {
-                        $canEditDelete = false;
-                    }
-                }
+            // View button - requires view user details permission
+            if ($currentUser->can('view user details')) {
+                $actions .= '<a href="' . route('admin.users.show', $user->id) . '" class="btn btn-outline-primary view-user" data-id="' . $user->id . '" data-bs-toggle="modal" data-bs-target="#viewUserModal" title="View">
+                        <i class="bi bi-eye"></i>
+                    </a>';
+            }
 
-                $actions = '<div class="dropdown">
-        <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown">
-            <i class="bi bi-three-dots-vertical"></i>
-        </button>
-        <div class="dropdown-menu">
-            <a class="dropdown-item view-user" href="' . route('admin.users.show', $user->id) . '" data-id="' . $user->id . '" data-bs-toggle="modal" data-bs-target="#viewUserModal">
-                <i class="bi bi-eye me-1"></i> View
-            </a>';
+            // Edit button
+            if ($currentUser->can('edit users') && $user->id !== $currentUser->id) {
+                $actions .= '<a href="' . route('admin.users.edit', $user->id) . '" class="btn btn-outline-secondary" title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </a>';
+            }
 
-                if ($canEditDelete) {
-                    $actions .= '<a class="dropdown-item" href="' . route('admin.users.edit', $user->id) . '">
-                        <i class="bi bi-pencil me-1"></i> Edit
-                     </a>
-                     <a class="dropdown-item text-danger delete-user" href="' . route('admin.users.destroy', $user->id) . '">
-                        <i class="bi bi-trash me-1"></i> Delete
-                     </a>';
-                }
+            // Delete button
+            if ($currentUser->can('delete users') && $user->id !== $currentUser->id) {
+                $actions .= '<button type="button" class="btn btn-outline-danger delete-user" data-id="' . $user->id . '" title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </button>';
+            }
 
-                $actions .= '</div></div>';
-
-                return $actions;
+            $actions .= '</div>';
+            
+            // If no actions available, return a dash
+            if (strlen($actions) <= strlen('<div class="btn-group btn-group-sm" role="group"></div>')) {
+                return new HtmlString('<span class="text-muted">-</span>');
+            }
+            
+            return new HtmlString($actions);
             })
 
 
-            ->addColumn('created_at', function (User $user): HtmlString|string {
-                if ($user->created_at === null) {
-                    return 'n/A';
-                }
-                $dates = 'Created: ' . $user->created_at->diffForHumans() . '<br><hr/>';
-                if ($user->updated_at === null) {
-                    $dates .= 'Updated: n/A';
-                } else {
-                    $dates .= 'Updated: ' . $user->updated_at->diffForHumans();
-                }
-                return new HtmlString($dates);
+            ->editColumn('created_at', function (User $user) {
+                return $user->created_at ? $user->created_at->diffForHumans() : 'N/A';
             })
-            ->rawColumns(['checkbox', 'roles', 'action', 'created_at']);
+            ->rawColumns(['roles', 'action']);
     }
 
     /**
@@ -111,14 +101,7 @@ class UserDataTable extends DataTable
      */
     public function query(User $model): QueryBuilder
     {
-        return $model->newQuery()->with('roles');
-
-        if (auth()->user()->hasRole('Admin')) {
-            $query->whereDoesntHave('roles', function ($q) {
-                $q->where('name', 'SuperAdmin');
-            });
-        }
-
+        $query = $model->newQuery()->with('roles');
         return $query;
     }
 
@@ -133,83 +116,47 @@ class UserDataTable extends DataTable
             ->setTableId('users-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
-            ->dom('
-                <"row"<"col-md-6 d-flex justify-content-start"f><"col-sm-12 col-md-6 d-flex align-items-center justify-content-end"lB>>
-                <"row"<"col-md-12"tr>>
-                <"row"<"col-md-6"i><"col-md-6"p>>
-            ')
             ->orderBy(1)
-            ->language([
-                "search" => "",
-                "lengthMenu" => "_MENU_",
-                "searchPlaceholder" => 'Search Users'
-            ])
-            ->buttons(
-                Button::make()
+            ->buttons(array_filter([
+                auth()->user()->can('create users') ? Button::make()
                     ->className('btn btn-primary')
                     ->text('<i class="bi bi-plus-circle"></i> New User')
                     ->action('function(e, dt, node, config) {
                         let url = "' . route('admin.users.create') . '";
                         console.log("Button clicked. Redirecting to: " + url);
                         window.location.href = url;
-                    }'),
-            )
+                    }') : null,
+        ]))
             ->parameters([
                 'paging' => true,
+            'searching' => true,
+            'ordering' => true,
+            'info' => true,
+            'autoWidth' => false,
+            'responsive' => true,
                 'lengthMenu' => [
                     [5, 10, 25, 50, -1],
                     ['5', '10', '25', '50', 'Show all']
                 ],
-                'scrollY' => true,
+            'pageLength' => 10,
                 'scrollX' => true,
-                'scrollCollapse' => true,
-                'responsive' => [
-                    'details' => [
-                        'type' => 'column',
-                        'target' => -1
-                    ]
-                ],
+            'scrollCollapse' => true,
                 'language' => [
                     'emptyTable' => 'No users found',
                     'zeroRecords' => 'No matching users found',
                     'info' => 'Showing _START_ to _END_ of _TOTAL_ users',
                     'infoEmpty' => 'Showing 0 to 0 of 0 users',
                     'infoFiltered' => '(filtered from _MAX_ total users)',
+                'search' => '',
+                'searchPlaceholder' => 'Search users...',
+                'lengthMenu' => 'Show _MENU_ entries',
+                'paginate' => [
+                    'first' => 'First',
+                    'last' => 'Last',
+                    'next' => 'Next',
+                    'previous' => 'Previous'
+                ]
                 ],
-                'initComplete' => 'function () {
-                    var selectedIds = [];
-                    function logSelectedIds() {
-                        console.log(selectedIds);
-                    }
-                    $("#check-all").on("change", function () {
-                        var isChecked = $(this).prop("checked");
-                        $(".row-checkbox").prop("checked", isChecked);
-                        if (isChecked) {
-                            selectedIds = [];
-                            $(".row-checkbox:checked").each(function() {
-                                selectedIds.push($(this).val());
-                            });
-                        } else {
-                            selectedIds = [];
-                        }
-                        logSelectedIds();
-                    });
-                    $(document).on("change", ".row-checkbox", function () {
-                        var isChecked = $(this).prop("checked");
-                        var rowId = $(this).val();
-                        if (isChecked) {
-                            selectedIds.push(rowId);
-                        } else {
-                            var index = selectedIds.indexOf(rowId);
-                            if (index !== -1) {
-                                selectedIds.splice(index, 1);
-                            }
-                        }
-                        logSelectedIds();
-                        var allChecked = $(".row-checkbox:checked").length === $(".row-checkbox").length;
-                        $("#check-all").prop("checked", allChecked);
-                    });
-                }',
             ]);
     }
 
@@ -221,13 +168,8 @@ class UserDataTable extends DataTable
     public function getColumns(): array
     {
         return [
+            Column::make('DT_RowIndex')->title('SR No')->orderable(false)->searchable(false)->width(60)->addClass('text-center'),
             Column::make('id')->visible(false)->style('width:200px'),
-            Column::make('checkbox')
-                ->title('<input type="checkbox" id="check-all"/>')
-                ->orderable(false)
-                ->searchable(false)
-                ->width(10)
-                ->style('width:50px'),
             Column::make('name')->title('Name')->style('width:200px'),
             Column::make('email')->title('Email')->style('width:200px'),
             Column::make('roles')
@@ -235,13 +177,12 @@ class UserDataTable extends DataTable
                 ->orderable(false)
                 ->searchable(false)
                 ->style('width:150px'),
-            Column::make('created_at')->title('Created At')->style('width:200px'),
+            Column::make('created_at')->title('Created')->width('10%'),
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)
-                ->width(60)
-                ->addClass('text-center')
-                ->style('width:100px'),
+                ->width(100)
+                ->addClass('text-center'),
         ];
     }
 

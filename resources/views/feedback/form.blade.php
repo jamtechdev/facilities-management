@@ -116,14 +116,20 @@
                     }
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
 
                 if (data.success) {
-                    document.getElementById('alert-container').innerHTML = 
-                        '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
-                        '<i class="bi bi-check-circle me-2"></i>' + data.message +
-                        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
-                        '</div>';
+                    if (typeof showToast !== 'undefined') {
+                        showToast('success', data.message);
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.success(data.message);
+                    } else {
+                        alert(data.message);
+                    }
                     this.reset();
                     document.querySelectorAll('.rating-star').forEach(s => {
                         s.innerHTML = '<i class="bi bi-star"></i>';
@@ -132,11 +138,13 @@
                     throw new Error(data.message || 'Failed to submit feedback');
                 }
             } catch (error) {
-                document.getElementById('alert-container').innerHTML = 
-                    '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
-                    '<i class="bi bi-exclamation-triangle me-2"></i>' + error.message +
-                    '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
-                    '</div>';
+                if (typeof showToast !== 'undefined') {
+                    showToast('error', error.message || 'Failed to submit feedback');
+                } else if (typeof toastr !== 'undefined') {
+                    toastr.error(error.message || 'Failed to submit feedback');
+                } else {
+                    alert(error.message || 'Failed to submit feedback');
+                }
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;

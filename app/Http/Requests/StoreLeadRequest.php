@@ -12,7 +12,20 @@ class StoreLeadRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user()->hasRole('Admin');
+        return auth()->check() && auth()->user()->can('create leads');
+    }
+
+    /**
+     * Handle a failed authorization attempt.
+     */
+    protected function failedAuthorization()
+    {
+        throw new \Illuminate\Http\Exceptions\HttpResponseException(
+            response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to create leads. Please contact your administrator if you need this access.'
+            ], 403)
+        );
     }
 
     /**

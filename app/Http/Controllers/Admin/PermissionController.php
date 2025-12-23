@@ -20,7 +20,7 @@ class PermissionController extends Controller
             return $parts[0] ?? 'other';
         });
         
-        return view('admin.permissions.index', compact('permissions'));
+        return view('superadmin.permissions.index', compact('permissions'));
     }
 
     /**

@@ -3,33 +3,34 @@
 @endphp
 
 <nav class="sidebar-nav">
-    @if ($user->hasAnyRole(['Admin', 'SuperAdmin']))
+    @if ($user->hasAnyRole(['SuperAdmin', 'Admin']))
         <div class="nav-section">
             <div class="nav-section-title">Main</div>
             @can('view admin dashboard')
                 <div class="nav-item-modern">
-                    <a class="nav-link-modern {{ request()->routeIs('admin.dashboard') || request()->routeIs('superadmin.dashboard') ? 'active' : '' }}"
-                        href="{{ $user->hasRole('SuperAdmin') ? route('superadmin.dashboard') : route('admin.dashboard') }}">
+                    <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('dashboard') ? 'active' : '' }}"
+                        href="{{ \App\Helpers\RouteHelper::url('dashboard') }}">
                         <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
                         <span class="nav-text">Dashboard</span>
                     </a>
                 </div>
             @endcan
             <div class="nav-item-modern">
-                <a class="nav-link-modern {{ request()->routeIs('admin.profile*') || request()->routeIs('superadmin.profile*') ? 'active' : '' }}"
-                    href="{{ $user->hasRole('SuperAdmin') ? route('superadmin.profile') : route('admin.profile') }}">
-                    <span class="nav-icon"><i class="bi bi-person"></i></span>
-                    <span class="nav-text">Profile</span>
+                <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('settings') ? 'active' : '' }}"
+                    href="{{ \App\Helpers\RouteHelper::url('settings') }}">
+                    <span class="nav-icon"><i class="bi bi-gear"></i></span>
+                    <span class="nav-text">Settings</span>
                 </a>
             </div>
         </div>
 
+        @if($user->can('view leads') || $user->can('view clients') || $user->can('view staff'))
         <div class="nav-section">
             <div class="nav-section-title">Business</div>
             @can('view leads')
                 <div class="nav-item-modern">
-                    <a class="nav-link-modern {{ request()->routeIs('admin.leads.*') ? 'active' : '' }}"
-                        href="{{ route('admin.leads.index') }}">
+                    <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('leads.*') ? 'active' : '' }}"
+                        href="{{ \App\Helpers\RouteHelper::url('leads.index') }}">
                         <span class="nav-icon"><i class="bi bi-person-lines-fill"></i></span>
                         <span class="nav-text">Leads</span>
                     </a>
@@ -38,8 +39,8 @@
 
             @can('view clients')
                 <div class="nav-item-modern">
-                    <a class="nav-link-modern {{ request()->routeIs('admin.clients.*') ? 'active' : '' }}"
-                        href="{{ route('admin.clients.index') }}">
+                    <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('clients.*') ? 'active' : '' }}"
+                        href="{{ \App\Helpers\RouteHelper::url('clients.index') }}">
                         <span class="nav-icon"><i class="bi bi-building"></i></span>
                         <span class="nav-text">Clients</span>
                     </a>
@@ -48,21 +49,23 @@
 
             @can('view staff')
                 <div class="nav-item-modern">
-                    <a class="nav-link-modern {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}"
-                        href="{{ route('admin.staff.index') }}">
+                    <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('staff.*') ? 'active' : '' }}"
+                        href="{{ \App\Helpers\RouteHelper::url('staff.index') }}">
                         <span class="nav-icon"><i class="bi bi-people"></i></span>
                         <span class="nav-text">Staff</span>
                     </a>
                 </div>
             @endcan
         </div>
+        @endif
 
+        @if($user->can('view invoices') || $user->can('view payouts'))
         <div class="nav-section">
             <div class="nav-section-title">Financial</div>
             @can('view invoices')
                 <div class="nav-item-modern">
-                    <a class="nav-link-modern {{ request()->routeIs('admin.invoices.*') ? 'active' : '' }}"
-                        href="{{ route('admin.invoices.index') }}">
+                    <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('invoices.*') ? 'active' : '' }}"
+                        href="{{ \App\Helpers\RouteHelper::url('invoices.index') }}">
                         <span class="nav-icon"><i class="bi bi-receipt"></i></span>
                         <span class="nav-text">Invoices</span>
                     </a>
@@ -71,34 +74,38 @@
 
             @can('view payouts')
                 <div class="nav-item-modern">
-                    <a class="nav-link-modern {{ request()->routeIs('admin.payouts.*') ? 'active' : '' }}"
-                        href="{{ route('admin.payouts.index') }}">
+                    <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('payouts.*') ? 'active' : '' }}"
+                        href="{{ \App\Helpers\RouteHelper::url('payouts.index') }}">
                         <span class="nav-icon"><i class="bi bi-cash-coin"></i></span>
                         <span class="nav-text">Payouts</span>
                     </a>
                 </div>
             @endcan
         </div>
+        @endif
 
+        @if($user->can('view inventory'))
         <div class="nav-section">
             <div class="nav-section-title">Operations</div>
             @can('view inventory')
                 <div class="nav-item-modern">
-                    <a class="nav-link-modern {{ request()->routeIs('admin.inventory.*') ? 'active' : '' }}"
-                        href="{{ route('admin.inventory.index') }}">
+                    <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('inventory.*') ? 'active' : '' }}"
+                        href="{{ \App\Helpers\RouteHelper::url('inventory.index') }}">
                         <span class="nav-icon"><i class="bi bi-box-seam"></i></span>
                         <span class="nav-text">Inventory</span>
                     </a>
                 </div>
             @endcan
         </div>
+        @endif
 
+        @if($user->can('view roles') || $user->can('view users'))
         <div class="nav-section">
             <div class="nav-section-title">System</div>
             @can('view roles')
                 <div class="nav-item-modern">
-                    <a class="nav-link-modern {{ request()->routeIs('admin.roles.*') || request()->routeIs('admin.permissions.*') ? 'active' : '' }}"
-                        href="{{ route('admin.roles.index') }}">
+                    <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('roles.*') || \App\Helpers\RouteHelper::routeIsAny('permissions.*') ? 'active' : '' }}"
+                        href="{{ \App\Helpers\RouteHelper::url('roles.index') }}">
                         <span class="nav-icon"><i class="bi bi-shield-check"></i></span>
                         <span class="nav-text">Roles & Permissions</span>
                     </a>
@@ -107,14 +114,15 @@
 
             @can('view users')
                 <div class="nav-item-modern">
-                    <a class="nav-link-modern {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
-                        href="{{ route('admin.users.index') }}">
+                    <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('users.*') ? 'active' : '' }}"
+                        href="{{ \App\Helpers\RouteHelper::url('users.index') }}">
                         <span class="nav-icon"><i class="bi bi-person-gear"></i></span>
                         <span class="nav-text">Users</span>
                     </a>
                 </div>
             @endcan
         </div>
+        @endif
     @elseif($user->hasRole('Staff'))
         <div class="nav-section">
             <div class="nav-section-title">Main</div>
@@ -139,13 +147,6 @@
             @endcan
 
             <div class="nav-item-modern">
-                <a class="nav-link-modern {{ request()->routeIs('staff.profile*') ? 'active' : '' }}"
-                    href="{{ route('staff.profile') }}">
-                    <span class="nav-icon"><i class="bi bi-person"></i></span>
-                    <span class="nav-text">Profile</span>
-                </a>
-            </div>
-            <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('staff.activity') ? 'active' : '' }}"
                     href="{{ route('staff.activity') }}">
                     <span class="nav-icon"><i class="bi bi-activity"></i></span>
@@ -161,13 +162,6 @@
                     href="{{ route('client.dashboard') }}">
                     <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
                     <span class="nav-text">Dashboard</span>
-                </a>
-            </div>
-            <div class="nav-item-modern">
-                <a class="nav-link-modern {{ request()->routeIs('client.profile*') ? 'active' : '' }}"
-                    href="{{ route('client.profile') }}">
-                    <span class="nav-icon"><i class="bi bi-person"></i></span>
-                    <span class="nav-text">Profile</span>
                 </a>
             </div>
         </div>
@@ -240,9 +234,9 @@
             <div class="user-name">{{ $user->name }}</div>
             <div class="user-role">
                 @php
-                    if($user->hasRole('SuperAdmin')) {
+                    if($user->hasRole('Admin')) {
                         $roleName = 'Super Admin';
-                    } elseif($user->hasRole('Admin')) {
+                    } elseif($user->hasRole('SuperAdmin')) {
                         $roleName = 'Admin';
                     } elseif($user->hasRole('Staff')) {
                         $roleName = 'Staff';

@@ -19,7 +19,7 @@ class PayoutController extends Controller
     public function index()
     {
         $staff = Staff::where('is_active', true)->get();
-        return view('admin.payouts.index', compact('staff'));
+        return view('superadmin.payouts.index', compact('staff'));
     }
 
     /**
@@ -126,7 +126,7 @@ class PayoutController extends Controller
             'timesheets' => $timesheets,
         ];
 
-        $pdf = Pdf::loadView('admin.payouts.pdf', $data);
+        $pdf = Pdf::loadView('superadmin.payouts.pdf', $data);
         
         $filename = 'payout-' . $staff->name . '-' . $startDate->format('Y-m-d') . '-to-' . $endDate->format('Y-m-d') . '.pdf';
         

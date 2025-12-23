@@ -58,19 +58,23 @@ class RegisterController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->hasRole('Admin')) {
+        // Redirect based on dashboard permissions (priority order)
+        if ($user->can('view admin dashboard')) {
+            if ($user->can('view roles')) {
+                return redirect()->route('superadmin.dashboard');
+            }
             return redirect()->route('admin.dashboard');
         }
 
-        if ($user->hasRole('Staff')) {
+        if ($user->can('view staff dashboard')) {
             return redirect()->route('staff.dashboard');
         }
 
-        if ($user->hasRole('Client')) {
+        if ($user->can('view client dashboard')) {
             return redirect()->route('client.dashboard');
         }
 
-        if ($user->hasRole('Lead')) {
+        if ($user->can('view lead dashboard')) {
             return redirect()->route('lead.dashboard');
         }
 

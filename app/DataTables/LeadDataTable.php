@@ -23,6 +23,7 @@ class LeadDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->setRowId('id')
+            ->addIndexColumn()
             ->addColumn('stage_badge', function (Lead $lead) {
                 $stageColors = [
                     'new_lead' => 'primary',
@@ -46,22 +47,41 @@ class LeadDataTable extends DataTable
                 return $lead->assignedStaff ? $lead->assignedStaff->name : '<span class="text-muted">Unassigned</span>';
             })
             ->addColumn('action', function (Lead $lead) {
-                return new HtmlString('
-                    <div class="btn-group btn-group-sm">
-                        <a href="' . route('admin.leads.show', $lead) . '" class="btn btn-outline-primary" title="View">
-                            <i class="bi bi-eye"></i>
-                        </a>
-                        <a href="' . route('admin.leads.edit', $lead) . '" class="btn btn-outline-secondary" title="Edit">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <button type="button" class="btn btn-outline-danger delete-lead" data-id="' . $lead->id . '" title="Delete">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                ');
+            $user = auth()->user();
+            $actions = '<div class="btn-group btn-group-sm" role="group">';
+
+            // View button - requires view lead details permission
+            if ($user->can('view lead details')) {
+                $actions .= '<a href="' . route('admin.leads.show', $lead) . '" class="btn btn-outline-primary" title="View">
+                        <i class="bi bi-eye"></i>
+                    </a>';
+            }
+
+            // Edit button
+            if ($user->can('edit leads')) {
+                $actions .= '<a href="' . route('admin.leads.edit', $lead) . '" class="btn btn-outline-secondary" title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </a>';
+            }
+
+            // Delete button
+            if ($user->can('delete leads')) {
+                $actions .= '<button type="button" class="btn btn-outline-danger delete-lead" data-id="' . $lead->id . '" title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </button>';
+            }
+
+            $actions .= '</div>';
+            
+            // If no actions available, return a dash
+            if (strlen($actions) <= strlen('<div class="btn-group btn-group-sm" role="group"></div>')) {
+                return new HtmlString('<span class="text-muted">-</span>');
+            }
+            
+            return new HtmlString($actions);
             })
             ->editColumn('created_at', function (Lead $lead) {
-                return $lead->created_at->format('M d, Y');
+                return $lead->created_at ? $lead->created_at->diffForHumans() : 'N/A';
             })
             ->rawColumns(['stage_badge', 'assigned_staff_name', 'action']);
     }
@@ -90,41 +110,26 @@ class LeadDataTable extends DataTable
             ->setTableId('leads-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
-            ->dom('
-                <"row"<"col-md-6 d-flex justify-content-start"f><"col-sm-12 col-md-6 d-flex align-items-center justify-content-end"lB>>
-                <"row"<"col-md-12"tr>>
-                <"row"<"col-md-6"i><"col-md-6"p>>
-            ')
             ->orderBy(1, 'desc')
-            ->language([
-                "search" => "",
-                "lengthMenu" => "_MENU_",
-                "searchPlaceholder" => 'Search leads...'
-            ])
-            ->buttons(
-                Button::make('create')
+            ->buttons(array_filter([
+                auth()->user()->can('create leads') ? Button::make('create')
                     ->className('btn btn-primary')
                     ->text('<i class="bi bi-plus-circle me-1"></i> New Lead')
                     ->action('function(e, dt, node, config) {
                         window.location.href = "' . route('admin.leads.create') . '";
-                    }'),
+                    }') : null,
                 Button::make('reload')
                     ->className('btn btn-secondary')
                     ->text('<i class="bi bi-arrow-clockwise me-1"></i> Reload')
-            )
+        ]))
             ->parameters([
                 'paging' => true,
                 'searching' => true,
                 'ordering' => true,
                 'info' => true,
                 'autoWidth' => false,
-                'responsive' => [
-                    'details' => [
-                        'type' => 'column',
-                        'target' => -1
-                    ]
-                ],
-                'pageLength' => 25,
+            'responsive' => true,
+                'pageLength' => 10,
                 'lengthMenu' => [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
                 'scrollX' => true,
                 'scrollCollapse' => true,
@@ -134,6 +139,15 @@ class LeadDataTable extends DataTable
                     'info' => 'Showing _START_ to _END_ of _TOTAL_ leads',
                     'infoEmpty' => 'Showing 0 to 0 of 0 leads',
                     'infoFiltered' => '(filtered from _MAX_ total leads)',
+                'search' => '',
+                'searchPlaceholder' => 'Search leads...',
+                'lengthMenu' => 'Show _MENU_ entries',
+                'paginate' => [
+                    'first' => 'First',
+                    'last' => 'Last',
+                    'next' => 'Next',
+                    'previous' => 'Previous'
+                ]
                 ],
             ]);
     }
@@ -146,6 +160,7 @@ class LeadDataTable extends DataTable
     public function getColumns(): array
     {
         return [
+            Column::make('DT_RowIndex')->title('SR No')->orderable(false)->searchable(false)->width(60)->addClass('text-center'),
             Column::make('id')->visible(false),
             Column::make('name')->title('Name')->width('15%'),
             Column::make('company')->title('Company')->width('15%'),

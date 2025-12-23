@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\User;
+use App\Helpers\RouteHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -25,7 +26,8 @@ class ProfileController extends Controller
             ->latest()
             ->get();
 
-        return view('admin.profile', compact('user', 'documents'));
+        $viewPrefix = RouteHelper::getViewPrefix();
+        return view($viewPrefix . '.profile', compact('user', 'documents'));
     }
 
     /**

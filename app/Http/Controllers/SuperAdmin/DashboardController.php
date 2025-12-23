@@ -20,36 +20,95 @@ class DashboardController extends Controller
     public function index()
     {
         $today = Carbon::today();
-        $stats = [
-            'total_leads' => Lead::count(),
-            'new_leads' => Lead::whereDate('created_at', $today)->count(),
-            'qualified_leads' => Lead::where('stage', 'qualified')->count(),
-            'total_clients' => Client::where('is_active', true)->count(),
-            'total_staff' => Staff::where('is_active', true)->count(),
-            'total_invoices' => Invoice::count(),
-            'revenue' => Invoice::where('status', 'paid')->sum('total_amount'),
-            'total_users' => User::count(),
-            'total_admins' => User::role('Admin')->count(),
-            'total_superadmins' => User::role('SuperAdmin')->count(),
-        ];
+        $user = auth()->user();
+        
+        $stats = [];
+        
+        // Only load stats if user has permission to view the card
+        if ($user->can('view dashboard leads card')) {
+            $stats['total_leads'] = Lead::count();
+            $stats['new_leads'] = Lead::whereDate('created_at', $today)->count();
+            $stats['qualified_leads'] = Lead::where('stage', 'qualified')->count();
+        }
+        
+        if ($user->can('view dashboard clients card')) {
+            $stats['total_clients'] = Client::where('is_active', true)->count();
+        }
+        
+        if ($user->can('view dashboard staff card')) {
+            $stats['total_staff'] = Staff::where('is_active', true)->count();
+        }
+        
+        if ($user->can('view dashboard revenue card')) {
+            $stats['total_invoices'] = Invoice::count();
+            $stats['revenue'] = Invoice::where('status', 'paid')->sum('total_amount');
+        }
+        
+        if ($user->can('view dashboard users card')) {
+            $stats['total_users'] = User::count();
+            $stats['total_admins'] = User::role('Admin')->count();
+            $stats['total_superadmins'] = User::role('SuperAdmin')->count();
+        }
 
-        // Automated follow-up reminders
-        $followUpReminders = FollowUpTask::where('is_completed', false)
-            ->where('due_date', '<=', Carbon::now()->addDays(7))
-            ->with(['lead.assignedStaff'])
-            ->orderBy('due_date', 'asc')
-            ->get();
+        // Automated follow-up reminders - only load if user has permission
+        $followUpReminders = collect();
+        if ($user->can('view dashboard followup reminders card')) {
+            $followUpReminders = FollowUpTask::where('is_completed', false)
+                ->where('due_date', '<=', Carbon::now()->addDays(7))
+                ->with(['lead.assignedStaff'])
+                ->orderBy('due_date', 'asc')
+                ->get();
+        }
 
-        // Recent activity (last 10 leads)
-        $recentActivity = Lead::with('assignedStaff')
-            ->orderBy('created_at', 'desc')
-            ->take(10)
-            ->get();
+        // Recent activity - only load if user has permission
+        $recentActivity = collect();
+        if ($user->can('view dashboard recent activity card')) {
+            $recentActivity = Lead::with('assignedStaff')
+                ->orderBy('created_at', 'desc')
+                ->take(10)
+                ->get();
+        }
+
+        // Lead stages breakdown - only if user can view lead stages graph
+        $leadStages = [];
+        if ($user->can('view dashboard lead stages graph')) {
+            $leadStages = Lead::selectRaw('stage, COUNT(*) as count')
+                ->groupBy('stage')
+                ->pluck('count', 'stage')
+                ->toArray();
+        }
+
+        // Leads over the last 7 days - only if user can view leads chart
+        $leadsLast7Days = [];
+        if ($user->can('view dashboard leads chart')) {
+            $today = Carbon::today();
+            
+            for ($i = 6; $i >= 0; $i--) {
+                $date = $today->copy()->subDays($i);
+                $dateStart = $date->copy()->startOfDay();
+                $dateEnd = $date->copy()->endOfDay();
+                
+                $count = Lead::whereBetween('created_at', [$dateStart, $dateEnd])->count();
+                
+                $leadsLast7Days[] = [
+                    'date' => $date->format('M d'),
+                    'day' => $date->format('D'),
+                    'full_date' => $date->format('Y-m-d'),
+                    'count' => $count
+                ];
+            }
+        }
+
+        // Today's leads
+        $todayLeads = Lead::whereDate('created_at', Carbon::today())->get();
 
         return view('superadmin.dashboard', compact(
             'stats',
+            'leadStages',
+            'leadsLast7Days',
             'followUpReminders',
-            'recentActivity'
+            'recentActivity',
+            'todayLeads'
         ));
     }
 }

@@ -1,0 +1,79 @@
+/* ============================================
+   Utility Classes - Common Styles
+   ============================================ */
+
+/* Green Gradient Background */
+.bg-gradient-green {
+    background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
+    color: white;
+}
+
+.bg-gradient-green:hover {
+    background: linear-gradient(135deg, #6ba85a 0%, #5a8a4d 100%);
+    color: white;
+}
+
+/* Green Gradient Badge */
+.badge-gradient-green {
+    background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
+    color: white;
+    border: none;
+}
+
+/* Green Gradient Button */
+.btn-gradient-green {
+    background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-gradient-green:hover {
+    background: linear-gradient(135deg, #6ba85a 0%, #5a8a4d 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(132, 195, 115, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-gradient-green:active {
+    transform: translateY(0);
+}
+
+/* Activity Badge with Green Gradient */
+.activity-badge-gradient {
+    background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
+    color: white;
+}
+
+/* Responsive Utilities */
+@media (max-width: 1200px) {
+    .btn-gradient-green {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .btn-gradient-green {
+        font-size: 0.8125rem;
+        padding: 0.45rem 0.9rem;
+    }
+    
+    .badge-gradient-green {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .btn-gradient-green {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .badge-gradient-green {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+    }
+}
+

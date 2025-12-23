@@ -63,24 +63,30 @@ class User extends Authenticatable
         return $this->hasOne(Lead::class);
     }
 
+    public function settings()
+    {
+        return $this->hasOne(UserSetting::class);
+    }
+
     // Helper methods
     public function isAdmin(): bool
     {
-        return $this->hasRole('Admin');
+        // Check if user has admin dashboard access (permission-based)
+        return $this->can('view admin dashboard');
     }
 
     public function isStaff(): bool
     {
-        return $this->hasRole('Staff');
+        return $this->can('view staff dashboard');
     }
 
     public function isClient(): bool
     {
-        return $this->hasRole('Client');
+        return $this->can('view client dashboard');
     }
 
     public function isLead(): bool
     {
-        return $this->hasRole('Lead');
+        return $this->can('view lead dashboard');
     }
 }

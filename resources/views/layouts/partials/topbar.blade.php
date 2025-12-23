@@ -97,10 +97,10 @@
                         <div class="navbar-user-name">{{ auth()->user()->name }}</div>
                         <div class="navbar-user-role">
                             @php
-                                if(auth()->user()->hasRole('SuperAdmin')) {
+                                if(auth()->user()->hasRole('Admin')) {
                                     $roleName = 'Super Admin';
                                     $roleColor = 'danger';
-                                } elseif(auth()->user()->hasRole('Admin')) {
+                                } elseif(auth()->user()->hasRole('SuperAdmin')) {
                                     $roleName = 'Admin';
                                     $roleColor = 'primary';
                                 } elseif(auth()->user()->hasRole('Staff')) {
@@ -115,14 +115,30 @@
                         </div>
                     </div>
                 </button>
-                <div class="dropdown-menu dropdown-menu-end">
+                <div class="dropdown-menu dropdown-menu-end user-dropdown-menu">
                     <h6 class="dropdown-header">Account</h6>
-                    <a class="dropdown-item" href="#"><i class="bi bi-person-circle me-2"></i>Profile</a>
-                    <a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a>
+                    @php
+                        $profileRoute = 'admin.profile';
+                        if(auth()->user()->hasRole('SuperAdmin')) {
+                            $profileRoute = 'superadmin.profile';
+                        } elseif(auth()->user()->hasRole('Admin')) {
+                            $profileRoute = 'admin.profile';
+                        } elseif(auth()->user()->hasRole('Staff')) {
+                            $profileRoute = 'staff.profile';
+                        } elseif(auth()->user()->hasRole('Client')) {
+                            $profileRoute = 'client.profile';
+                        }
+                    @endphp
+                    <a class="dropdown-item user-dropdown-item" href="{{ route($profileRoute) }}">
+                        <i class="bi bi-person-circle me-2"></i>Profile
+                    </a>
+                    <a class="dropdown-item user-dropdown-item" href="#">
+                        <i class="bi bi-gear me-2"></i>Settings
+                    </a>
                     <div class="dropdown-divider"></div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button class="dropdown-item text-danger" type="submit">
+                        <button class="dropdown-item user-dropdown-item logout-item" type="submit">
                             <i class="bi bi-box-arrow-right me-2"></i>Logout
                         </button>
                     </form>

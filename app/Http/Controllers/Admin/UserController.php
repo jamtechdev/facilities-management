@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\DataTables\UserDataTable;
+use App\Helpers\RouteHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -16,7 +17,8 @@ class UserController extends Controller
      */
     public function index(UserDataTable $dataTable)
     {
-        return $dataTable->render('admin.users.index');
+        $viewPrefix = RouteHelper::getViewPrefix();
+        return $dataTable->render($viewPrefix . '.users.index');
     }
 
     /**
@@ -25,7 +27,8 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::all();
-        return view('admin.users.create', compact('roles'));
+        $viewPrefix = RouteHelper::getViewPrefix();
+        return view($viewPrefix . '.users.create', compact('roles'));
     }
 
     /**
@@ -48,7 +51,7 @@ class UserController extends Controller
 
         $user->assignRole($validated['role']);
         // return response()->json(['success' => true]);
-        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
+        return redirect(RouteHelper::url('users.index'))->with('success', 'User created successfully.');
     }
 
     /**
@@ -56,20 +59,31 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
+        // Check permission to view user details
+        if (!auth()->user()->can('view user details')) {
+            abort(403, 'You do not have permission to view user details.');
+        }
         $user->load('roles');
         return response()->json($user);
     }
 
     public function edit(User $user)
     {
-        if (auth()->user()->hasRole('Admin')) {
-            if ($user->hasRole('SuperAdmin') || $user->id === auth()->id()) {
-                abort(403, 'Access denied.');
-            }
+        $currentUser = auth()->user();
+        
+        // Check permission to edit users
+        if (!$currentUser->can('edit users')) {
+            abort(403, 'You do not have permission to edit users.');
+        }
+        
+        // Prevent users from editing themselves
+        if ($user->id === $currentUser->id) {
+            abort(403, 'You cannot edit your own user account.');
         }
 
         $roles = Role::all();
-        return view('admin.users.edit', compact('user', 'roles'));
+        $viewPrefix = RouteHelper::getViewPrefix();
+        return view($viewPrefix . '.users.edit', compact('user', 'roles'));
     }
 
     public function update(Request $request, User $user)
@@ -93,16 +107,21 @@ class UserController extends Controller
         // Role update
         $user->syncRoles([$validated['role']]);
 
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+        return redirect(RouteHelper::url('users.index'))->with('success', 'User updated successfully.');
     }
 
     public function destroy(User $user)
     {
-
-        if (auth()->user()->hasRole('Admin')) {
-            if ($user->hasRole('SuperAdmin') || $user->id === auth()->id()) {
-                abort(403, 'Access denied.');
-            }
+        $currentUser = auth()->user();
+        
+        // Check permission to delete users
+        if (!$currentUser->can('delete users')) {
+            abort(403, 'You do not have permission to delete users.');
+        }
+        
+        // Prevent users from deleting themselves
+        if ($user->id === $currentUser->id) {
+            abort(403, 'You cannot delete your own user account.');
         }
 
         $user->delete();
