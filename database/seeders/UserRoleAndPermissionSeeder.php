@@ -29,19 +29,35 @@ class UserRoleAndPermissionSeeder extends Seeder
             'view staff dashboard',
             'view client dashboard',
             'view lead dashboard',
+            // Dashboard card/widget permissions
+            'view dashboard leads card',
+            'view dashboard clients card',
+            'view dashboard staff card',
+            'view dashboard revenue card',
+            'view dashboard qualified leads card',
+            'view dashboard new leads card',
+            'view dashboard users card',
+            'view dashboard invoices card',
+            'view dashboard followup reminders card',
+            'view dashboard recent activity card',
+            'view dashboard lead stages graph',
+            'view dashboard leads chart',
             // Lead permissions
             'view leads',
+            'view lead details',
             'create leads',
             'edit leads',
             'delete leads',
             'convert leads',
             // Client permissions
             'view clients',
+            'view client details',
             'create clients',
             'edit clients',
             'delete clients',
             // Staff permissions
             'view staff',
+            'view staff details',
             'create staff',
             'edit staff',
             'delete staff',
@@ -52,9 +68,16 @@ class UserRoleAndPermissionSeeder extends Seeder
             'approve timesheets',
             // Invoice permissions
             'view invoices',
+            'view invoice details',
             'create invoices',
             'edit invoices',
             'delete invoices',
+            // User permissions
+            'view users',
+            'view user details',
+            'create users',
+            'edit users',
+            'delete users',
             // Payout permissions
             'view payouts',
             'calculate payouts',
@@ -92,46 +115,12 @@ class UserRoleAndPermissionSeeder extends Seeder
         $clientRole = Role::firstOrCreate(['name' => 'Client']);
         $leadRole = Role::firstOrCreate(['name' => 'Lead']);
 
-        // Assign all permissions to SuperAdmin role
+        // Assign ALL permissions to SuperAdmin role
         $superAdminRole->syncPermissions(Permission::all());
 
-        // Admin role gets limited permissions by default - SuperAdmin can assign more
-        // Admin cannot manage roles/permissions or change own permissions
+        // Admin role gets ONLY dashboard permission by default - SuperAdmin will assign other permissions to Admin users
         $adminRole->syncPermissions([
             'view admin dashboard',
-            'view leads',
-            'create leads',
-            'edit leads',
-            'delete leads',
-            'convert leads',
-            'view clients',
-            'create clients',
-            'edit clients',
-            'delete clients',
-            'view staff',
-            'create staff',
-            'edit staff',
-            'delete staff',
-            'view timesheets',
-            'create timesheets',
-            'edit timesheets',
-            'approve timesheets',
-            'view invoices',
-            'create invoices',
-            'edit invoices',
-            'delete invoices',
-            'view payouts',
-            'calculate payouts',
-            'download payout reports',
-            'view inventory',
-            'create inventory',
-            'edit inventory',
-            'delete inventory',
-            'assign inventory',
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
         ]);
 
         // Assign permissions to Staff role
@@ -152,7 +141,7 @@ class UserRoleAndPermissionSeeder extends Seeder
             'view lead dashboard',
         ]);
 
-        // Create super admin user
+        // Create SuperAdmin user (has all permissions)
         $superAdmin = User::firstOrCreate(
             ['email' => 'superadmin@keystone.com'],
             [
@@ -161,12 +150,12 @@ class UserRoleAndPermissionSeeder extends Seeder
             ]
         );
 
-        // Assign super admin role if not already assigned
+        // Assign SuperAdmin role if not already assigned
         if (!$superAdmin->hasRole('SuperAdmin')) {
             $superAdmin->assignRole('SuperAdmin');
         }
 
-        // Create admin user
+        // Create Admin user (has dashboard permission by default - SuperAdmin will assign other permissions)
         $admin = User::firstOrCreate(
             ['email' => 'admin@keystone.com'],
             [
@@ -175,7 +164,7 @@ class UserRoleAndPermissionSeeder extends Seeder
             ]
         );
 
-        // Assign admin role if not already assigned
+        // Assign Admin role if not already assigned
         if (!$admin->hasRole('Admin')) {
             $admin->assignRole('Admin');
         }
@@ -264,11 +253,11 @@ class UserRoleAndPermissionSeeder extends Seeder
 
         $this->command->info('Permissions, roles, and users created successfully!');
         $this->command->info('');
-        $this->command->info('Super Admin credentials:');
+        $this->command->info('SuperAdmin credentials (has ALL permissions):');
         $this->command->info('Email: superadmin@keystone.com');
         $this->command->info('Password: password');
         $this->command->info('');
-        $this->command->info('Admin credentials:');
+        $this->command->info('Admin credentials (has dashboard permission by default - SuperAdmin will assign other permissions):');
         $this->command->info('Email: admin@keystone.com');
         $this->command->info('Password: password');
         $this->command->info('');
@@ -276,7 +265,8 @@ class UserRoleAndPermissionSeeder extends Seeder
         $this->command->info('Email: staff@keystone.com');
         $this->command->info('Password: password');
         $this->command->info('');
-        $this->command->info('Note: Only Admin, SuperAdmin, and Staff can login to the system.');
+        $this->command->info('Note: SuperAdmin has all permissions. Admin has dashboard permission by default.');
+        $this->command->info('SuperAdmin can assign additional permissions to Admin users through the Roles & Permissions section.');
     }
 
     /**

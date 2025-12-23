@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Inventory;
 use App\Models\Staff;
 use App\Models\Client;
+use App\DataTables\InventoryDataTable;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -15,10 +16,9 @@ class InventoryController extends Controller
     /**
      * Display a listing of inventory items
      */
-    public function index()
+    public function index(InventoryDataTable $dataTable)
     {
-        $inventory = Inventory::with('assignedTo')->latest()->get();
-        return view('admin.inventory.index', compact('inventory'));
+        return $dataTable->render('superadmin.inventory.index');
     }
 
     /**

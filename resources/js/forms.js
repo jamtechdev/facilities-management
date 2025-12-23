@@ -62,12 +62,36 @@ function handleFormSubmit(form, submitBtn) {
     axios.post(action, formData, { headers })
         .then(function(response) {
             if (response.data.success) {
-                if (response.data.redirect) {
-                    window.location.href = response.data.redirect;
-                } else {
-                    // Reload page if no redirect
-                    window.location.reload();
+                // Show success message
+                const successMessage = response.data.message || 'Operation completed successfully.';
+                if (typeof window.showToast !== 'undefined') {
+                    window.showToast('success', successMessage);
+                } else if (typeof window.toastr !== 'undefined') {
+                    window.toastr.success(successMessage);
                 }
+
+                // Redirect or reload after a short delay to show toast
+                setTimeout(function () {
+                    if (response.data.redirect) {
+                        window.location.href = response.data.redirect;
+                    } else {
+                        // Reload page if no redirect
+                        window.location.reload();
+                    }
+                }, 500); // Small delay to show toast
+            } else {
+                // Handle case where success is false
+                const errorMessage = response.data.message || 'Operation failed. Please try again.';
+                if (typeof window.showToast !== 'undefined') {
+                    window.showToast('error', errorMessage);
+                } else if (typeof window.toastr !== 'undefined') {
+                    window.toastr.error(errorMessage);
+                } else {
+                    alert(errorMessage);
+                }
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = submitBtnText;
             }
         })
         .catch(function(error) {
@@ -79,7 +103,14 @@ function handleFormSubmit(form, submitBtn) {
             if (error.response?.status === 422) {
                 displayValidationErrors(error.response.data.errors, form);
             } else {
-                //  alert(error.response?.data?.message || 'An error occurred. Please try again.');
+                const errorMessage = error.response?.data?.message || error.message || 'An error occurred. Please try again.';
+                if (typeof showToast !== 'undefined') {
+                    showToast('error', errorMessage);
+                } else if (typeof toastr !== 'undefined') {
+                    toastr.error(errorMessage);
+                } else {
+                    alert(errorMessage);
+                }
             }
         });
 }
@@ -130,15 +161,32 @@ function initDeleteConfirmations() {
                 })
                 .then(function(response) {
                     if (response.data.success) {
-                        if (response.data.redirect) {
-                            window.location.href = response.data.redirect;
-                        } else {
-                            window.location.reload();
+                        // Show success message
+                        const successMessage = response.data.message || 'Item deleted successfully.';
+                        if (typeof window.showToast !== 'undefined') {
+                            window.showToast('success', successMessage);
+                        } else if (typeof window.toastr !== 'undefined') {
+                            window.toastr.success(successMessage);
                         }
+
+                        // Redirect or reload after a short delay
+                        setTimeout(function () {
+                            if (response.data.redirect) {
+                                window.location.href = response.data.redirect;
+                            } else {
+                                window.location.reload();
+                            }
+                        }, 500);
                     }
                 })
                 .catch(function(error) {
-                    alert(error.response?.data?.message || 'Failed to delete item');
+                    if (typeof showToast !== 'undefined') {
+                        showToast('error', error.response?.data?.message || 'Failed to delete item');
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error(error.response?.data?.message || 'Failed to delete item');
+                    } else {
+                        alert(error.response?.data?.message || 'Failed to delete item');
+                    }
                 });
             }
         });

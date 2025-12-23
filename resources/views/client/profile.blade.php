@@ -3,7 +3,7 @@
 @section('title', 'My Profile')
 
 @push('styles')
-    @vite(['resources/css/profile.css'])
+    @vite(['resources/css/utilities.css', 'resources/css/profile.css'])
 @endpush
 
 @section('content')
@@ -179,12 +179,11 @@
                         <div class="profile-card">
                             <div class="profile-card-header d-flex justify-content-between align-items-center">
                                 <h5><i class="bi bi-folder"></i> Uploaded Documents</h5>
-                                <span class="badge"
-                                    style="background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%); color: white;">
+                                <span class="badge badge-gradient-green">
                                     {{ $documents->count() }} file{{ $documents->count() != 1 ? 's' : '' }}
                                 </span>
                             </div>
-                            <div class="profile-card-body" style="max-height: 500px; overflow-y: auto;">
+                            <div class="profile-card-body profile-card-body-scrollable">
                                 @forelse($documents as $document)
                                     <div
                                         class="document-item d-flex justify-content-between align-items-center py-3 border-bottom">
@@ -210,7 +209,7 @@
                                     </div>
                                 @empty
                                     <div class="text-center py-5">
-                                        <i class="bi bi-inbox" style="font-size: 3.5rem; color: #adb5bd;"></i>
+                                        <i class="bi bi-inbox empty-state-icon-xl"></i>
                                         <p class="text-muted mt-3">No documents uploaded yet.</p>
                                         <p class="text-muted small">Upload your company documents like GST, agreements,
                                             etc.</p>
@@ -245,6 +244,10 @@
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         }
                     });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
 
                     const data = await response.json();
 
@@ -286,6 +289,10 @@
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
                             }
                         });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
 
                         const data = await response.json();
 
@@ -343,17 +350,20 @@
                 });
             });
 
-            // Alert Function
+            // Alert Function - using toastr
             function showAlert(type, message) {
-                const container = document.getElementById('alert-container');
-                container.innerHTML = `
-            <div class="alert alert-${type} alert-dismissible fade show mt-3" role="alert">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        `;
-
-                if (type === 'success') {
+                if (typeof showToast !== 'undefined') {
+                    showToast(type, message);
+                } else if (typeof toastr !== 'undefined') {
+                    const toastType = type === 'danger' ? 'error' : type;
+                    toastr[toastType](message);
+                } else {
+                    alert(message);
+                }
+            }
+            
+            // Legacy code removed - keeping for reference
+            if (false) {
                     setTimeout(() => {
                         const alert = container.querySelector('.alert');
                         if (alert) alert.remove();

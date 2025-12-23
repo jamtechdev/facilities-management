@@ -42,8 +42,8 @@
         }
 
         // Extract labels and data
-        const labels = leadsData.map(item => item.date);
-        const data = leadsData.map(item => item.count);
+        const labels = leadsData.map(item => item.date || item.day || '');
+        const data = leadsData.map(item => item.count || 0);
 
         // Calculate max value for better Y-axis scaling
         const maxValue = Math.max(...data, 1);

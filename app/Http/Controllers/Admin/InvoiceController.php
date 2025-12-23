@@ -20,7 +20,7 @@ class InvoiceController extends Controller
      */
     public function index(InvoiceDataTable $dataTable)
     {
-        return $dataTable->render('admin.invoices.index');
+        return $dataTable->render('superadmin.invoices.index');
     }
 
     /**
@@ -29,7 +29,7 @@ class InvoiceController extends Controller
     public function create()
     {
         $clients = Client::where('is_active', true)->get();
-        return view('admin.invoices.create', compact('clients'));
+        return view('superadmin.invoices.create', compact('clients'));
     }
 
     /**
@@ -107,8 +107,12 @@ class InvoiceController extends Controller
      */
     public function show(Invoice $invoice)
     {
+        // Check permission to view invoice details
+        if (!auth()->user()->can('view invoice details')) {
+            abort(403, 'You do not have permission to view invoice details.');
+        }
         $invoice->load(['client', 'createdBy']);
-        return view('admin.invoices.show', compact('invoice'));
+        return view('superadmin.invoices.show', compact('invoice'));
     }
 
     /**
@@ -153,7 +157,7 @@ class InvoiceController extends Controller
     {
         $invoice->load(['client', 'createdBy']);
         
-        $pdf = Pdf::loadView('admin.invoices.pdf', compact('invoice'));
+        $pdf = Pdf::loadView('superadmin.invoices.pdf', compact('invoice'));
         
         return $pdf->download('invoice-' . $invoice->invoice_number . '.pdf');
     }

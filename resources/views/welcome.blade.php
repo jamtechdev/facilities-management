@@ -3,10 +3,33 @@
 @section('title', 'Welcome')
 
 @push('styles')
-    @vite(['resources/css/welcome.css'])
+    @vite(['resources/css/welcome.css', 'resources/css/profile.css'])
 @endpush
 
 @section('content')
+<div class="container-fluid py-4">
+    <!-- Welcome Header -->
+    <div class="profile-header">
+        <div class="profile-header-content">
+            <div class="profile-avatar">
+                <i class="bi bi-building" style="font-size: 2.5rem;"></i>
+            </div>
+            <div class="profile-info flex-grow-1">
+                <h1>Welcome to KEYSTONE</h1>
+                <p>Commercial Cleaning Services Management System - Streamline your operations with our comprehensive ERP solution</p>
+            </div>
+            <div class="profile-header-actions">
+                <a href="{{ route('login') }}" class="btn btn-light btn-lg px-4 py-2 shadow-lg rounded-pill fw-semibold">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                </a>
+                <a href="{{ route('register') }}" class="btn btn-outline-light btn-lg px-4 py-2 rounded-pill fw-semibold border-2">
+                    <i class="bi bi-person-plus me-2"></i>Sign Up
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Hero Section -->
 <section class="hero-section position-relative overflow-hidden" style="background-image: url('{{ asset('office-cleaning.jpg') }}');">
     <div class="container h-100">

@@ -427,16 +427,20 @@
                 }
             });
 
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const data = await response.json();
 
             if (data.success) {
                 showAlert('success', data.message);
                 setTimeout(() => location.reload(), 1200);
             } else {
-                showAlert('danger', data.message);
+                showAlert('danger', data.message || 'Failed to clock in');
             }
         } catch (error) {
-            showAlert('danger', 'Failed to clock in: ' + error.message);
+            showAlert('danger', 'Failed to clock in: ' + (error.message || 'Unknown error'));
         } finally {
             btn.disabled = false;
             btn.innerHTML = originalText;
@@ -472,16 +476,20 @@
                     }
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
 
                 if (data.success) {
                     showAlert('success', data.message);
                     setTimeout(() => location.reload(), 1200);
                 } else {
-                    showAlert('danger', data.message);
+                    showAlert('danger', data.message || 'Failed to clock out');
                 }
             } catch (error) {
-                showAlert('danger', 'Failed to clock out: ' + error.message);
+                showAlert('danger', 'Failed to clock out: ' + (error.message || 'Unknown error'));
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalText;
@@ -490,15 +498,14 @@
     });
 
     function showAlert(type, message) {
-        alertContainer.innerHTML = `
-            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        `;
-        setTimeout(() => {
-            alertContainer.innerHTML = '';
-        }, 5000);
+        if (typeof showToast !== 'undefined') {
+            showToast(type, message);
+        } else if (typeof toastr !== 'undefined') {
+            const toastType = type === 'danger' ? 'error' : type;
+            toastr[toastType](message);
+        } else {
+            alert(message);
+        }
     }
 </script>
 @endpush

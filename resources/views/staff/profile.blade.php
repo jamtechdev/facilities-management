@@ -3,7 +3,7 @@
 @section('title', 'My Profile')
 
 @push('styles')
-    @vite(['resources/css/profile.css'])
+    @vite(['resources/css/utilities.css', 'resources/css/profile.css'])
 @endpush
 
 @section('content')
@@ -167,7 +167,7 @@
                     <div class="profile-card">
                         <div class="profile-card-header">
                             <h5><i class="bi bi-folder"></i> Your Files</h5>
-                            <span class="badge" style="background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%); color: white;">{{ $documents->count() }} files</span>
+                            <span class="badge badge-gradient-green">{{ $documents->count() }} files</span>
                         </div>
                         <div class="profile-card-body">
                             @forelse($documents as $document)
@@ -190,7 +190,7 @@
                                 </div>
                             @empty
                                 <div class="text-center py-4">
-                                    <i class="bi bi-inbox" style="font-size: 3rem; color: #868e96;"></i>
+                                    <i class="bi bi-inbox empty-state-icon-large"></i>
                                     <p class="text-muted mt-3 mb-0">No documents uploaded yet.</p>
                                 </div>
                             @endforelse
@@ -223,15 +223,19 @@
                 }
             });
 
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const data = await response.json();
 
             if (data.success) {
                 showAlert('success', data.message);
             } else {
-                showAlert('danger', data.message);
+                showAlert('danger', data.message || 'Failed to update profile');
             }
         } catch (error) {
-            showAlert('danger', 'Failed to update profile: ' + error.message);
+            showAlert('danger', 'Failed to update profile: ' + (error.message || 'Unknown error'));
         } finally {
             btn.disabled = false;
             btn.innerHTML = originalText;
@@ -239,13 +243,14 @@
     });
 
     function showAlert(type, message) {
-        const alertContainer = document.getElementById('alert-container');
-        alertContainer.innerHTML = `
-            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        `;
+        if (typeof showToast !== 'undefined') {
+            showToast(type, message);
+        } else if (typeof toastr !== 'undefined') {
+            const toastType = type === 'danger' ? 'error' : type;
+            toastr[toastType](message);
+        } else {
+            alert(message);
+        }
     }
 
     const documentForm = document.getElementById('documentUploadForm');
@@ -268,15 +273,19 @@
                     }
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
                 if (data.success) {
                     showAlert('success', data.message);
                     setTimeout(() => location.reload(), 1000);
                 } else {
-                    showAlert('danger', data.message);
+                    showAlert('danger', data.message || 'Failed to upload document');
                 }
             } catch (error) {
-                showAlert('danger', 'Failed to upload document: ' + error.message);
+                showAlert('danger', 'Failed to upload document: ' + (error.message || 'Unknown error'));
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalText;

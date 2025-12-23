@@ -9,6 +9,7 @@ use App\DataTables\ClientDataTable;
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Services\ClientService;
+use App\Helpers\RouteHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -26,7 +27,8 @@ class ClientController extends Controller
      */
     public function index(ClientDataTable $dataTable)
     {
-        return $dataTable->render('admin.clients.index');
+        $viewPrefix = RouteHelper::getViewPrefix();
+        return $dataTable->render($viewPrefix . '.clients.index');
     }
 
     /**
@@ -34,7 +36,8 @@ class ClientController extends Controller
      */
     public function create()
     {
-        return view('admin.clients.create');
+        $viewPrefix = RouteHelper::getViewPrefix();
+        return view($viewPrefix . '.clients.create');
     }
 
     /**
@@ -48,7 +51,7 @@ class ClientController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Client created successfully.',
-                'redirect' => route('admin.clients.index')
+                'redirect' => RouteHelper::url('clients.index')
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -63,6 +66,10 @@ class ClientController extends Controller
      */
     public function show(Client $client)
     {
+        // Check permission to view client details
+        if (!auth()->user()->can('view client details')) {
+            abort(403, 'You do not have permission to view client details.');
+        }
         $client->load([
             'user',
             'lead',
@@ -75,7 +82,8 @@ class ClientController extends Controller
             'invoices'
         ]);
 
-        return view('admin.clients.show', compact('client'));
+        $viewPrefix = RouteHelper::getViewPrefix();
+        return view($viewPrefix . '.clients.show', compact('client'));
     }
 
     /**
@@ -83,7 +91,8 @@ class ClientController extends Controller
      */
     public function edit(Client $client)
     {
-        return view('admin.clients.edit', compact('client'));
+        $viewPrefix = RouteHelper::getViewPrefix();
+        return view($viewPrefix . '.clients.edit', compact('client'));
     }
 
     /**
@@ -97,7 +106,7 @@ class ClientController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Client updated successfully.',
-                'redirect' => route('admin.clients.show', $client)
+                'redirect' => RouteHelper::url('clients.show', $client)
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

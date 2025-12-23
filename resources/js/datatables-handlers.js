@@ -67,16 +67,16 @@
                 }
             });
 
-            // Generic alert function
+            // Generic alert function - using toastr
             window.showAlert = function(type, message) {
-                const alertHtml = `
-                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                        ${message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                `;
-                $('.container-fluid').first().prepend(alertHtml);
-                setTimeout(() => $('.alert').first().fadeOut(), 5000);
+                if (typeof showToast !== 'undefined') {
+                    showToast(type, message);
+                } else if (typeof toastr !== 'undefined') {
+                    const toastType = type === 'danger' ? 'error' : type;
+                    toastr[toastType](message);
+                } else {
+                    alert(message);
+                }
             };
         });
     }

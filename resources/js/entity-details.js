@@ -30,7 +30,13 @@ function initConvertToClient() {
                 .catch(function(error) {
                     convertBtn.disabled = false;
                     convertBtn.innerHTML = btnText;
-                    alert(error.response?.data?.message || 'Failed to convert lead');
+                    if (typeof showToast !== 'undefined') {
+                        showToast('error', error.response?.data?.message || 'Failed to convert lead');
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error(error.response?.data?.message || 'Failed to convert lead');
+                    } else {
+                        alert(error.response?.data?.message || 'Failed to convert lead');
+                    }
                 });
             }
         });

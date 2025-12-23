@@ -23,6 +23,7 @@ class InvoiceDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->setRowId('id')
+            ->addIndexColumn()
             ->addColumn('status_badge', function (Invoice $invoice) {
                 $statusColors = [
                     'draft' => 'secondary',
@@ -46,28 +47,50 @@ class InvoiceDataTable extends DataTable
                 return $invoice->client ? $invoice->client->company_name : 'N/A';
             })
             ->addColumn('action', function (Invoice $invoice) {
-                return new HtmlString('
-                    <div class="btn-group btn-group-sm">
-                        <a href="' . route('admin.invoices.show', $invoice) . '" class="btn btn-outline-primary" title="View">
-                            <i class="bi bi-eye"></i>
-                        </a>
-                        <a href="' . route('admin.invoices.download', $invoice) . '" class="btn btn-outline-info" title="Download PDF">
-                            <i class="bi bi-download"></i>
-                        </a>
-                        <button type="button" class="btn btn-outline-danger delete-invoice" data-id="' . $invoice->id . '" title="Delete">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                ');
+            $user = auth()->user();
+            $actions = '<div class="btn-group btn-group-sm" role="group">';
+
+            // View button - requires view invoice details permission
+            if ($user->can('view invoice details')) {
+                $actions .= '<a href="' . route('admin.invoices.show', $invoice) . '" class="btn btn-outline-primary" title="View">
+                        <i class="bi bi-eye"></i>
+                    </a>';
+            }
+
+            // Download button
+            if ($user->can('view invoices')) {
+                $actions .= '<a href="' . route('admin.invoices.download', $invoice) . '" class="btn btn-outline-info" title="Download PDF">
+                        <i class="bi bi-download"></i>
+                    </a>';
+            }
+
+            // Delete button
+            if ($user->can('delete invoices')) {
+                $actions .= '<button type="button" class="btn btn-outline-danger delete-invoice" data-id="' . $invoice->id . '" title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </button>';
+            }
+
+            $actions .= '</div>';
+            
+            // If no actions available, return a dash
+            if (strlen($actions) <= strlen('<div class="btn-group btn-group-sm" role="group"></div>')) {
+                return new HtmlString('<span class="text-muted">-</span>');
+            }
+            
+            return new HtmlString($actions);
             })
             ->editColumn('total_amount', function (Invoice $invoice) {
                 return '$' . number_format($invoice->total_amount, 2);
             })
             ->editColumn('billing_period_start', function (Invoice $invoice) {
-                return $invoice->billing_period_start->format('M d, Y');
+                return $invoice->billing_period_start ? $invoice->billing_period_start->format('M d, Y') : 'N/A';
             })
             ->editColumn('billing_period_end', function (Invoice $invoice) {
-                return $invoice->billing_period_end->format('M d, Y');
+                return $invoice->billing_period_end ? $invoice->billing_period_end->format('M d, Y') : 'N/A';
+            })
+            ->editColumn('created_at', function (Invoice $invoice) {
+                return $invoice->created_at ? $invoice->created_at->diffForHumans() : 'N/A';
             })
             ->rawColumns(['status_badge', 'action']);
     }
@@ -94,41 +117,26 @@ class InvoiceDataTable extends DataTable
             ->setTableId('invoices-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
-            ->dom('
-                <"row"<"col-md-6 d-flex justify-content-start"f><"col-sm-12 col-md-6 d-flex align-items-center justify-content-end"lB>>
-                <"row"<"col-md-12"tr>>
-                <"row"<"col-md-6"i><"col-md-6"p>>
-            ')
             ->orderBy(1, 'desc')
-            ->language([
-                "search" => "",
-                "lengthMenu" => "_MENU_",
-                "searchPlaceholder" => 'Search invoices...'
-            ])
-            ->buttons(
-                Button::make('create')
+            ->buttons(array_filter([
+                auth()->user()->can('create invoices') ? Button::make('create')
                     ->className('btn btn-primary')
                     ->text('<i class="bi bi-plus-circle me-1"></i> New Invoice')
                     ->action('function(e, dt, node, config) {
                         window.location.href = "' . route('admin.invoices.create') . '";
-                    }'),
+                    }') : null,
                 Button::make('reload')
                     ->className('btn btn-secondary')
                     ->text('<i class="bi bi-arrow-clockwise me-1"></i> Reload')
-            )
+        ]))
             ->parameters([
                 'paging' => true,
                 'searching' => true,
                 'ordering' => true,
                 'info' => true,
                 'autoWidth' => false,
-                'responsive' => [
-                    'details' => [
-                        'type' => 'column',
-                        'target' => -1
-                    ]
-                ],
-                'pageLength' => 25,
+            'responsive' => true,
+                'pageLength' => 10,
                 'lengthMenu' => [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
                 'scrollX' => true,
                 'scrollCollapse' => true,
@@ -138,6 +146,15 @@ class InvoiceDataTable extends DataTable
                     'info' => 'Showing _START_ to _END_ of _TOTAL_ invoices',
                     'infoEmpty' => 'Showing 0 to 0 of 0 invoices',
                     'infoFiltered' => '(filtered from _MAX_ total invoices)',
+                'search' => '',
+                'searchPlaceholder' => 'Search invoices...',
+                'lengthMenu' => 'Show _MENU_ entries',
+                'paginate' => [
+                    'first' => 'First',
+                    'last' => 'Last',
+                    'next' => 'Next',
+                    'previous' => 'Previous'
+                ]
                 ],
             ]);
     }
@@ -150,6 +167,7 @@ class InvoiceDataTable extends DataTable
     public function getColumns(): array
     {
         return [
+            Column::make('DT_RowIndex')->title('SR No')->orderable(false)->searchable(false)->width(60)->addClass('text-center'),
             Column::make('id')->visible(false),
             Column::make('invoice_number')->title('Invoice #')->width('12%'),
             Column::make('client_name')->title('Client')->orderable(false)->searchable(false)->width('15%'),

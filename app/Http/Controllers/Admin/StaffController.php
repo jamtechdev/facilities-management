@@ -25,7 +25,7 @@ class StaffController extends Controller
      */
     public function index(StaffDataTable $dataTable)
     {
-        return $dataTable->render('admin.staff.index');
+        return $dataTable->render('superadmin.staff.index');
     }
 
     /**
@@ -33,7 +33,7 @@ class StaffController extends Controller
      */
     public function create()
     {
-        return view('admin.staff.create');
+        return view('superadmin.staff.create');
     }
 
     /**
@@ -62,6 +62,10 @@ class StaffController extends Controller
      */
     public function show(Staff $staff)
     {
+        // Check permission to view staff details
+        if (!auth()->user()->can('view staff details')) {
+            abort(403, 'You do not have permission to view staff details.');
+        }
         $staff->load([
             'user',
             'clients',
@@ -71,7 +75,7 @@ class StaffController extends Controller
             'documents.uploadedBy'
         ]);
 
-        return view('admin.staff.show', compact('staff'));
+        return view('superadmin.staff.show', compact('staff'));
     }
 
     /**
@@ -79,7 +83,7 @@ class StaffController extends Controller
      */
     public function edit(Staff $staff)
     {
-        return view('admin.staff.edit', compact('staff'));
+        return view('superadmin.staff.edit', compact('staff'));
     }
 
     /**

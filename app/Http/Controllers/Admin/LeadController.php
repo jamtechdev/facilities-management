@@ -9,6 +9,7 @@ use App\DataTables\LeadDataTable;
 use App\Http\Requests\StoreLeadRequest;
 use App\Http\Requests\UpdateLeadRequest;
 use App\Services\LeadService;
+use App\Helpers\RouteHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -26,7 +27,8 @@ class LeadController extends Controller
      */
     public function index(LeadDataTable $dataTable)
     {
-        return $dataTable->render('admin.leads.index');
+        $viewPrefix = RouteHelper::getViewPrefix();
+        return $dataTable->render($viewPrefix . '.leads.index');
     }
 
     /**
@@ -35,7 +37,8 @@ class LeadController extends Controller
     public function create()
     {
         $staff = Staff::where('is_active', true)->get();
-        return view('admin.leads.create', compact('staff'));
+        $viewPrefix = RouteHelper::getViewPrefix();
+        return view($viewPrefix . '.leads.create', compact('staff'));
     }
 
     /**
@@ -49,7 +52,7 @@ class LeadController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Lead created successfully.',
-                'redirect' => route('admin.leads.index')
+                'redirect' => RouteHelper::url('leads.index')
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -64,6 +67,10 @@ class LeadController extends Controller
      */
     public function show(Lead $lead)
     {
+        // Check permission to view lead details
+        if (!auth()->user()->can('view lead details')) {
+            abort(403, 'You do not have permission to view lead details.');
+        }
         $lead->load([
             'assignedStaff',
             'convertedToClient',
@@ -74,8 +81,9 @@ class LeadController extends Controller
         ]);
 
         $staff = Staff::where('is_active', true)->get();
+        $viewPrefix = RouteHelper::getViewPrefix();
 
-        return view('admin.leads.show', compact('lead', 'staff'));
+        return view($viewPrefix . '.leads.show', compact('lead', 'staff'));
     }
 
     /**
@@ -84,7 +92,8 @@ class LeadController extends Controller
     public function edit(Lead $lead)
     {
         $staff = Staff::where('is_active', true)->get();
-        return view('admin.leads.edit', compact('lead', 'staff'));
+        $viewPrefix = RouteHelper::getViewPrefix();
+        return view($viewPrefix . '.leads.edit', compact('lead', 'staff'));
     }
 
     /**
@@ -98,7 +107,7 @@ class LeadController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Lead updated successfully.',
-                'redirect' => route('admin.leads.show', $lead)
+                'redirect' => RouteHelper::url('leads.show', $lead)
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -135,8 +144,8 @@ class LeadController extends Controller
     {
         $user = auth()->user();
 
-        // Check permission - SuperAdmin or user with 'convert leads' permission
-        if (!$user->hasRole('SuperAdmin') && !$user->can('convert leads')) {
+        // Check permission to convert leads
+        if (!$user->can('convert leads')) {
             return response()->json([
                 'success' => false,
                 'message' => 'You do not have permission to convert leads.'
@@ -149,7 +158,7 @@ class LeadController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Lead converted to client successfully.',
-                'redirect' => route('admin.clients.show', $client->id)
+                'redirect' => RouteHelper::url('clients.show', $client->id)
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

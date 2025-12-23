@@ -20,26 +20,30 @@ class EnsureSuperAdminRole
         }
 
         $user = auth()->user();
-
-        // Redirect other roles to their dashboards
-        if ($user->hasRole('Admin')) {
-            return redirect()->route('admin.dashboard');
-        }
-
-        if ($user->hasRole('Staff')) {
-            return redirect()->route('staff.dashboard');
-        }
-
-        if ($user->hasRole('Client')) {
-            return redirect()->route('client.dashboard');
-        }
-
-        if ($user->hasRole('Lead')) {
-            return redirect()->route('lead.dashboard');
-        }
-
-        if (!$user->hasRole('SuperAdmin')) {
-            abort(403, 'Unauthorized access.');
+        
+        // Check if user has view roles permission (SuperAdmin typically has this)
+        if (!$user->can('view roles')) {
+            // For AJAX/API requests, return JSON response
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You do not have permission to access this area. Required permission: view roles'
+                ], 403);
+            }
+            
+            // For regular requests, redirect with flash message based on dashboard permissions
+            $dashboardRoute = 'admin.dashboard';
+            if ($user->can('view admin dashboard')) {
+                $dashboardRoute = 'admin.dashboard';
+            } elseif ($user->can('view staff dashboard')) {
+                $dashboardRoute = 'staff.dashboard';
+            } elseif ($user->can('view client dashboard')) {
+                $dashboardRoute = 'client.dashboard';
+            } elseif ($user->can('view lead dashboard')) {
+                $dashboardRoute = 'lead.dashboard';
+            }
+            
+            return redirect()->route($dashboardRoute)->with('error', 'You do not have permission to access this area. Required permission: view roles');
         }
 
         return $next($request);
