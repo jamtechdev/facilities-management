@@ -170,21 +170,21 @@
             <div class="nav-section-title">Services</div>
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('client.services*') ? 'active' : '' }}"
-                    href="#">
+                    href="{{ route('client.services') }}">
                     <span class="nav-icon"><i class="bi bi-calendar-check"></i></span>
                     <span class="nav-text">Service History</span>
                 </a>
             </div>
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('client.photos*') ? 'active' : '' }}"
-                    href="#">
+                    href="{{ route('client.photos') }}">
                     <span class="nav-icon"><i class="bi bi-images"></i></span>
                     <span class="nav-text">Before & After Photos</span>
                 </a>
             </div>
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('client.feedback*') ? 'active' : '' }}"
-                    href="#">
+                    href="{{ route('client.feedback') }}">
                     <span class="nav-icon"><i class="bi bi-chat-dots"></i></span>
                     <span class="nav-text">Feedback</span>
                 </a>
@@ -195,7 +195,7 @@
             <div class="nav-section-title">Documents</div>
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('client.documents*') ? 'active' : '' }}"
-                    href="#">
+                    href="{{ route('client.documents') }}">
                     <span class="nav-icon"><i class="bi bi-file-earmark-text"></i></span>
                     <span class="nav-text">Documents</span>
                 </a>
@@ -206,7 +206,7 @@
             <div class="nav-section-title">Financial</div>
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('client.invoices*') ? 'active' : '' }}"
-                    href="#">
+                    href="{{ route('client.invoices') }}">
                     <span class="nav-icon"><i class="bi bi-receipt"></i></span>
                     <span class="nav-text">Invoices</span>
                 </a>

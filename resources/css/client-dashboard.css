@@ -235,7 +235,7 @@
 .service-card {
     background: white;
     border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(132, 195, 115, 0.15);
     overflow: hidden;
     height: 100%;
@@ -345,41 +345,41 @@
         max-width: 100% !important;
         margin-bottom: 1rem;
     }
-    
+
     .client-dashboard-content .row.g-4 {
         margin-left: 0 !important;
         margin-right: 0 !important;
     }
-    
+
     .client-dashboard-content .row.g-4 > [class*="col-"] {
         padding-left: 0 !important;
         padding-right: 0 !important;
     }
-    
+
     .client-stat-card {
         padding: 1rem 1rem;
         margin-bottom: 0;
     }
-    
+
     .stat-header {
         gap: 1rem;
     }
-    
+
     .stat-icon-wrapper {
         width: 50px;
         height: 50px;
         font-size: 24px;
     }
-    
+
     .stat-value {
         font-size: 1.75rem;
     }
-    
+
     .service-card-header,
     .profile-card-header {
         padding: 1.25rem;
     }
-    
+
     .service-card-body,
     .profile-card-body {
         padding: 1.25rem;
@@ -393,43 +393,43 @@
         flex: 0 0 100% !important;
         max-width: 100% !important;
     }
-    
+
     .client-stat-card {
         padding: 0.875rem 0.875rem;
     }
-    
+
     .stat-icon-wrapper {
         width: 45px;
         height: 45px;
         font-size: 22px;
     }
-    
+
     .stat-value {
         font-size: 1.5rem;
     }
-    
+
     .stat-label {
         font-size: 0.7rem;
     }
-    
+
     .stat-description {
         font-size: 0.8rem;
     }
-    
+
     .stat-header {
         gap: 0.75rem;
     }
-    
+
     .service-card-header,
     .profile-card-header {
         padding: 1rem;
     }
-    
+
     .service-card-body,
     .profile-card-body {
         padding: 1rem;
     }
-    
+
     .service-card-header h5,
     .profile-card-header h5 {
         font-size: 1rem;
