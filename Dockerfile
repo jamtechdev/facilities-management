@@ -31,7 +31,7 @@ COPY . /var/www/html
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache \
-    && chmod +x /var/www/html/railway/*.sh
+    && chmod +x /var/www/html/railway/*.sh || true
 
 # Set Apache document root
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
@@ -48,8 +48,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 # Install npm dependencies and build assets
 RUN npm install && npm run build
 
-# Create .env file placeholder (will be overridden by Railway)
-RUN touch .env
+# Create .env file placeholder (will be generated from env vars at runtime)
+RUN touch .env && chmod 666 .env
 
 # Expose port 80
 EXPOSE 80

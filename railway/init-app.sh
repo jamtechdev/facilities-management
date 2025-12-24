@@ -4,6 +4,9 @@
 # Exit the script if any command fails
 set -e
 
+# Generate .env file from environment variables
+chmod +x ./railway/generate-env.sh && sh ./railway/generate-env.sh
+
 # Run migrations
 php artisan migrate --force
 
