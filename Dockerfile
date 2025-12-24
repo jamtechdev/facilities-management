@@ -25,14 +25,23 @@ WORKDIR /var/www
 # Copy composer files
 COPY composer.json composer.lock ./
 
-# Create app/Helpers directory and copy helper file needed for composer autoload
-RUN mkdir -p app/Helpers
+# Create all necessary directories for Laravel
+RUN mkdir -p app/Helpers \
+    bootstrap/cache \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/framework/cache \
+    storage/logs
+
+# Copy minimal files needed for composer install (artisan needs bootstrap files)
+COPY artisan ./
+COPY bootstrap/ bootstrap/
 COPY app/Helpers/RouteHelper.php app/Helpers/RouteHelper.php
 
 # Install PHP dependencies
 RUN composer install --optimize-autoloader --no-interaction
 
-# Copy remaining application files
+# Copy all remaining application files
 COPY . /var/www
 
 # Create storage directories and set permissions
