@@ -25,6 +25,9 @@ WORKDIR /var/www
 # Copy composer files
 COPY composer.json composer.lock ./
 
+# Copy helper file needed for autoload
+COPY app/Helpers/RouteHelper.php ./app/Helpers/RouteHelper.php
+
 # Install PHP dependencies
 RUN composer install 
 
