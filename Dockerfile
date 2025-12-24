@@ -44,12 +44,13 @@ RUN mkdir -p storage/framework/{sessions,views,cache} \
 # Package discovery will happen at runtime when the application starts
 RUN composer dump-autoload --optimize --no-scripts
 
-# Copy custom PHP-FPM configuration (before switching user)
-COPY docker/php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
+# Copy and set up entrypoint script (before switching user)
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Change current user to www-data
 USER www-data
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
-CMD ["php-fpm"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
