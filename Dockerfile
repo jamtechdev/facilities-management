@@ -26,7 +26,7 @@ WORKDIR /var/www
 COPY composer.json composer.lock ./
 
 # Install PHP dependencies
-RUN composer install --optimize-autoloader --no-scripts --no-interaction
+RUN composer install 
 
 # Copy existing application directory permissions
 COPY --chown=www-data:www-data . /var/www
