@@ -7,7 +7,12 @@ set -e
 # Generate .env file from environment variables
 chmod +x ./railway/generate-env.sh && sh ./railway/generate-env.sh
 
+# Test database connection before proceeding
+echo "Testing database connection..."
+chmod +x ./railway/test-db-connection.sh && sh ./railway/test-db-connection.sh
+
 # Run migrations
+echo "Running database migrations..."
 php artisan migrate --force
 
 # Run database seeders
