@@ -27,12 +27,10 @@ RUN a2enmod rewrite
 # Copy existing application directory contents
 COPY . /var/www/html
 
-# Copy existing application directory permissions
-# Make railway scripts executable
+# Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache \
-    && if [ -d /var/www/html/railway ]; then chmod +x /var/www/html/railway/*.sh; fi
+    && chmod -R 755 /var/www/html/bootstrap/cache
 
 # Set Apache document root
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
