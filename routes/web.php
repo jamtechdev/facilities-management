@@ -77,6 +77,13 @@ Route::middleware(['auth', 'permission:view client dashboard'])->prefix('client'
     Route::post('/profile/documents', [\App\Http\Controllers\Client\ProfileController::class, 'uploadDocument'])->name('profile.documents.store');
     Route::get('/profile/documents/{document}/download', [\App\Http\Controllers\Client\ProfileController::class, 'downloadDocument'])->name('profile.documents.download');
     Route::delete('/profile/documents/{document}', [\App\Http\Controllers\Client\ProfileController::class, 'destroyDocument'])->name('profile.documents.destroy');
+    Route::get('/services', [\App\Http\Controllers\Client\ServiceHistoryController::class, 'index'])->name('services');
+    Route::get('/photos', [\App\Http\Controllers\Client\PhotoController::class, 'index'])->name('photos');
+    Route::get('/feedback', [\App\Http\Controllers\Client\FeedbackController::class, 'index'])->name('feedback');
+    Route::get('/documents', [\App\Http\Controllers\Client\DocumentController::class, 'documents'])->name('documents');
+    Route::get('/documents/{document}/download', [\App\Http\Controllers\Client\DocumentController::class, 'download'])->name('documents.download');
+    Route::get('/invoices', [\App\Http\Controllers\Client\InvoiceController::class, 'index'])->name('invoices');
+
 });
 
 // Lead routes - Permission-based access
