@@ -22,11 +22,17 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-# Copy composer files and install dependencies
+# Copy composer files
 COPY composer.json composer.lock ./
+
+# Create app/Helpers directory and copy helper file needed for composer autoload
+RUN mkdir -p app/Helpers
+COPY app/Helpers/RouteHelper.php app/Helpers/RouteHelper.php
+
+# Install PHP dependencies
 RUN composer install --optimize-autoloader --no-interaction
 
-# Copy application files
+# Copy remaining application files
 COPY . /var/www
 
 # Create storage directories and set permissions
