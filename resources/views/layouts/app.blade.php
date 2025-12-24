@@ -6,14 +6,15 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Laravel') }} - @yield('title', 'Dashboard')</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    {{-- Load jQuery first from npm, then other scripts - jQuery will be globally available on all pages --}}
     @vite([
+        'resources/js/jquery-global.js',
         'resources/css/app.css',
         'resources/css/utilities.css',
         'resources/css/layout.css',
         'resources/css/dashboard.css',
         'resources/css/forms.css',
         'resources/css/datatables.css',
-
         'resources/js/app.js',
         'resources/js/layout.js',
         'resources/js/forms.js',
@@ -226,9 +227,8 @@
         </div>
     </div>
 
-    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
-    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> --}}
-
+    {{-- jQuery is loaded globally from npm via jquery-global.js in head section above --}}
+    {{-- jQuery ($ and jQuery) is now available on all pages --}}
     @stack('scripts')
 
     <script>

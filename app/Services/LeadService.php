@@ -17,6 +17,11 @@ class LeadService
     public function create(array $data): Lead
     {
         return DB::transaction(function() use ($data) {
+            // Ensure assigned_staff_id is set if provided
+            if (isset($data['assigned_staff_id']) && empty($data['assigned_staff_id'])) {
+                $data['assigned_staff_id'] = null;
+            }
+            
             $lead = Lead::create($data);
 
             // Create automated follow-up tasks (30/60/90 days)
@@ -99,6 +104,14 @@ class LeadService
                 'notes' => $lead->notes,
                 'is_active' => true,
             ]);
+
+            // Assign staff from lead to client if staff is assigned to lead
+            if ($lead->assigned_staff_id) {
+                $client->staff()->attach($lead->assigned_staff_id, [
+                    'is_active' => true,
+                    'assignment_start_date' => now(),
+                ]);
+            }
 
             // Migrate all communications
             foreach ($lead->communications as $communication) {

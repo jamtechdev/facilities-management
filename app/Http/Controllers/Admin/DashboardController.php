@@ -104,7 +104,8 @@ class DashboardController extends Controller
                 ->get();
         }
 
-        return view('admin.dashboard', compact(
+        $viewPrefix = \App\Helpers\RouteHelper::getViewPrefix();
+        return view($viewPrefix . '.dashboard', compact(
             'stats', 
             'leadStages',
             'leadsLast7Days',
