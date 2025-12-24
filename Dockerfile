@@ -30,7 +30,8 @@ COPY . /var/www/html
 # Copy existing application directory permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+    && chmod -R 755 /var/www/html/bootstrap/cache \
+    && chmod +x /var/www/html/railway/*.sh
 
 # Set Apache document root
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
