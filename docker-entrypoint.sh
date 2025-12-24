@@ -1,19 +1,21 @@
 #!/bin/bash
-set -e
+# Don't exit on error - we want Apache to start even if some steps fail
+set +e
 
 # Ensure output goes to stdout/stderr for Railway logs
 exec 1>&2
 
 echo "🚀 Starting Laravel setup..."
-echo "Current directory: $(pwd)"
-echo "Working directory: /var/www/html"
+
+# Change to app directory
+cd /var/www/html || exit 1
 
 # Generate .env file from environment variables
 echo "📝 Generating .env file..."
 cat > /var/www/html/.env <<EOF
 APP_NAME="${APP_NAME:-Facilities Management}"
 APP_ENV="${APP_ENV:-production}"
-APP_KEY="${APP_KEY}"
+APP_KEY="${APP_KEY:-}"
 APP_DEBUG="${APP_DEBUG:-false}"
 APP_URL="${APP_URL:-http://localhost}"
 
@@ -38,18 +40,17 @@ MAIL_FROM_ADDRESS="${MAIL_FROM_ADDRESS:-hello@example.com}"
 MAIL_FROM_NAME="${MAIL_FROM_NAME:-${APP_NAME}}"
 EOF
 
-# Wait for database to be ready
+# Wait for database to be ready (but don't fail if it doesn't connect)
 echo "⏳ Waiting for database connection..."
 echo "DB_HOST: ${DB_HOST}"
 echo "DB_PORT: ${DB_PORT}"
 echo "DB_DATABASE: ${DB_DATABASE}"
-echo "DB_USERNAME: ${DB_USERNAME}"
 
-MAX_ATTEMPTS=30
+MAX_ATTEMPTS=10
 ATTEMPT=0
+DB_CONNECTED=false
+
 while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
-    cd /var/www/html
-    # Test MySQL connection directly
     php -r "
     try {
         \$pdo = new PDO(
@@ -58,58 +59,64 @@ while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
             getenv('DB_PASSWORD'),
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 5]
         );
-        echo 'Database connection successful!' . PHP_EOL;
         exit(0);
     } catch (PDOException \$e) {
-        echo 'Connection failed: ' . \$e->getMessage() . PHP_EOL;
         exit(1);
     }
-    " 2>&1 && break || {
-        ATTEMPT=$((ATTEMPT + 1))
-        echo "  Attempt $((ATTEMPT + 1))/$MAX_ATTEMPTS - waiting for database..."
-        sleep 2
-    }
+    " 2>&1 > /dev/null
+    
+    if [ $? -eq 0 ]; then
+        DB_CONNECTED=true
+        echo "✅ Database connected!"
+        break
+    fi
+    
+    ATTEMPT=$((ATTEMPT + 1))
+    echo "  Attempt $((ATTEMPT + 1))/$MAX_ATTEMPTS - waiting for database..."
+    sleep 2
 done
 
-if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
-    echo "❌ Database connection failed after $MAX_ATTEMPTS attempts!"
-    echo "Please check your database configuration."
-    exit 1
+if [ "$DB_CONNECTED" = false ]; then
+    echo "⚠️  Database connection failed, but continuing..."
 fi
 
-echo "✅ Database connected!"
+# Run database operations only if connected
+if [ "$DB_CONNECTED" = true ]; then
+    # Clear caches
+    echo "🧹 Clearing caches..."
+    php artisan optimize:clear 2>&1 || true
+    
+    # Run migrations
+    echo "🔄 Running migrations..."
+    php artisan migrate --force 2>&1 || echo "⚠️  Migrations failed, continuing..."
+    
+    # Run seeders
+    echo "🌱 Seeding database..."
+    php artisan db:seed --force 2>&1 || echo "⚠️  Seeding failed, continuing..."
+    
+    # Optimize Laravel
+    echo "⚡ Optimizing application..."
+    php artisan config:cache 2>&1 || true
+    php artisan route:cache 2>&1 || true
+    php artisan view:cache 2>&1 || true
+else
+    echo "⚠️  Skipping database operations due to connection failure"
+fi
 
-# Change to app directory
-cd /var/www/html
-
-# Clear caches
-echo "🧹 Clearing caches..."
-php artisan optimize:clear 2>&1 || echo "Cache clear skipped"
-
-# Check migration status
-echo "📊 Checking migration status..."
-php artisan migrate:status 2>&1 || echo "Migration status check skipped"
-
-# Run migrations
-echo "🔄 Running migrations..."
-php artisan migrate --force 2>&1
-
-# Run seeders
-echo "🌱 Seeding database..."
-php artisan db:seed --force 2>&1
-
-# Create storage link
+# Create storage link (always try this)
 echo "🔗 Creating storage link..."
-php artisan storage:link 2>&1 || echo "Storage link already exists"
+php artisan storage:link 2>&1 || true
 
-# Optimize Laravel
-echo "⚡ Optimizing application..."
-php artisan config:cache 2>&1
-php artisan route:cache 2>&1
-php artisan view:cache 2>&1
+# Ensure storage directories exist
+mkdir -p storage/framework/cache/data
+mkdir -p storage/framework/sessions
+mkdir -p storage/framework/views
+mkdir -p storage/logs
+chmod -R 775 storage
+chmod -R 775 bootstrap/cache
 
 echo "✅ Setup completed! Starting Apache..."
 
-# Start Apache
+# Start Apache (this must always run)
 exec apache2-foreground
 
