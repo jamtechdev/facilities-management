@@ -22,11 +22,11 @@ LOG_STDERR_FORMATTER="${LOG_STDERR_FORMATTER:-\\Monolog\\Formatter\\JsonFormatte
 LOG_LEVEL="${LOG_LEVEL:-error}"
 
 DB_CONNECTION="${DB_CONNECTION:-mysql}"
-DB_HOST="${DB_HOST}"
-DB_PORT="${DB_PORT:-3306}"
-DB_DATABASE="${DB_DATABASE}"
-DB_USERNAME="${DB_USERNAME}"
-DB_PASSWORD="${DB_PASSWORD}"
+DB_HOST="${DB_HOST:-ballast.proxy.rlwy.net}"
+DB_PORT="${DB_PORT:-21988}"
+DB_DATABASE="${DB_DATABASE:-railway}"
+DB_USERNAME="${DB_USERNAME:-root}"
+DB_PASSWORD="${DB_PASSWORD:-wKrHSSNUFwdyJiMgYPHfwnzOnRNQPgFM}"
 
 SESSION_DRIVER="${SESSION_DRIVER:-database}"
 QUEUE_CONNECTION="${QUEUE_CONNECTION:-database}"
@@ -43,12 +43,28 @@ echo "⏳ Waiting for database connection..."
 echo "DB_HOST: ${DB_HOST}"
 echo "DB_PORT: ${DB_PORT}"
 echo "DB_DATABASE: ${DB_DATABASE}"
+echo "DB_USERNAME: ${DB_USERNAME}"
 
 MAX_ATTEMPTS=30
 ATTEMPT=0
 while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
     cd /var/www/html
-    php artisan db:show --database=mysql 2>&1 && break || {
+    # Test MySQL connection directly
+    php -r "
+    try {
+        \$pdo = new PDO(
+            'mysql:host=' . getenv('DB_HOST') . ';port=' . getenv('DB_PORT') . ';dbname=' . getenv('DB_DATABASE'),
+            getenv('DB_USERNAME'),
+            getenv('DB_PASSWORD'),
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 5]
+        );
+        echo 'Database connection successful!' . PHP_EOL;
+        exit(0);
+    } catch (PDOException \$e) {
+        echo 'Connection failed: ' . \$e->getMessage() . PHP_EOL;
+        exit(1);
+    }
+    " 2>&1 && break || {
         ATTEMPT=$((ATTEMPT + 1))
         echo "  Attempt $((ATTEMPT + 1))/$MAX_ATTEMPTS - waiting for database..."
         sleep 2
