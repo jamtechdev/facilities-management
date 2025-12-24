@@ -118,10 +118,8 @@ class UserRoleAndPermissionSeeder extends Seeder
         // Assign ALL permissions to SuperAdmin role
         $superAdminRole->syncPermissions(Permission::all());
 
-        // Admin role gets ONLY dashboard permission by default - SuperAdmin will assign other permissions to Admin users
-        $adminRole->syncPermissions([
-            'view admin dashboard',
-        ]);
+        // Assign ALL permissions to Admin role (same as SuperAdmin)
+        $adminRole->syncPermissions(Permission::all());
 
         // Assign permissions to Staff role
         $staffRole->syncPermissions([
@@ -155,7 +153,7 @@ class UserRoleAndPermissionSeeder extends Seeder
             $superAdmin->assignRole('SuperAdmin');
         }
 
-        // Create Admin user (has dashboard permission by default - SuperAdmin will assign other permissions)
+        // Create Admin user (has all permissions)
         $admin = User::firstOrCreate(
             ['email' => 'admin@keystone.com'],
             [
@@ -257,7 +255,7 @@ class UserRoleAndPermissionSeeder extends Seeder
         $this->command->info('Email: superadmin@keystone.com');
         $this->command->info('Password: password');
         $this->command->info('');
-        $this->command->info('Admin credentials (has dashboard permission by default - SuperAdmin will assign other permissions):');
+        $this->command->info('Admin credentials (has ALL permissions):');
         $this->command->info('Email: admin@keystone.com');
         $this->command->info('Password: password');
         $this->command->info('');
@@ -265,8 +263,7 @@ class UserRoleAndPermissionSeeder extends Seeder
         $this->command->info('Email: staff@keystone.com');
         $this->command->info('Password: password');
         $this->command->info('');
-        $this->command->info('Note: SuperAdmin has all permissions. Admin has dashboard permission by default.');
-        $this->command->info('SuperAdmin can assign additional permissions to Admin users through the Roles & Permissions section.');
+        $this->command->info('Note: Both SuperAdmin and Admin roles have all permissions by default.');
     }
 
     /**
