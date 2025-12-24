@@ -44,6 +44,9 @@ RUN mkdir -p storage/framework/{sessions,views,cache} \
 # Package discovery will happen at runtime when the application starts
 RUN composer dump-autoload --optimize --no-scripts
 
+# Copy custom PHP-FPM configuration (before switching user)
+COPY docker/php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
+
 # Change current user to www-data
 USER www-data
 
