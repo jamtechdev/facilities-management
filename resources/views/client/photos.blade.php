@@ -3,8 +3,8 @@
 @section('title', 'Before & After Gallery')
 
 @push('styles')
-@vite(['resources/css/profile.css'])
- @vite(['resources/css/client-dashboard.css'])
+    @vite(['resources/css/profile.css'])
+    @vite(['resources/css/client-dashboard.css'])
 @endpush
 
 @section('content')
@@ -25,7 +25,6 @@
             </div>
         </div>
 
-
         <!-- Gallery Cards -->
         <div class="row mt-4">
             <div class="col-lg-11 mx-auto">
@@ -43,18 +42,27 @@
                                                         $firstBefore = $pair['before']->first();
                                                         $beforePath = 'job-photos/' . basename($firstBefore->file_path);
                                                     @endphp
-                                                    <img src="{{ asset('storage/' . $beforePath) }}" alt="Before">
+
+                                                    @if (Storage::exists('public/' . $beforePath))
+                                                        <img src="{{ asset('storage/' . $beforePath) }}" alt="Before">
+                                                    @else
+                                                        <img src="{{ asset('storage/images/before.webp') }}"
+                                                            alt="Dummy Before">
+                                                    @endif
+
                                                     <div class="photo-label">Before</div>
                                                     @if ($pair['before']->count() > 1)
                                                         <div class="more-badge">+{{ $pair['before']->count() - 1 }}</div>
                                                     @endif
                                                 @else
-                                                    <div class="no-photo">
-                                                        <i class="bi bi-image" style="font-size: 3rem;"></i>
-                                                    </div>
+                                                    <img src="{{ asset('storage/images/before.webp') }}"
+                                                        alt="Dummy Before">
+                                                    <div class="photo-label">Before</div>
                                                 @endif
                                             </div>
                                         </div>
+
+
                                         <!-- After -->
                                         <div class="col-6">
                                             <div class="photo-container">
@@ -63,19 +71,28 @@
                                                         $firstAfter = $pair['after']->first();
                                                         $afterPath = 'job-photos/' . basename($firstAfter->file_path);
                                                     @endphp
-                                                    <img src="{{ asset('storage/' . $afterPath) }}" alt="After">
+
+                                                    @if (Storage::exists('public/' . $afterPath))
+                                                        <img src="{{ asset('storage/' . $afterPath) }}" alt="After">
+                                                    @else
+                                                        <img src="{{ asset('storage/images/after.webp') }}"
+                                                            alt="Dummy After">
+                                                    @endif
+
                                                     <div class="photo-label after-label">After</div>
                                                     @if ($pair['after']->count() > 1)
                                                         <div class="more-badge">+{{ $pair['after']->count() - 1 }}</div>
                                                     @endif
                                                 @else
-                                                    <div class="no-photo">
-                                                        <i class="bi bi-image" style="font-size: 3rem;"></i>
-                                                    </div>
+                                                    <img src="{{ asset('storage/images/after.webp') }}"
+                                                        alt="Dummy After">
+                                                    <div class="photo-label after-label">After</div>
                                                 @endif
                                             </div>
                                         </div>
+
                                     </div>
+
                                     <!-- Footer Info -->
                                     <div class="session-info">
                                         <p class="fw-bold mb-1">

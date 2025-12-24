@@ -98,10 +98,10 @@
                         <div class="navbar-user-role">
                             @php
                                 if(auth()->user()->hasRole('Admin')) {
-                                    $roleName = 'Super Admin';
+                                    $roleName = 'Admin';
                                     $roleColor = 'danger';
                                 } elseif(auth()->user()->hasRole('SuperAdmin')) {
-                                    $roleName = 'Admin';
+                                    $roleName = 'Super Admin';
                                     $roleColor = 'primary';
                                 } elseif(auth()->user()->hasRole('Staff')) {
                                     $roleName = 'Staff';
