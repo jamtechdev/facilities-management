@@ -22,35 +22,34 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-# Copy composer files
+# Copy composer files and install dependencies
 COPY composer.json composer.lock ./
+RUN composer install --optimize-autoloader --no-interaction
 
-# Install PHP dependencies (without scripts to avoid Laravel initialization issues)
-RUN composer install --optimize-autoloader --no-scripts --no-interaction
-
-# Copy existing application directory
+# Copy application files
 COPY . /var/www
 
 # Create storage directories and set permissions
 RUN mkdir -p storage/framework/{sessions,views,cache} \
     && mkdir -p storage/logs \
     && mkdir -p bootstrap/cache \
-    && chown -R www-data:www-data /var/www/storage \
-    && chown -R www-data:www-data /var/www/bootstrap/cache \
+    && chown -R www-data:www-data /var/www \
     && chmod -R 775 /var/www/storage \
     && chmod -R 775 /var/www/bootstrap/cache
 
-# Run composer dump-autoload without scripts to avoid Laravel initialization during build
-# Package discovery will happen at runtime when the application starts
-RUN composer dump-autoload --optimize --no-scripts
+# Run Laravel artisan commands during build
+RUN php artisan config:clear || true \
+    && php artisan cache:clear || true \
+    && php artisan route:clear || true \
+    && php artisan view:clear || true
 
-# Copy and set up entrypoint script (before switching user)
+# Copy entrypoint script
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Change current user to www-data
+# Change to www-data user
 USER www-data
 
-# Expose port 9000 and start php-fpm server
+# Expose port and set entrypoint
 EXPOSE 9000
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
