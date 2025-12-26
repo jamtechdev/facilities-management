@@ -1,6 +1,6 @@
 import './bootstrap';
 import $ from 'jquery';
-import 'bootstrap';
+import * as bootstrap from 'bootstrap';
 import 'datatables.net';
 import 'datatables.net-bs5';
 import toastr from 'toastr';
@@ -8,6 +8,9 @@ import 'toastr/build/toastr.min.css';
 
 // Make jQuery globally available BEFORE anything else
 window.$ = window.jQuery = $;
+
+// Make Bootstrap globally available
+window.bootstrap = bootstrap;
 
 // Ensure jQuery is available immediately
 if (typeof window.$ === 'undefined' || typeof window.jQuery === 'undefined') {

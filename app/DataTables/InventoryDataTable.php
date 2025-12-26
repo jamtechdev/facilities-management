@@ -74,6 +74,7 @@ class InventoryDataTable extends DataTable
                 'min_stock_level' => $inventory->min_stock_level,
                 'unit' => $inventory->unit,
                 'unit_cost' => $inventory->unit_cost,
+                'status' => $inventory->status,
             ];
             $inventoryJson = htmlspecialchars(json_encode($inventoryData), ENT_QUOTES, 'UTF-8');
 

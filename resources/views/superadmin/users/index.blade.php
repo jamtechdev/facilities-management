@@ -65,73 +65,79 @@
     {{ $dataTable->scripts(attributes: ['type' => 'module']) }}
 
     <script>
-        // View User
-        $(document).on('click', '.view-user', function(e) {
-            e.preventDefault();
-            let url = $(this).attr('href');
+        // jQuery is loaded globally from npm via layout
+        $(document).ready(function() {
+            // View User
+            $(document).on('click', '.view-user', function(e) {
+                e.preventDefault();
+                let url = $(this).attr('href');
 
-            $('#userDetails').html('<p class="text-muted">Loading...</p>');
+                $('#userDetails').html('<p class="text-muted">Loading...</p>');
 
-            $.get(url, function(user) {
-                let roles = user.roles.map(r => `<span class="badge bg-primary me-1">${r.name}</span>`)
-                    .join('');
+                $.get(url, function(user) {
+                    let roles = user.roles.map(r => `<span class="badge bg-primary me-1">${r.name}</span>`)
+                        .join('');
 
-                let html = `
-            <p><strong>Name:</strong> ${user.name}</p>
-            <p><strong>Email:</strong> ${user.email}</p>
-            <p><strong>Roles:</strong> ${roles || '<span class="text-muted">No roles</span>'}</p>
-            <p><strong>Created At:</strong> ${user.created_at}</p>
-            <p><strong>Updated At:</strong> ${user.updated_at ?? 'N/A'}</p>
-        `;
+                    let html = `
+                <p><strong>Name:</strong> ${user.name}</p>
+                <p><strong>Email:</strong> ${user.email}</p>
+                <p><strong>Roles:</strong> ${roles || '<span class="text-muted">No roles</span>'}</p>
+                <p><strong>Created At:</strong> ${user.created_at}</p>
+                <p><strong>Updated At:</strong> ${user.updated_at ?? 'N/A'}</p>
+            `;
 
-                $('#userDetails').html(html);
-            });
-        });
-
-        // Delete User
-        $(document).on('click', '.delete-user', function(e) {
-            e.preventDefault();
-            let url = $(this).attr('href'); // destroy route
-            let id = $(this).data('id');
-
-            if (confirm("Are you sure you want to delete this user?")) {
-                $.ajax({
-                    url: url,
-                    type: 'DELETE',
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            if (typeof showToast !== 'undefined') {
-                                showToast('success', "User deleted successfully");
-                            } else if (typeof toastr !== 'undefined') {
-                                toastr.success("User deleted successfully");
-                            } else {
-                                alert("User deleted successfully");
-                            }
-                            $('#users-table').DataTable().ajax.reload(); // reload table
-                        } else {
-                            if (typeof showToast !== 'undefined') {
-                                showToast('error', "Failed to delete user");
-                            } else if (typeof toastr !== 'undefined') {
-                                toastr.error("Failed to delete user");
-                            } else {
-                                alert("Failed to delete user");
-                            }
-                        }
-                    },
-                    error: function(xhr) {
-                        if (typeof showToast !== 'undefined') {
-                            showToast('error', "Error deleting user");
-                        } else if (typeof toastr !== 'undefined') {
-                            toastr.error("Error deleting user");
-                        } else {
-                            alert("Error deleting user");
-                        }
-                    }
+                    $('#userDetails').html(html);
+                }).fail(function(xhr) {
+                    $('#userDetails').html('<p class="text-danger">Error loading user details. Please try again.</p>');
+                    console.error('Error loading user:', xhr);
                 });
-            }
+            });
+
+            // Delete User
+            $(document).on('click', '.delete-user', function(e) {
+                e.preventDefault();
+                let url = $(this).attr('href'); // destroy route
+                let id = $(this).data('id');
+
+                if (confirm("Are you sure you want to delete this user?")) {
+                    $.ajax({
+                        url: url,
+                        type: 'DELETE',
+                        data: {
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                if (typeof showToast !== 'undefined') {
+                                    showToast('success', "User deleted successfully");
+                                } else if (typeof toastr !== 'undefined') {
+                                    toastr.success("User deleted successfully");
+                                } else {
+                                    alert("User deleted successfully");
+                                }
+                                $('#users-table').DataTable().ajax.reload(); // reload table
+                            } else {
+                                if (typeof showToast !== 'undefined') {
+                                    showToast('error', "Failed to delete user");
+                                } else if (typeof toastr !== 'undefined') {
+                                    toastr.error("Failed to delete user");
+                                } else {
+                                    alert("Failed to delete user");
+                                }
+                            }
+                        },
+                        error: function(xhr) {
+                            if (typeof showToast !== 'undefined') {
+                                showToast('error', "Error deleting user");
+                            } else if (typeof toastr !== 'undefined') {
+                                toastr.error("Error deleting user");
+                            } else {
+                                alert("Error deleting user");
+                            }
+                        }
+                    });
+                }
+            });
         });
     </script>
 @endpush
