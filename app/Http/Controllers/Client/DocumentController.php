@@ -20,7 +20,17 @@ class DocumentController extends Controller
         $filePath = storage_path('app/public/' . $document->file_path);
 
         if (file_exists($filePath)) {
-            return response()->download($filePath, $document->name);
+            // Get the original file extension from the stored file
+            $extension = pathinfo($document->file_path, PATHINFO_EXTENSION);
+
+            // Format the download filename properly
+            $nameWithoutExt = pathinfo($document->name, PATHINFO_FILENAME);
+            $downloadName = $nameWithoutExt . '.' . $extension;
+
+            // Clean the filename
+            $downloadName = preg_replace('/[^a-zA-Z0-9._-]/', '_', $downloadName);
+
+            return response()->download($filePath, $downloadName);
         }
 
         abort(404, 'File not found.');

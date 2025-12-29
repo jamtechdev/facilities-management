@@ -10,20 +10,46 @@
     @vite([
         'resources/js/jquery-global.js',
         'resources/css/app.css',
+        'resources/css/common-styles.css',
         'resources/css/utilities.css',
         'resources/css/layout.css',
-        'resources/css/dashboard.css',
         'resources/css/forms.css',
         'resources/css/datatables.css',
+        'resources/css/preloader.css',
         'resources/js/app.js',
         'resources/js/layout.js',
         'resources/js/forms.js',
+        'resources/js/flash-messages.js',
+        'resources/js/image-modal.js',
         'resources/js/datatables-init.js',
-        'resources/js/datatables-handlers.js'
+        'resources/js/datatables-handlers.js',
+        'resources/js/global-loader.js',
+        'resources/js/preloader.js'
     ])
     @stack('styles')
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+
+    <!-- Firebase Config -->
+    <script>
+        window.firebaseConfig = {
+            apiKey: "{{ config('services.firebase.api_key', '') }}",
+            authDomain: "{{ config('services.firebase.auth_domain', '') }}",
+            projectId: "{{ config('services.firebase.project_id', '') }}",
+            storageBucket: "{{ config('services.firebase.storage_bucket', '') }}",
+            messagingSenderId: "{{ config('services.firebase.messaging_sender_id', '') }}",
+            appId: "{{ config('services.firebase.app_id', '') }}",
+            vapidKey: "{{ config('services.firebase.vapid_key', '') }}"
+        };
+    </script>
 </head>
-<body>
+<body class="authenticated"
+    @if(session('success')) data-flash-success="{{ session('success') }}" @endif
+    @if(session('error')) data-flash-error="{{ session('error') }}" @endif
+    @if($errors->any()) data-flash-errors='@json($errors->all())' @endif>
+    @include('layouts.partials.preloader')
     <div class="min-vh-100 d-flex">
         <!-- Modern Sidebar -->
         <aside class="sidebar-modern">
@@ -42,7 +68,7 @@
 
             <!-- Sidebar Navigation -->
             <nav class="sidebar-nav">
-                @if(auth()->user()->hasAnyRole(['SuperAdmin', 'Admin']))
+                @if(auth()->user()->can('view admin dashboard'))
                     <!-- Main Section -->
                     <div class="nav-section">
                         <div class="nav-section-title">Main</div>
@@ -143,7 +169,7 @@
                         </div>
                         @endcan
                     </div>
-                @elseif(auth()->user()->hasRole('Staff'))
+                @elseif(auth()->user()->can('view staff dashboard'))
                     <!-- Staff Section -->
                     <div class="nav-section">
                         <div class="nav-section-title">Main</div>
@@ -192,12 +218,15 @@
                         <div class="user-name">{{ auth()->user()->name }}</div>
                         <div class="user-role">
                             @php
-                                if(auth()->user()->hasRole('Admin')) {
+                                $authUser = auth()->user();
+                                if($authUser->can('view roles')) {
                                     $roleName = 'Super Admin';
-                                } elseif(auth()->user()->hasRole('SuperAdmin')) {
+                                } elseif($authUser->can('view admin dashboard')) {
                                     $roleName = 'Admin';
-                                } elseif(auth()->user()->hasRole('Staff')) {
+                                } elseif($authUser->can('view staff dashboard')) {
                                     $roleName = 'Staff';
+                                } elseif($authUser->can('view client dashboard')) {
+                                    $roleName = 'Client';
                                 } else {
                                     $roleName = 'User';
                                 }
@@ -229,29 +258,8 @@
 
     {{-- jQuery is loaded globally from npm via jquery-global.js in head section above --}}
     {{-- jQuery ($ and jQuery) is now available on all pages --}}
+    {{-- Flash messages are handled by flash-messages.js --}}
+    @vite(['resources/js/firebase-notifications.js'])
     @stack('scripts')
-
-    <script>
-        // Show flash messages using Toastr
-        @if(session('success'))
-            if (typeof showToast !== 'undefined') {
-                showToast('success', '{{ session('success') }}');
-            }
-        @endif
-
-        @if(session('error'))
-            if (typeof showToast !== 'undefined') {
-                showToast('error', '{{ session('error') }}');
-            }
-        @endif
-
-        @if($errors->any())
-            if (typeof showToast !== 'undefined') {
-                @foreach($errors->all() as $error)
-                    showToast('error', '{{ $error }}');
-                @endforeach
-            }
-        @endif
-    </script>
 </body>
 </html>

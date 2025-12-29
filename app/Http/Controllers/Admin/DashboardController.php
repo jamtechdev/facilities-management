@@ -19,35 +19,52 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $today = Carbon::today();
         $user = auth()->user();
-        
+        $role = $user->roles->first();
+
+        // Prevent SuperAdmin from accessing Admin dashboard (check by role, not permission)
+        if ($role && $role->name === 'SuperAdmin') {
+            abort(403, 'SuperAdmin users must use the SuperAdmin dashboard.');
+        }
+
+        // Ensure user has admin dashboard permission
+        if (!$user->can('view admin dashboard')) {
+            abort(403, 'You do not have permission to access the admin dashboard.');
+        }
+
+        $today = Carbon::today();
+
         $stats = [];
-        
+
         // Only load stats if user has permission to view the card
         if ($user->can('view dashboard leads card')) {
             $stats['total_leads'] = Lead::count();
             $stats['new_leads'] = Lead::whereDate('created_at', $today)->count();
             $stats['qualified_leads'] = Lead::where('stage', 'qualified')->count();
         }
-        
+
         if ($user->can('view dashboard clients card')) {
             $stats['total_clients'] = Client::where('is_active', true)->count();
         }
-        
+
         if ($user->can('view dashboard staff card')) {
             $stats['total_staff'] = Staff::where('is_active', true)->count();
         }
-        
+
         if ($user->can('view dashboard revenue card')) {
             $stats['total_invoices'] = Invoice::count();
             $stats['revenue'] = Invoice::where('status', 'paid')->sum('total_amount');
         }
-        
+
         if ($user->can('view dashboard users card')) {
             $stats['total_users'] = User::count();
-            $stats['total_admins'] = User::role('Admin')->count();
-            $stats['total_superadmins'] = User::role('SuperAdmin')->count();
+            // Count users with admin dashboard permission but not view roles permission
+            $stats['total_admins'] = User::permission('view admin dashboard')
+                ->whereDoesntHave('permissions', function($q) {
+                    $q->where('name', 'view roles');
+                })->count();
+            // Count users with view roles permission (SuperAdmin)
+            $stats['total_superadmins'] = User::permission('view roles')->count();
         }
 
         // Lead stages breakdown - only if user can view leads
@@ -67,9 +84,9 @@ class DashboardController extends Controller
                 $date = $today->copy()->subDays($i);
                 $dateStart = $date->copy()->startOfDay();
                 $dateEnd = $date->copy()->endOfDay();
-                
+
                 $count = Lead::whereBetween('created_at', [$dateStart, $dateEnd])->count();
-                
+
                 $leadsLast7Days[] = [
                     'date' => $date->format('M d'),
                     'day' => $date->format('D'),
@@ -106,7 +123,7 @@ class DashboardController extends Controller
 
         $viewPrefix = \App\Helpers\RouteHelper::getViewPrefix();
         return view($viewPrefix . '.dashboard', compact(
-            'stats', 
+            'stats',
             'leadStages',
             'leadsLast7Days',
             'followUpReminders',

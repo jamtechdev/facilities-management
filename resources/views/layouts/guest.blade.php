@@ -6,10 +6,20 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Laravel') }} - @yield('title', 'Welcome')</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    @vite(['resources/css/app.css', 'resources/css/guest.css', 'resources/js/app.js'])
+    @vite([
+        'resources/css/app.css',
+        'resources/css/guest.css',
+        'resources/css/utilities.css',
+        'resources/css/preloader.css',
+        'resources/js/app.js',
+        'resources/js/global-loader.js',
+        'resources/js/preloader.js',
+        'resources/js/navbar-collapse-fix.js'
+    ])
     @stack('styles')
 </head>
 <body>
+    @include('layouts.partials.preloader')
     <div class="min-vh-100 d-flex flex-column">
         <!-- Navigation -->
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-lg navbar-guest">

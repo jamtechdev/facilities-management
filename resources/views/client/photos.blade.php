@@ -43,14 +43,14 @@
                                                         $firstBefore = $pair['before']->first();
                                                         $beforePath = 'job-photos/' . basename($firstBefore->file_path);
                                                     @endphp
-                                                    <img src="{{ asset('storage/' . $beforePath) }}" alt="Before">
+                                                    <img src="{{ asset('storage/' . $beforePath) }}" alt="Before" onerror="this.src='/Image-not-found.png'; this.onerror=null;">
                                                     <div class="photo-label">Before</div>
                                                     @if ($pair['before']->count() > 1)
                                                         <div class="more-badge">+{{ $pair['before']->count() - 1 }}</div>
                                                     @endif
                                                 @else
                                                     <div class="no-photo">
-                                                        <i class="bi bi-image" style="font-size: 3rem;"></i>
+                                                        <i class="bi bi-image icon-3rem"></i>
                                                     </div>
                                                 @endif
                                             </div>
@@ -63,14 +63,14 @@
                                                         $firstAfter = $pair['after']->first();
                                                         $afterPath = 'job-photos/' . basename($firstAfter->file_path);
                                                     @endphp
-                                                    <img src="{{ asset('storage/' . $afterPath) }}" alt="After">
+                                                    <img src="{{ asset('storage/' . $afterPath) }}" alt="After" onerror="this.src='/Image-not-found.png'; this.onerror=null;">
                                                     <div class="photo-label after-label">After</div>
                                                     @if ($pair['after']->count() > 1)
                                                         <div class="more-badge">+{{ $pair['after']->count() - 1 }}</div>
                                                     @endif
                                                 @else
                                                     <div class="no-photo">
-                                                        <i class="bi bi-image" style="font-size: 3rem;"></i>
+                                                        <i class="bi bi-image icon-3rem"></i>
                                                     </div>
                                                 @endif
                                             </div>
@@ -105,7 +105,7 @@
                     </div>
                 @else
                     <div class="text-center py-5 my-5">
-                        <i class="bi bi-images" style="font-size: 6rem; color: #dee2e6; opacity: 0.6;"></i>
+                        <i class="bi bi-images empty-state-icon-large"></i>
                         <h3 class="text-muted mt-3">No Gallery Images Yet</h3>
                         <p class="text-muted">Before & After photos will appear here once our team uploads them.</p>
                     </div>

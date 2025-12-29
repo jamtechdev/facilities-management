@@ -11,7 +11,7 @@
                     <h1 class="h3 mb-0">Edit Lead</h1>
                     <p class="text-muted">{{ $lead->name }}</p>
                 </div>
-                <a href="{{ route('admin.leads.show', $lead) }}" class="btn btn-outline-secondary">
+                <a href="{{ \App\Helpers\RouteHelper::url('leads.show', $lead) }}" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-2"></i>Back to Lead
                 </a>
             </div>
@@ -25,7 +25,7 @@
                     <h5><i class="bi bi-pencil-square me-2"></i>Edit Lead Information</h5>
                 </div>
                 <div class="form-card-body">
-                    <form id="updateLeadForm" method="POST" action="{{ route('admin.leads.update', $lead) }}">
+                    <form id="updateLeadForm" method="POST" action="{{ \App\Helpers\RouteHelper::url('leads.update', $lead) }}">
                         @csrf
                         @method('PUT')
 

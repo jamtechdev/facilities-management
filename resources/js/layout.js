@@ -14,23 +14,67 @@
     });
 
     /**
-     * Mobile Sidebar Toggle
+     * Update sidebar toggle icon based on state
+     */
+    function updateSidebarToggleIcon() {
+        const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
+        const sidebar = document.querySelector('.sidebar-modern');
+
+        if (!sidebarToggleIcon || !sidebar) return;
+
+        if (sidebar.classList.contains('collapsed')) {
+            sidebarToggleIcon.classList.remove('bi-chevron-left');
+            sidebarToggleIcon.classList.add('bi-chevron-right');
+        } else {
+            sidebarToggleIcon.classList.remove('bi-chevron-right');
+            sidebarToggleIcon.classList.add('bi-chevron-left');
+        }
+    }
+
+    /**
+     * Sidebar Toggle (Collapsible)
      */
     function initSidebarToggle() {
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebar = document.querySelector('.sidebar-modern');
-        
+
         if (!sidebarToggle || !sidebar) return;
 
+        // Load saved state from localStorage
+        const savedState = localStorage.getItem('sidebarCollapsed');
+        if (savedState === 'true') {
+            sidebar.classList.add('collapsed');
+        }
+
+        // Update icon based on initial state
+        updateSidebarToggleIcon();
+
         sidebarToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('mobile-open');
-            
-            // Add overlay for mobile
-            if (sidebar.classList.contains('mobile-open')) {
-                createMobileOverlay();
-            } else {
-                removeMobileOverlay();
+            // Toggle collapsed state
+            sidebar.classList.toggle('collapsed');
+
+            // Update icon
+            updateSidebarToggleIcon();
+
+            // Save state to localStorage
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+
+            // On mobile, also handle mobile-open class
+            if (window.innerWidth <= 992) {
+                sidebar.classList.toggle('mobile-open');
+
+                // Add overlay for mobile
+                if (sidebar.classList.contains('mobile-open')) {
+                    createMobileOverlay();
+                } else {
+                    removeMobileOverlay();
+                }
             }
+        });
+
+        // Update icon on window resize
+        window.addEventListener('resize', function() {
+            updateSidebarToggleIcon();
         });
 
         // Close sidebar when clicking outside on mobile
@@ -38,7 +82,7 @@
             if (window.innerWidth <= 992) {
                 const isClickInsideSidebar = sidebar.contains(event.target);
                 const isClickOnToggle = sidebarToggle.contains(event.target);
-                
+
                 if (!isClickInsideSidebar && !isClickOnToggle && sidebar.classList.contains('mobile-open')) {
                     sidebar.classList.remove('mobile-open');
                     removeMobileOverlay();
@@ -60,7 +104,7 @@
      */
     function createMobileOverlay() {
         if (document.getElementById('mobile-overlay')) return;
-        
+
         const overlay = document.createElement('div');
         overlay.id = 'mobile-overlay';
         overlay.style.cssText = `
@@ -73,7 +117,7 @@
             z-index: 999;
             transition: opacity 0.3s ease;
         `;
-        
+
         overlay.addEventListener('click', function() {
             const sidebar = document.querySelector('.sidebar-modern');
             if (sidebar) {
@@ -81,9 +125,9 @@
             }
             removeMobileOverlay();
         });
-        
+
         document.body.appendChild(overlay);
-        
+
         // Fade in
         setTimeout(() => {
             overlay.style.opacity = '1';
@@ -110,7 +154,7 @@
      */
     function initBootstrapTooltips() {
         if (typeof bootstrap === 'undefined') return;
-        
+
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
@@ -131,7 +175,7 @@
             if (!ticking) {
                 window.requestAnimationFrame(function() {
                     const currentScroll = window.pageYOffset;
-                    
+
                     if (currentScroll <= 0) {
                         navbar.style.boxShadow = '0 2px 10px rgba(0,0,0,0.05)';
                     } else if (currentScroll > lastScroll && currentScroll > 100) {
@@ -141,16 +185,14 @@
                         // Scrolling up
                         navbar.style.boxShadow = '0 2px 10px rgba(0,0,0,0.05)';
                     }
-                    
+
                     lastScroll = currentScroll;
                     ticking = false;
                 });
-                
+
                 ticking = true;
             }
         });
     }
 
 })();
-
-

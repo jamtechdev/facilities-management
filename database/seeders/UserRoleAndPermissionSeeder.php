@@ -118,8 +118,12 @@ class UserRoleAndPermissionSeeder extends Seeder
         // Assign ALL permissions to SuperAdmin role
         $superAdminRole->syncPermissions(Permission::all());
 
-        // Assign ALL permissions to Admin role (same as SuperAdmin)
-        $adminRole->syncPermissions(Permission::all());
+        // Assign ALL permissions to Admin role EXCEPT 'view roles' (SuperAdmin only permission)
+        $allPermissions = Permission::all();
+        $adminPermissions = $allPermissions->reject(function ($permission) {
+            return $permission->name === 'view roles';
+        });
+        $adminRole->syncPermissions($adminPermissions);
 
         // Assign permissions to Staff role
         $staffRole->syncPermissions([
@@ -321,4 +325,3 @@ class UserRoleAndPermissionSeeder extends Seeder
         }
     }
 }
-

@@ -58,7 +58,7 @@
                     <form method="POST" action="{{ route('login') }}" class="mt-4">
                     @csrf
 
-                    <x-form-input 
+                    <x-form-input
                         type="email"
                         name="email"
                         label="Email Address"
@@ -70,7 +70,7 @@
                         autocomplete="email"
                     />
 
-                    <x-form-input 
+                    <x-form-input
                         type="password"
                         name="password"
                         label="Password"
@@ -88,7 +88,7 @@
                                 Remember me
                             </label>
                         </div>
-                        <a href="#" class="login-link">Forgot Password?</a>
+                        <a href="{{ route('password.forgot') }}" class="login-link">Forgot Password?</a>
                     </div>
 
                     <div class="d-grid mb-4">
@@ -99,22 +99,13 @@
 
                     <div class="text-center">
                         <p class="text-muted mb-0">
-                            Don't have an account? 
+                            Don't have an account?
                             <a href="{{ route('register') }}" class="login-link fw-bold">
                                 Register here
                             </a>
                         </p>
                     </div>
                 </form>
-
-                <div class="mt-4 pt-4 border-top text-center">
-                    <p class="text-muted small mb-2">Or continue with</p>
-                    <div class="d-flex justify-content-center">
-                        <button class="btn btn-outline-secondary social-login-btn">
-                            <i class="bi bi-google me-2"></i>Login with Google
-                        </button>
-                    </div>
-                </div>
                 </div>
             </div>
         </div>

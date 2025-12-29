@@ -197,7 +197,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Download a staff document
+     * Download a client document
      */
     public function downloadDocument(Document $document)
     {
@@ -212,6 +212,16 @@ class ProfileController extends Controller
             abort(404, 'Document not found.');
         }
 
-        return Storage::disk('public')->download($document->file_path, $document->name);
+        // Get the original file extension from the stored file
+        $extension = pathinfo($document->file_path, PATHINFO_EXTENSION);
+
+        // Format the download filename properly
+        $nameWithoutExt = pathinfo($document->name, PATHINFO_FILENAME);
+        $downloadName = $nameWithoutExt . '.' . $extension;
+
+        // Clean the filename
+        $downloadName = preg_replace('/[^a-zA-Z0-9._-]/', '_', $downloadName);
+
+        return Storage::disk('public')->download($document->file_path, $downloadName);
     }
 }

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\DataTables\UserDataTable;
 use App\Helpers\RouteHelper;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
@@ -26,32 +27,44 @@ class UserController extends Controller
      */
     public function create()
     {
-        $roles = Role::all();
         $viewPrefix = RouteHelper::getViewPrefix();
-        return view($viewPrefix . '.users.create', compact('roles'));
+        return view($viewPrefix . '.users.create');
     }
 
     /**
      * Store a newly created user in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'role' => 'required|string'
-        ]);
+        $currentUser = auth()->user();
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|string|min:6',
+            ]);
 
-        $user->assignRole($validated['role']);
-        // return response()->json(['success' => true]);
-        return redirect(RouteHelper::url('users.index'))->with('success', 'User created successfully.');
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
+
+            // Assign default Lead role for new users
+            $user->assignRole('Lead');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User created successfully.',
+                'redirect' => RouteHelper::url('users.index')
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create user: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -64,67 +77,110 @@ class UserController extends Controller
             abort(403, 'You do not have permission to view user details.');
         }
         $user->load('roles');
-        return response()->json($user);
+        $viewPrefix = RouteHelper::getViewPrefix();
+        return view($viewPrefix . '.users.show', compact('user'));
     }
 
     public function edit(User $user)
     {
         $currentUser = auth()->user();
-        
+
         // Check permission to edit users
         if (!$currentUser->can('edit users')) {
             abort(403, 'You do not have permission to edit users.');
         }
-        
+
         // Prevent users from editing themselves
         if ($user->id === $currentUser->id) {
             abort(403, 'You cannot edit your own user account.');
         }
 
-        $roles = Role::all();
         $viewPrefix = RouteHelper::getViewPrefix();
-        return view($viewPrefix . '.users.edit', compact('user', 'roles'));
+        return view($viewPrefix . '.users.edit', compact('user'));
     }
 
-    public function update(Request $request, User $user)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:6',
-            'role' => 'required|string'
-        ]);
-
-        $user->name = $validated['name'];
-        $user->email = $validated['email'];
-
-        if (!empty($validated['password'])) {
-            $user->password = Hash::make($validated['password']);
-        }
-
-        $user->save();
-
-        // Role update
-        $user->syncRoles([$validated['role']]);
-
-        return redirect(RouteHelper::url('users.index'))->with('success', 'User updated successfully.');
-    }
-
-    public function destroy(User $user)
+    public function update(Request $request, User $user): JsonResponse
     {
         $currentUser = auth()->user();
-        
-        // Check permission to delete users
-        if (!$currentUser->can('delete users')) {
-            abort(403, 'You do not have permission to delete users.');
-        }
-        
-        // Prevent users from deleting themselves
-        if ($user->id === $currentUser->id) {
-            abort(403, 'You cannot delete your own user account.');
+
+        // Check permission to edit users
+        if (!$currentUser->can('edit users')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to edit users.'
+            ], 403);
         }
 
-        $user->delete();
-        return response()->json(['success' => true]);
+        // Prevent users from editing themselves
+        if ($user->id === $currentUser->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot edit your own user account.'
+            ], 403);
+        }
+
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email,' . $user->id,
+                'password' => 'nullable|string|min:6',
+            ]);
+
+            $user->name = $validated['name'];
+            $user->email = $validated['email'];
+
+            if (!empty($validated['password'])) {
+                $user->password = Hash::make($validated['password']);
+            }
+
+            $user->save();
+
+            // Keep existing roles - no role changes through this form
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User updated successfully.',
+                'redirect' => RouteHelper::url('users.index')
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update user: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function destroy(User $user): JsonResponse
+    {
+        $currentUser = auth()->user();
+
+        // Check permission to delete users
+        if (!$currentUser->can('delete users')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to delete users.'
+            ], 403);
+        }
+
+        // Prevent users from deleting themselves
+        if ($user->id === $currentUser->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot delete your own user account.'
+            ], 403);
+        }
+
+        try {
+            $user->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'User deleted successfully.'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete user: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

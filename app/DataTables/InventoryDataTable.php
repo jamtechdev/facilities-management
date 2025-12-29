@@ -64,32 +64,18 @@ class InventoryDataTable extends DataTable
             $user = auth()->user();
             $actions = '<div class="btn-group btn-group-sm" role="group">';
 
-            // Prepare inventory data for JSON
-            $inventoryData = [
-                'id' => $inventory->id,
-                'name' => $inventory->name,
-                'description' => $inventory->description,
-                'category' => $inventory->category,
-                'quantity' => $inventory->quantity,
-                'min_stock_level' => $inventory->min_stock_level,
-                'unit' => $inventory->unit,
-                'unit_cost' => $inventory->unit_cost,
-                'status' => $inventory->status,
-            ];
-            $inventoryJson = htmlspecialchars(json_encode($inventoryData), ENT_QUOTES, 'UTF-8');
-
             // View button - requires view inventory permission
             if ($user->can('view inventory')) {
-                $actions .= '<button type="button" class="btn btn-outline-primary view-inventory" data-item="' . $inventoryJson . '" title="View">
+                $actions .= '<a href="' . route('admin.inventory.show', $inventory) . '" class="btn btn-outline-primary" title="View">
                         <i class="bi bi-eye"></i>
-                    </button>';
+                    </a>';
             }
 
-            // Edit button
+            // Edit button - redirect to edit page
             if ($user->can('edit inventory')) {
-                $actions .= '<button type="button" class="btn btn-outline-secondary edit-inventory" data-item="' . $inventoryJson . '" title="Edit">
+                $actions .= '<a href="' . route('admin.inventory.edit', $inventory) . '" class="btn btn-outline-secondary" title="Edit">
                         <i class="bi bi-pencil"></i>
-                    </button>';
+                    </a>';
             }
 
             // Delete button
@@ -100,12 +86,12 @@ class InventoryDataTable extends DataTable
             }
 
             $actions .= '</div>';
-            
+
             // If no actions available, return a dash
             if (strlen($actions) <= strlen('<div class="btn-group btn-group-sm" role="group"></div>')) {
                 return new HtmlString('<span class="text-muted">-</span>');
             }
-            
+
             return new HtmlString($actions);
             })
             ->editColumn('created_at', function (Inventory $inventory) {
@@ -142,7 +128,7 @@ class InventoryDataTable extends DataTable
                     ->className('btn btn-primary')
                     ->text('<i class="bi bi-plus-circle me-1"></i> New Item')
                     ->action('function(e, dt, node, config) {
-                        $("#addInventoryModal").modal("show");
+                        window.location.href = "' . route('admin.inventory.create') . '";
                     }') : null,
                 Button::make('reload')
                     ->className('btn btn-secondary')
@@ -169,10 +155,10 @@ class InventoryDataTable extends DataTable
                 'searchPlaceholder' => 'Search inventory...',
                 'lengthMenu' => 'Show _MENU_ entries',
                 'paginate' => [
-                    'first' => 'First',
-                    'last' => 'Last',
-                    'next' => 'Next',
-                    'previous' => 'Previous'
+                    'first' => '«',
+                    'last' => '»',
+                    'next' => '›',
+                    'previous' => '‹'
                 ]
                 ],
             ]);
@@ -214,4 +200,3 @@ class InventoryDataTable extends DataTable
         return 'Inventory_' . date('YmdHis');
     }
 }
-

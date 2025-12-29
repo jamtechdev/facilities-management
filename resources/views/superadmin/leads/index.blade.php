@@ -12,7 +12,7 @@
     <div class="profile-header">
         <div class="profile-header-content">
             <div class="profile-avatar">
-                <i class="bi bi-person-lines-fill" style="font-size: 2.5rem;"></i>
+                <i class="bi bi-person-lines-fill icon-2-5rem"></i>
             </div>
             <div class="profile-info flex-grow-1">
                 <h1>Leads Management</h1>
@@ -20,7 +20,7 @@
             </div>
             @can('create leads')
             <div class="profile-header-actions">
-                <a href="{{ route('admin.leads.create') }}" class="btn btn-light btn-lg px-4 py-2 shadow-lg rounded-pill fw-semibold">
+                <a href="{{ \App\Helpers\RouteHelper::url('leads.create') }}" class="btn btn-light btn-lg px-4 py-2 shadow-lg rounded-pill fw-semibold">
                     <i class="bi bi-plus-circle me-2"></i>Create New Lead
                 </a>
             </div>
@@ -44,6 +44,16 @@
 @endsection
 
 @push('scripts')
-{!! $dataTable->scripts(attributes: ['type' => 'module']) !!}
+    <script>
+        // Pass routes to JS for delete operations
+        if (typeof window.deleteLeadRoute === 'undefined') {
+            window.deleteLeadRoute = '{{ \App\Helpers\RouteHelper::url("leads.destroy", ":id") }}';
+        }
+        // Pass route for stage update
+        if (typeof window.updateStageRoute === 'undefined') {
+            window.updateStageRoute = '{{ \App\Helpers\RouteHelper::url("leads.update-stage", ":id") }}';
+        }
+    </script>
+    {!! $dataTable->scripts(attributes: ['type' => 'module']) !!}
 @endpush
 

@@ -4,9 +4,9 @@
 ])
 
 @php
-    // Check if user can convert leads - Admin or user with 'convert leads' permission
+    // Check if user can convert leads - user with 'convert leads' permission and admin dashboard access
     $user = auth()->user();
-    $hasConvertPermission = $user->hasRole('Admin') || $user->can('convert leads');
+    $hasConvertPermission = $user->can('view admin dashboard') && $user->can('convert leads');
     $canConvertLead = $hasConvertPermission && $canConvert && !$lead->converted_to_client_id && $lead->stage == 'qualified';
 @endphp
 
@@ -23,7 +23,9 @@
                         This lead is qualified and ready to be converted to a client. All data will be migrated.
                     </p>
                 </div>
-                <button type="button" class="btn btn-success btn-lg" id="convertToClientBtn" data-lead-id="{{ $lead->id }}">
+                <button type="button" class="btn btn-success btn-lg" id="convertToClientBtn" 
+                        data-lead-id="{{ $lead->id }}"
+                        data-convert-url="{{ \App\Helpers\RouteHelper::url('leads.convert', $lead) }}">
                     <i class="bi bi-arrow-right-circle me-2"></i>Convert to Client
                 </button>
             </div>
@@ -42,7 +44,7 @@
                     <p class="mb-0 small text-muted">
                         This lead has been converted to a client.
                         @if($lead->convertedToClient)
-                            <a href="{{ route('admin.clients.show', $lead->convertedToClient) }}" class="text-decoration-none">
+                            <a href="{{ \App\Helpers\RouteHelper::url('clients.show', $lead->convertedToClient) }}" class="text-decoration-none">
                                 View Client <i class="bi bi-arrow-right"></i>
                             </a>
                         @endif

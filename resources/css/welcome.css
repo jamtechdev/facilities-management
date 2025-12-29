@@ -1,19 +1,4 @@
 /* Welcome Page Styles */
-:root {
-    --primary-green: #84c373;
-    --primary-dark: #5a8a4d;
-    --primary-light: #a8d99a;
-    --primary-lighter: #c8e9bd;
-    --primary-lightest: #e8f5e4;
-    --primary-gradient: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
-    --primary-gradient-light: linear-gradient(135deg, #a8d99a 0%, #84c373 100%);
-    --text-dark: #2d4a25;
-    --bg-light: #f8fbf7;
-    --hero-overlay: linear-gradient(135deg, rgba(132, 195, 115, 0.95) 0%, rgba(90, 138, 77, 0.95) 100%);
-    --shadow-sm: 0 2px 8px rgba(132, 195, 115, 0.1);
-    --shadow-md: 0 4px 16px rgba(132, 195, 115, 0.15);
-    --shadow-lg: 0 8px 32px rgba(132, 195, 115, 0.2);
-}
 
 /* Hero Section */
 .hero-section {

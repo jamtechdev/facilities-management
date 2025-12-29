@@ -1,15 +1,5 @@
 /* Modern Form Styles - Matching Green Theme */
 
-:root {
-    --primary-green: #84c373;
-    --primary-dark: #5a8a4d;
-    --primary-light: #a8d99a;
-    --primary-lighter: #c8e9bd;
-    --primary-lightest: #e8f5e4;
-    --border-color: #e0e0e0;
-    --focus-shadow: rgba(132, 195, 115, 0.25);
-}
-
 /* Form Container */
 .form-container {
     background: white;
@@ -341,6 +331,7 @@ select.form-select {
 /* Fix for iOS Safari dropdown issues */
 @supports (-webkit-touch-callout: none) {
     select.form-select {
+        appearance: menulist;
         -webkit-appearance: menulist;
     }
 }

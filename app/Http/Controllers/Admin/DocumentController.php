@@ -99,7 +99,17 @@ class DocumentController extends Controller
             abort(404, 'Document not found');
         }
 
-        return Storage::disk('public')->download($document->file_path, $document->name);
+        // Get the original file extension from the stored file
+        $extension = pathinfo($document->file_path, PATHINFO_EXTENSION);
+
+        // Format the download filename properly
+        // Remove any existing extension from name and add the correct one
+        $nameWithoutExt = pathinfo($document->name, PATHINFO_FILENAME);
+        $downloadName = $nameWithoutExt . '.' . $extension;
+
+        // Clean the filename (remove special characters that might cause issues)
+        $downloadName = preg_replace('/[^a-zA-Z0-9._-]/', '_', $downloadName);
+
+        return Storage::disk('public')->download($document->file_path, $downloadName);
     }
 }
-

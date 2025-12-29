@@ -87,12 +87,6 @@
     margin-left: auto;
 }
 
-.clock-time-section {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
 .clock-icon-wrapper {
     width: 60px;
     height: 60px;
@@ -128,16 +122,6 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: white !important;
-}
-
-.clock-seconds {
-    font-size: 1.25rem;
-    opacity: 0.9;
-    font-weight: 600;
-    margin-left: 0.5rem;
-    min-width: 50px;
-    text-align: center;
     color: white !important;
 }
 
@@ -187,13 +171,7 @@
 
     .clock-date {
         font-size: 0.875rem;
-    }
-
-    .clock-seconds {
-        font-size: 1rem;
-        margin-left: 0;
-        margin-top: 0.25rem;
-    }
+    
 }
 
 @media (max-width: 576px) {

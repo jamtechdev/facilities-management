@@ -2,6 +2,87 @@
    Utility Classes - Common Styles
    ============================================ */
 
+/* Convert Switcher */
+.convert-switcher-wrapper .card {
+    border-width: 2px;
+}
+
+.convert-switcher-wrapper .card-body {
+    padding: 15px 20px;
+}
+
+/* Common Animations */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Common Header Pattern - Used across dashboards */
+.dashboard-header-pattern {
+    background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(132, 195, 115, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-header-pattern::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: pulse 8s ease-in-out infinite;
+}
+
+.dashboard-header-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* Common Tab Styles - Used across profile, timesheet, entity-details */
+.common-tabs {
+    border-bottom: 2px solid rgba(132, 195, 115, 0.2);
+    margin-bottom: 2rem;
+}
+
+.common-tabs .nav-link {
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-right: 2rem;
+    padding: 1rem 0;
+    font-weight: 600;
+    color: #6c757d;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.common-tabs .nav-link:hover {
+    color: #84c373;
+    border-bottom-color: rgba(132, 195, 115, 0.5);
+}
+
+.common-tabs .nav-link.active {
+    color: #84c373;
+    border-bottom-color: #84c373;
+    background: transparent;
+}
+
 /* Green Gradient Background */
 .bg-gradient-green {
     background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
@@ -58,7 +139,7 @@
         font-size: 0.8125rem;
         padding: 0.45rem 0.9rem;
     }
-    
+
     .badge-gradient-green {
         font-size: 0.75rem;
         padding: 0.25rem 0.5rem;
@@ -70,10 +151,77 @@
         font-size: 0.75rem;
         padding: 0.4rem 0.8rem;
     }
-    
+
     .badge-gradient-green {
         font-size: 0.7rem;
         padding: 0.2rem 0.4rem;
     }
 }
 
+/* ============================================
+   Global Loader Styles
+   ============================================ */
+.global-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9998; /* Lower than preloader (9999) to prevent conflicts */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.global-loader.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Hide global loader when preloader is active */
+body.preloader-active .global-loader.show {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+.global-loader-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+}
+
+.global-loader-content {
+    position: relative;
+    z-index: 10000;
+    background: white;
+    padding: 2rem 3rem;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    min-width: 280px;
+}
+
+.global-loader-spinner {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 1.5rem;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary-green, #84c373);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.global-loader-message {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1f2e;
+    margin: 0;
+}

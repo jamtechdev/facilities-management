@@ -3,7 +3,11 @@
 @section('title', 'Client Details')
 
 @push('styles')
-    @vite(['resources/css/entity-details.css'])
+    @vite(['resources/css/entity-details.css', 'resources/css/common-styles.css'])
+@endpush
+
+@push('scripts')
+    @vite(['resources/js/image-modal.js'])
 @endpush
 
 @section('content')
@@ -16,10 +20,10 @@
         :phone="$client->phone"
         type="client">
         <x-slot name="actions">
-            <a href="{{ route('admin.clients.edit', $client) }}" class="btn btn-light me-2">
+            <a href="{{ \App\Helpers\RouteHelper::url('clients.edit', $client) }}" class="btn btn-light me-2">
                 <i class="bi bi-pencil me-2"></i>Edit
             </a>
-            <a href="{{ route('admin.clients.index') }}" class="btn btn-outline-light">
+            <a href="{{ \App\Helpers\RouteHelper::url('clients.index') }}" class="btn btn-outline-light">
                 <i class="bi bi-arrow-left me-2"></i>Back
             </a>
         </x-slot>
@@ -43,36 +47,86 @@
         <!-- Information Tab -->
         <div class="tab-pane fade show active" id="info" role="tabpanel">
             <div class="row g-3">
-                <x-info-card label="Company Name" :value="$client->company_name" />
-                <x-info-card label="Contact Person" :value="$client->contact_person" />
-                <x-info-card label="Email" :value="$client->email" :link="'mailto:' . $client->email" />
-                <x-info-card label="Phone" :value="$client->phone ?? '-'" :link="$client->phone ? 'tel:' . $client->phone : null" />
-                <x-info-card label="Address" :value="$client->address ?? '-'" />
-                <x-info-card label="City" :value="$client->city ?? '-'" />
-                <x-info-card label="Postal Code" :value="$client->postal_code ?? '-'" />
-                <x-info-card 
-                    label="Status" 
-                    :badge="$client->is_active ? 'Active' : 'Inactive'" 
-                    :badgeColor="$client->is_active ? 'success' : 'secondary'" />
-                <x-info-card 
-                    label="Billing Frequency" 
-                    :badge="$client->billing_frequency ? ucfirst($client->billing_frequency) : 'Not set'" 
-                    badgeColor="info" />
-                <x-info-card label="Agreed Weekly Hours" :value="$client->agreed_weekly_hours ? $client->agreed_weekly_hours . ' hours' : '-'" />
-                <x-info-card label="Agreed Monthly Hours" :value="$client->agreed_monthly_hours ? $client->agreed_monthly_hours . ' hours' : '-'" />
-                @if($client->lead)
-                    <x-info-card 
-                        label="Converted From Lead" 
-                        :value="$client->lead->name" 
-                        :link="route('admin.leads.show', $client->lead)" />
+                <!-- Company Information Section -->
+                <div class="col-12">
+                    <h5 class="mb-3 text-muted fw-bold">
+                        <i class="bi bi-building me-2"></i>Company Information
+                    </h5>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="Company Name" :value="$client->company_name" />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="Contact Person" :value="$client->contact_person" />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="Email" :value="$client->email" :link="'mailto:' . $client->email" />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="Phone" :value="$client->phone ?? '-'" :link="$client->phone ? 'tel:' . $client->phone : null" />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="City" :value="$client->city ?? '-'" />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="Postal Code" :value="$client->postal_code ?? '-'" />
+                </div>
+                @if($client->address)
+                    <div class="col-12">
+                        <x-info-card label="Address" :value="$client->address" />
+                    </div>
                 @endif
+
+                <!-- Status & Settings Section -->
+                <div class="col-12 mt-4">
+                    <h5 class="mb-3 text-muted fw-bold">
+                        <i class="bi bi-gear me-2"></i>Status & Settings
+                    </h5>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card 
+                        label="Status" 
+                        :badge="$client->is_active ? 'Active' : 'Inactive'" 
+                        :badgeColor="$client->is_active ? 'success' : 'secondary'" />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card 
+                        label="Billing Frequency" 
+                        :badge="$client->billing_frequency ? ucfirst($client->billing_frequency) : 'Not set'" 
+                        badgeColor="info" />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="Agreed Weekly Hours" :value="$client->agreed_weekly_hours ? $client->agreed_weekly_hours . ' hours' : '-'" />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="Agreed Monthly Hours" :value="$client->agreed_monthly_hours ? $client->agreed_monthly_hours . ' hours' : '-'" />
+                </div>
+
+                <!-- Additional Information Section -->
+                <div class="col-12 mt-4">
+                    <h5 class="mb-3 text-muted fw-bold">
+                        <i class="bi bi-info-circle me-2"></i>Additional Information
+                    </h5>
+                </div>
+                @if($client->lead)
+                    <div class="col-md-6 col-lg-4">
+                        <x-info-card 
+                            label="Converted From Lead" 
+                            :value="$client->lead->name" 
+                            :link="\App\Helpers\RouteHelper::url('leads.show', $client->lead)" />
+                    </div>
+                @endif
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="Created" :value="$client->created_at->format('M d, Y h:i A')" />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="Last Updated" :value="$client->updated_at->format('M d, Y h:i A')" />
+                </div>
                 @if($client->notes)
                     <div class="col-12">
                         <x-info-card label="Notes" :value="$client->notes" />
                     </div>
                 @endif
-                <x-info-card label="Created" :value="$client->created_at->format('M d, Y h:i A')" />
-                <x-info-card label="Last Updated" :value="$client->updated_at->format('M d, Y h:i A')" />
             </div>
         </div>
 
@@ -88,7 +142,7 @@
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="flex-grow-1">
                                 <h6 class="mb-2">
-                                    <a href="{{ route('admin.staff.show', $staff) }}" class="text-decoration-none">
+                                    <a href="{{ \App\Helpers\RouteHelper::url('staff.show', $staff) }}" class="text-decoration-none">
                                         <i class="bi bi-person me-2"></i>{{ $staff->name }}
                                     </a>
                                 </h6>
@@ -116,7 +170,7 @@
                 @endforeach
             @else
                 <div class="text-center py-5">
-                    <i class="bi bi-people" style="font-size: 48px; color: #dee2e6;"></i>
+                    <i class="bi bi-people icon-48px empty-state-icon-medium"></i>
                     <p class="text-muted mt-3">No staff assigned yet</p>
                 </div>
             @endif
@@ -172,12 +226,17 @@
                             <div class="photo-gallery">
                                 @foreach($timesheet->jobPhotos as $photo)
                                     <div class="photo-item">
-                                        <img src="{{ asset('storage/' . $photo->photo_path) }}" alt="Job Photo" onclick="openImageModal('{{ asset('storage/' . $photo->photo_path) }}', '{{ $photo->photo_type }}')">
+                                        <img src="{{ asset('storage/' . $photo->photo_path) }}" 
+                                             alt="Job Photo" 
+                                             class="job-photo"
+                                             data-image-modal="{{ asset('storage/' . $photo->photo_path) }}" 
+                                             data-image-type="{{ $photo->photo_type }}"
+                                             onerror="this.src='/Image-not-found.png'; this.onerror=null;">
                                         <span class="photo-badge bg-{{ $photo->photo_type == 'before' ? 'warning' : 'success' }}">
                                             {{ ucfirst($photo->photo_type) }}
                                         </span>
                                         @if($photo->is_approved)
-                                            <span class="badge bg-success" style="position: absolute; bottom: 8px; left: 8px; font-size: 10px;">
+                                            <span class="badge bg-success photo-badge-position">
                                                 <i class="bi bi-check-circle"></i>
                                             </span>
                                         @endif
@@ -189,7 +248,7 @@
                 @endforeach
             @else
                 <div class="text-center py-5">
-                    <i class="bi bi-clock-history" style="font-size: 48px; color: #dee2e6;"></i>
+                    <i class="bi bi-clock-history icon-48px empty-state-icon-medium"></i>
                     <p class="text-muted mt-3">No service history yet</p>
                 </div>
             @endif
@@ -228,7 +287,7 @@
                 @endforeach
             @else
                 <div class="text-center py-5">
-                    <i class="bi bi-chat-dots" style="font-size: 48px; color: #dee2e6;"></i>
+                    <i class="bi bi-chat-dots icon-48px empty-state-icon-medium"></i>
                     <p class="text-muted mt-3">No communications yet</p>
                     <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addCommunicationModal">
                         <i class="bi bi-plus-circle me-2"></i>Add First Communication
@@ -255,14 +314,14 @@
                             <span class="badge bg-secondary ms-2">{{ ucfirst($document->document_type) }}</span>
                             <small class="text-muted ms-2">{{ $document->created_at->format('M d, Y') }}</small>
                         </div>
-                        <a href="{{ route('admin.documents.download', $document) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                        <a href="{{ \App\Helpers\RouteHelper::url('documents.download', $document) }}" class="btn btn-sm btn-outline-primary" target="_blank">
                             <i class="bi bi-download"></i> Download
                         </a>
                     </div>
                 @endforeach
             @else
                 <div class="text-center py-5">
-                    <i class="bi bi-file-earmark" style="font-size: 48px; color: #dee2e6;"></i>
+                    <i class="bi bi-file-earmark icon-48px empty-state-icon-medium"></i>
                     <p class="text-muted mt-3">No documents uploaded yet</p>
                     <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#uploadDocumentModal">
                         <i class="bi bi-upload me-2"></i>Upload First Document
@@ -297,7 +356,7 @@
                 @endforeach
             @else
                 <div class="text-center py-5">
-                    <i class="bi bi-star" style="font-size: 48px; color: #dee2e6;"></i>
+                    <i class="bi bi-star icon-48px empty-state-icon-medium"></i>
                     <p class="text-muted mt-3">No feedback received yet</p>
                 </div>
             @endif
@@ -307,7 +366,7 @@
         <div class="tab-pane fade" id="invoices" role="tabpanel">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h5 class="mb-0">Invoices</h5>
-                <a href="{{ route('admin.invoices.create', ['client_id' => $client->id]) }}" class="btn btn-primary">
+                <a href="{{ \App\Helpers\RouteHelper::url('invoices.create', ['client_id' => $client->id]) }}" class="btn btn-primary">
                     <i class="bi bi-plus-circle me-2"></i>Create Invoice
                 </a>
             </div>
@@ -329,7 +388,7 @@
                             @foreach($client->invoices->sortByDesc('created_at') as $invoice)
                                 <tr>
                                     <td>
-                                        <a href="{{ route('admin.invoices.show', $invoice) }}" class="text-decoration-none">
+                                        <a href="{{ \App\Helpers\RouteHelper::url('invoices.show', $invoice) }}" class="text-decoration-none">
                                             {{ $invoice->invoice_number }}
                                         </a>
                                     </td>
@@ -342,7 +401,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <a href="{{ route('admin.invoices.download', $invoice) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                        <a href="{{ \App\Helpers\RouteHelper::url('invoices.download', $invoice) }}" class="btn btn-sm btn-outline-primary" target="_blank">
                                             <i class="bi bi-download"></i>
                                         </a>
                                     </td>
@@ -353,7 +412,7 @@
                 </div>
             @else
                 <div class="text-center py-5">
-                    <i class="bi bi-receipt" style="font-size: 48px; color: #dee2e6;"></i>
+                    <i class="bi bi-receipt icon-48px empty-state-icon-medium"></i>
                     <p class="text-muted mt-3">No invoices yet</p>
                     <a href="{{ route('admin.invoices.create', ['client_id' => $client->id]) }}" class="btn btn-primary mt-2">
                         <i class="bi bi-plus-circle me-2"></i>Create First Invoice
@@ -379,7 +438,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center">
-                <img id="modalImage" src="" alt="Job Photo" class="img-fluid" style="max-height: 70vh;">
+                <img id="modalImage" src="" alt="Job Photo" class="img-fluid modal-image" onerror="this.src='/Image-not-found.png'; this.onerror=null;">
             </div>
         </div>
     </div>

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Lead;
 use App\Models\Client;
 use App\Models\FollowUpTask;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -21,11 +22,23 @@ class LeadService
             if (isset($data['assigned_staff_id']) && empty($data['assigned_staff_id'])) {
                 $data['assigned_staff_id'] = null;
             }
-            
+
             $lead = Lead::create($data);
 
             // Create automated follow-up tasks (30/60/90 days)
             $this->createFollowUpTasks($lead);
+
+            // Send notification to admins about new lead (with error handling)
+            try {
+                $notificationService = app(NotificationService::class);
+                $notificationService->notifyAdminsNewLead($lead);
+            } catch (\Exception $e) {
+                // Log error but don't fail lead creation
+                Log::error('Failed to send lead notification', [
+                    'lead_id' => $lead->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
 
             return $lead;
         });
@@ -60,12 +73,9 @@ class LeadService
     public function update(Lead $lead, array $data): Lead
     {
         return DB::transaction(function() use ($lead, $data) {
+            // Only update the lead - do NOT auto-convert to client
+            // Conversion should be done manually via the "Convert to Client" button
             $lead->update($data);
-
-            // Auto-convert to client if stage is qualified
-            if (isset($data['stage']) && $data['stage'] === 'qualified' && !$lead->converted_to_client_id) {
-                $this->convertToClient($lead);
-            }
 
             return $lead->fresh();
         });
@@ -175,4 +185,3 @@ class LeadService
         return Lead::where('assigned_staff_id', $staffId)->latest()->get();
     }
 }
-

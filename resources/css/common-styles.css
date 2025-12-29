@@ -1,0 +1,345 @@
+/* ============================================
+   Common Styles - Consolidated from Inline Styles
+   ============================================ */
+
+/* Chart Container */
+.chart-container {
+    position: relative;
+    height: 350px;
+}
+
+/* Icon Sizes */
+.icon-2rem {
+    font-size: 2rem !important;
+}
+
+.icon-2-5rem {
+    font-size: 2.5rem !important;
+}
+
+.icon-3rem {
+    font-size: 3rem !important;
+}
+
+.icon-4rem {
+    font-size: 4rem !important;
+}
+
+.icon-6rem {
+    font-size: 6rem !important;
+}
+
+.icon-48px {
+    font-size: 48px !important;
+}
+
+/* Avatar Sizes */
+.avatar-large {
+    width: 90px;
+    height: 90px;
+    font-size: 3rem;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading Sizes */
+.heading-2-5rem {
+    font-size: 2.5rem;
+    font-weight: 800;
+}
+
+.heading-1-75rem {
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.subtitle-1-25rem {
+    font-size: 1.25rem;
+}
+
+/* Profile Header Variants */
+.profile-header-large .profile-avatar {
+    width: 90px;
+    height: 90px;
+    font-size: 3rem;
+}
+
+.profile-header-large .profile-info h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+}
+
+.profile-header-large .profile-info p {
+    font-size: 1.25rem;
+}
+
+/* Card Styles */
+.card-rounded-20 {
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+/* Badge Styles */
+.badge-large {
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+.badge-fs-5 {
+    font-size: 1.25rem;
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+/* Timeline Styles */
+.timeline-item {
+    margin-bottom: 4rem;
+}
+
+.timeline-content {
+    padding: 2rem;
+}
+
+.timeline-title {
+    font-size: 1.25rem;
+}
+
+.timeline-date {
+    font-size: 1.1rem;
+}
+
+.timeline-icon {
+    font-size: 1.5rem;
+}
+
+.timeline-icon-large {
+    font-size: 1.2rem;
+}
+
+/* Job Photos */
+.job-photos {
+    margin-top: 1.5rem;
+}
+
+.job-photo {
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.job-photo:hover {
+    transform: scale(1.1);
+    z-index: 10;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.photo-border-white {
+    border: 3px solid #fff;
+}
+
+.photo-size-140 {
+    width: 140px;
+    height: 140px;
+}
+
+/* Empty State Icons */
+.empty-state-icon-large {
+    font-size: 6rem;
+    color: #dee2e6;
+    opacity: 0.6;
+}
+
+.empty-state-icon-medium {
+    font-size: 4rem;
+    color: #dee2e6;
+}
+
+.empty-state-icon-small {
+    font-size: 3rem;
+    color: #dee2e6;
+}
+
+/* Notification Dropdown */
+.notification-dropdown {
+    min-width: 350px;
+    max-width: 400px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.notification-icon-large {
+    font-size: 32px;
+}
+
+/* Image Modal */
+.modal-image {
+    max-height: 70vh;
+}
+
+/* Form Fields */
+.field-hidden {
+    display: none;
+}
+
+/* Payout Result */
+.payout-result {
+    display: none;
+}
+
+/* Clock Form Header Variant */
+.clock-form-header-red {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+}
+
+/* Photo Badge Positioning */
+.photo-badge-position {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    font-size: 10px;
+}
+
+/* Timeline Styles - Extended */
+.timeline-icon-1-8rem {
+    font-size: 1.8rem;
+}
+
+.timeline-heading-1-4rem {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.timeline-date-text {
+    font-size: 1.1rem;
+}
+
+.timeline-icon-1-5rem {
+    font-size: 1.5rem;
+}
+
+.timeline-icon-1-2rem {
+    font-size: 1.2rem;
+}
+
+.timeline-note-box {
+    border-left: 4px solid #84c373;
+}
+
+.badge-completed {
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 15px;
+}
+
+.photo-border-white {
+    border: 3px solid #fff !important;
+}
+
+.photo-size-140 {
+    width: 140px;
+    height: 140px;
+}
+
+.text-weight-600 {
+    font-weight: 600;
+}
+
+/* PDF Styles - Keep minimal inline styles only for PDF */
+.pdf-container {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+.pdf-header {
+    margin-bottom: 20px;
+}
+
+.pdf-footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+    font-size: 10px;
+    color: #666;
+}
+
+.pdf-section {
+    margin-bottom: 20px;
+}
+
+.pdf-flex {
+    display: flex;
+    justify-content: space-between;
+}
+
+.pdf-margin {
+    margin: 5px 0;
+}
+
+.pdf-heading {
+    margin-bottom: 10px;
+}
+
+/* Background Images - Applied via inline style in auth views only */
+/* Note: Background images are kept inline in auth views as they use dynamic asset paths */
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .chart-container {
+        height: 300px;
+    }
+
+    .heading-2-5rem {
+        font-size: 2rem;
+    }
+
+    .subtitle-1-25rem {
+        font-size: 1.1rem;
+    }
+
+    .avatar-large {
+        width: 70px;
+        height: 70px;
+        font-size: 2.5rem;
+    }
+
+    .icon-6rem {
+        font-size: 4rem;
+    }
+
+    .icon-4rem {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .chart-container {
+        height: 250px;
+    }
+
+    .heading-2-5rem {
+        font-size: 1.75rem;
+    }
+
+    .avatar-large {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
+    }
+}
+
+/* Image Not Found Styling */
+img.image-not-found {
+    opacity: 0.7;
+    background-color: #f8f9fa;
+    border: 1px dashed #dee2e6;
+    padding: 20px;
+    object-fit: contain;
+}
+
+img.image-not-found:hover {
+    opacity: 0.9;
+}
+

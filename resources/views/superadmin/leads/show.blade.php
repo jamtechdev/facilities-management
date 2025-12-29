@@ -16,10 +16,10 @@
         :phone="$lead->phone"
         type="lead">
         <x-slot name="actions">
-            <a href="{{ route('admin.leads.edit', $lead) }}" class="btn btn-light me-2">
+            <a href="{{ \App\Helpers\RouteHelper::url('leads.edit', $lead) }}" class="btn btn-light me-2">
                 <i class="bi bi-pencil me-2"></i>Edit
             </a>
-            <a href="{{ route('admin.leads.index') }}" class="btn btn-outline-light">
+            <a href="{{ \App\Helpers\RouteHelper::url('leads.index') }}" class="btn btn-outline-light">
                 <i class="bi bi-arrow-left me-2"></i>Back
             </a>
         </x-slot>
@@ -28,7 +28,7 @@
     <!-- Convert Switcher -->
     @php
         $user = auth()->user();
-        $canConvert = $user->hasRole('Admin') || $user->can('convert leads');
+        $canConvert = $user->can('view admin dashboard') && $user->can('convert leads');
     @endphp
     <x-convert-switcher :lead="$lead" :canConvert="$canConvert" />
 
@@ -48,16 +48,43 @@
         <!-- Information Tab -->
         <div class="tab-pane fade show active" id="info" role="tabpanel">
             <div class="row g-3">
-                <x-info-card label="Name" :value="$lead->name" />
-                <x-info-card label="Email" :value="$lead->email" :link="'mailto:' . $lead->email" />
-                <x-info-card label="Company" :value="$lead->company ?? '-'" />
-                <x-info-card label="Designation" :value="$lead->designation ?? '-'" />
-                <x-info-card label="Phone" :value="$lead->phone ?? '-'" :link="$lead->phone ? 'tel:' . $lead->phone : null" />
-                <x-info-card label="City" :value="$lead->city ?? '-'" />
-                <x-info-card 
-                    label="Source" 
-                    :badge="$lead->source ?? null" 
-                    badgeColor="info" />
+                <!-- Basic Information Section -->
+                <div class="col-12">
+                    <h5 class="mb-3 text-muted fw-bold">
+                        <i class="bi bi-person-circle me-2"></i>Basic Information
+                    </h5>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="Name" :value="$lead->name" />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="Email" :value="$lead->email" :link="'mailto:' . $lead->email" />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="Phone" :value="$lead->phone ?? '-'" :link="$lead->phone ? 'tel:' . $lead->phone : null" />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="Company" :value="$lead->company ?? '-'" />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="Designation" :value="$lead->designation ?? '-'" />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="City" :value="$lead->city ?? '-'" />
+                </div>
+
+                <!-- Lead Status Section -->
+                <div class="col-12 mt-4">
+                    <h5 class="mb-3 text-muted fw-bold">
+                        <i class="bi bi-tags me-2"></i>Lead Status
+                    </h5>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card 
+                        label="Source" 
+                        :badge="$lead->source ?? null" 
+                        badgeColor="info" />
+                </div>
                 @php
                     $stageColors = [
                         'new_lead' => 'primary',
@@ -68,27 +95,44 @@
                     ];
                     $stageColor = $stageColors[$lead->stage] ?? 'secondary';
                 @endphp
-                <x-info-card 
-                    label="Stage" 
-                    :badge="ucfirst(str_replace('_', ' ', $lead->stage))" 
-                    :badgeColor="$stageColor" />
-                <x-info-card 
-                    label="Assigned Staff" 
-                    :value="$lead->assignedStaff ? $lead->assignedStaff->name : 'Unassigned'" />
-                @if($lead->convertedToClient)
+                <div class="col-md-6 col-lg-4">
                     <x-info-card 
-                        label="Converted To Client" 
-                        :value="$lead->convertedToClient->company_name" 
-                        :link="route('admin.clients.show', $lead->convertedToClient)" />
+                        label="Stage" 
+                        :badge="ucfirst(str_replace('_', ' ', $lead->stage))" 
+                        :badgeColor="$stageColor" />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card 
+                        label="Assigned Staff" 
+                        :value="$lead->assignedStaff ? $lead->assignedStaff->name : 'Unassigned'" />
+                </div>
+
+                <!-- Additional Information Section -->
+                <div class="col-12 mt-4">
+                    <h5 class="mb-3 text-muted fw-bold">
+                        <i class="bi bi-info-circle me-2"></i>Additional Information
+                    </h5>
+                </div>
+                @if($lead->convertedToClient)
+                    <div class="col-md-6 col-lg-4">
+                        <x-info-card 
+                            label="Converted To Client" 
+                            :value="$lead->convertedToClient->company_name" 
+                            :link="\App\Helpers\RouteHelper::url('clients.show', $lead->convertedToClient)" />
+                    </div>
+                @endif
+                <div class="col-md-6 col-lg-4">
+                    <x-info-card label="Created" :value="$lead->created_at->format('M d, Y h:i A')" />
+                </div>
+                @if($lead->converted_at)
+                    <div class="col-md-6 col-lg-4">
+                        <x-info-card label="Converted At" :value="$lead->converted_at->format('M d, Y h:i A')" />
+                    </div>
                 @endif
                 @if($lead->notes)
                     <div class="col-12">
                         <x-info-card label="Notes" :value="$lead->notes" />
                     </div>
-                @endif
-                <x-info-card label="Created" :value="$lead->created_at->format('M d, Y h:i A')" />
-                @if($lead->converted_at)
-                    <x-info-card label="Converted At" :value="$lead->converted_at->format('M d, Y h:i A')" />
                 @endif
             </div>
         </div>
@@ -126,7 +170,7 @@
                 @endforeach
             @else
                 <div class="text-center py-5">
-                    <i class="bi bi-chat-dots" style="font-size: 48px; color: #dee2e6;"></i>
+                    <i class="bi bi-chat-dots icon-48px empty-state-icon-medium"></i>
                     <p class="text-muted mt-3">No communications yet</p>
                     <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addCommunicationModal">
                         <i class="bi bi-plus-circle me-2"></i>Add First Communication
@@ -153,14 +197,14 @@
                             <span class="badge bg-secondary ms-2">{{ ucfirst($document->document_type) }}</span>
                             <small class="text-muted ms-2">{{ $document->created_at->format('M d, Y') }}</small>
                         </div>
-                        <a href="{{ route('admin.documents.download', $document) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                        <a href="{{ \App\Helpers\RouteHelper::url('documents.download', $document) }}" class="btn btn-sm btn-outline-primary" target="_blank">
                             <i class="bi bi-download"></i> Download
                         </a>
                     </div>
                 @endforeach
             @else
                 <div class="text-center py-5">
-                    <i class="bi bi-file-earmark" style="font-size: 48px; color: #dee2e6;"></i>
+                    <i class="bi bi-file-earmark icon-48px empty-state-icon-medium"></i>
                     <p class="text-muted mt-3">No documents uploaded yet</p>
                     <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#uploadDocumentModal">
                         <i class="bi bi-upload me-2"></i>Upload First Document
@@ -199,7 +243,7 @@
                 @endforeach
             @else
                 <div class="text-center py-5">
-                    <i class="bi bi-calendar-check" style="font-size: 48px; color: #dee2e6;"></i>
+                    <i class="bi bi-calendar-check icon-48px empty-state-icon-medium"></i>
                     <p class="text-muted mt-3">No follow-up tasks</p>
                 </div>
             @endif
@@ -228,7 +272,7 @@
                 @endforeach
             @else
                 <div class="text-center py-5">
-                    <i class="bi bi-star" style="font-size: 48px; color: #dee2e6;"></i>
+                    <i class="bi bi-star icon-48px empty-state-icon-medium"></i>
                     <p class="text-muted mt-3">No feedback received yet</p>
                 </div>
             @endif
@@ -251,7 +295,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center">
-                <img id="modalImage" src="" alt="Job Photo" class="img-fluid" style="max-height: 70vh;">
+                <img id="modalImage" src="" alt="Job Photo" class="img-fluid modal-image" onerror="this.src='/Image-not-found.png'; this.onerror=null;">
             </div>
         </div>
     </div>
@@ -259,6 +303,16 @@
 
 @endsection
 
+@push('styles')
+    @vite(['resources/css/entity-details.css', 'resources/css/common-styles.css'])
+@endpush
+
 @push('scripts')
-    @vite(['resources/js/entity-details.js'])
+    <script>
+        // Pass routes to JS (only once per page)
+        if (typeof window.convertLeadRoute === 'undefined') {
+            window.convertLeadRoute = '{{ \App\Helpers\RouteHelper::url("leads.convert", $lead) }}';
+        }
+    </script>
+    @vite(['resources/js/entity-details.js', 'resources/js/image-modal.js'])
 @endpush

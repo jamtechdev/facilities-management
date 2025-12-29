@@ -12,7 +12,7 @@
     <div class="profile-header">
         <div class="profile-header-content">
             <div class="profile-avatar">
-                <i class="bi bi-building" style="font-size: 2.5rem;"></i>
+                <i class="bi bi-building icon-2-5rem"></i>
             </div>
             <div class="profile-info flex-grow-1">
                 <h1>Welcome to KEYSTONE</h1>
@@ -123,7 +123,7 @@
         <div class="row align-items-center g-5">
             <div class="col-lg-6 order-lg-2">
                 <div class="position-relative">
-                    <img src="{{ asset('office-cleaning.jpg') }}" alt="Professional Team" class="img-fluid rounded-4 shadow-lg">
+                    <img src="{{ asset('office-cleaning.jpg') }}" alt="Professional Team" class="img-fluid rounded-4 shadow-lg" onerror="this.src='/Image-not-found.png'; this.onerror=null;">
                     <div class="position-absolute top-0 start-0 m-4">
                         <span class="badge px-4 py-2 rounded-pill feature-badge">
                             <i class="bi bi-star-fill me-1"></i>Trusted Solution

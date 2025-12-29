@@ -8,7 +8,7 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="addCommunicationForm">
+            <form id="addCommunicationForm" action="{{ \App\Helpers\RouteHelper::url('communications.store') }}">
                 @csrf
                 <input type="hidden" name="communicable_type" value="{{ get_class($communicable) }}">
                 <input type="hidden" name="communicable_id" value="{{ $communicable->id }}">
@@ -16,13 +16,13 @@
                     <div class="mb-3">
                         <label for="communication_type" class="form-label">Type <span class="text-danger">*</span></label>
                         <select class="form-select" id="communication_type" name="type" required>
-                            <option value="call">Call</option>
                             <option value="email">Email</option>
+                            <option value="call">Call</option>
                             <option value="meeting">Meeting</option>
                             <option value="note">Note</option>
                         </select>
                     </div>
-                    <div class="mb-3" id="email_to_field" style="display: none;">
+                    <div class="mb-3 field-hidden" id="email_to_field">
                         <label for="email_to" class="form-label">Email To <span class="text-danger">*</span></label>
                         <input type="email" class="form-control" id="email_to" name="email_to" value="{{ $communicable->email ?? '' }}">
                     </div>
@@ -46,56 +46,15 @@
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('addCommunicationForm');
-    const typeSelect = document.getElementById('communication_type');
-    const emailToField = document.getElementById('email_to_field');
-
-    // Show/hide email field based on type
-    typeSelect.addEventListener('change', function() {
-        if (this.value === 'email') {
-            emailToField.style.display = 'block';
-            document.getElementById('email_to').required = true;
-        } else {
-            emailToField.style.display = 'none';
-            document.getElementById('email_to').required = false;
+@once
+@push('scripts')
+    <script>
+        // Pass route to JS (only once per page, even if modal is included multiple times)
+        if (typeof window.communicationRoute === 'undefined') {
+            window.communicationRoute = '{{ \App\Helpers\RouteHelper::url("communications.store") }}';
         }
-    });
-
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const formData = new FormData(form);
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
-
-            axios.post('{{ route("admin.communications.store") }}', formData, {
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            })
-            .then(function(response) {
-                if (response.data.success) {
-                    location.reload();
-                }
-            })
-            .catch(function(error) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-                if (typeof showToast !== 'undefined') {
-                    showToast('error', error.response?.data?.message || 'Failed to save communication');
-                } else if (typeof toastr !== 'undefined') {
-                    toastr.error(error.response?.data?.message || 'Failed to save communication');
-                } else {
-                    alert(error.response?.data?.message || 'Failed to save communication');
-                }
-            });
-        });
-    }
-});
-</script>
+    </script>
+    @vite(['resources/js/pages/communications.js'])
+@endpush
+@endonce
 

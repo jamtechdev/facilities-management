@@ -2,23 +2,29 @@
 
 @section('title', 'Invoice Details')
 
+@push('styles')
+    @vite(['resources/css/profile.css'])
+@endpush
+
 @section('content')
     <div class="container-fluid">
-        <div class="row mb-4">
-            <div class="col">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h1 class="h3 mb-0">Invoice #{{ $invoice->invoice_number }}</h1>
-                        <p class="text-muted">{{ $invoice->client->company_name }}</p>
+        <!-- Invoice Header -->
+        <div class="profile-header">
+            <div class="profile-header-content">
+                <div class="profile-avatar">
+                    <i class="bi bi-receipt icon-2-5rem"></i>
+                </div>
+                <div class="profile-info flex-grow-1">
+                    <h1>Invoice #{{ $invoice->invoice_number }}</h1>
+                    <p>{{ $invoice->client->company_name }}</p>
                     </div>
-                    <div>
-                        <a href="{{ route('admin.invoices.download', $invoice) }}" class="btn btn-info me-2">
+                <div class="profile-header-actions">
+                    <a href="{{ route('admin.invoices.download', $invoice) }}" class="btn btn-light me-2">
                             <i class="bi bi-download me-2"></i>Download PDF
                         </a>
-                        <a href="{{ route('admin.invoices.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('admin.invoices.index') }}" class="btn btn-outline-light">
                             <i class="bi bi-arrow-left me-2"></i>Back
                         </a>
-                    </div>
                 </div>
             </div>
         </div>
@@ -173,7 +179,14 @@
                     const data = await response.json();
 
                     if (data.success) {
-                        location.reload();
+                        if (typeof showToast !== 'undefined') {
+                            showToast('success', data.message || 'Invoice status updated successfully');
+                        } else if (typeof toastr !== 'undefined') {
+                            toastr.success(data.message || 'Invoice status updated successfully');
+                        }
+                        setTimeout(() => {
+                            location.reload();
+                        }, 500);
                     } else {
                         throw new Error(data.message || 'Failed to update status');
                     }

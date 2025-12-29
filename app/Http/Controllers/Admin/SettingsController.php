@@ -17,7 +17,7 @@ class SettingsController extends Controller
     {
         $user = auth()->user();
         $settings = UserSetting::getOrCreateForUser($user->id);
-        
+
         $viewPrefix = RouteHelper::getViewPrefix();
         return view($viewPrefix . '.settings', compact('settings'));
     }
@@ -34,6 +34,7 @@ class SettingsController extends Controller
             'email_notifications' => 'sometimes|boolean',
             'in_app_notifications' => 'sometimes|boolean',
             'sms_notifications' => 'sometimes|boolean',
+            'push_notifications' => 'sometimes|boolean',
             'notify_new_leads' => 'sometimes|boolean',
             'notify_lead_updates' => 'sometimes|boolean',
             'notify_client_updates' => 'sometimes|boolean',
@@ -166,6 +167,7 @@ class SettingsController extends Controller
             'email_notifications' => 'sometimes|boolean',
             'in_app_notifications' => 'sometimes|boolean',
             'sms_notifications' => 'sometimes|boolean',
+            'push_notifications' => 'sometimes|boolean',
             'notify_new_leads' => 'sometimes|boolean',
             'notify_lead_updates' => 'sometimes|boolean',
             'notify_client_updates' => 'sometimes|boolean',
@@ -204,7 +206,7 @@ class SettingsController extends Controller
                 'receive_messages', 'email_on_message', 'notify_message_read',
                 'dark_mode', 'auto_assign_staff', 'show_completed_tasks', 'show_archived_items'
             ];
-            
+
             if (in_array($key, $booleanFields)) {
                 $data[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN);
             } else {

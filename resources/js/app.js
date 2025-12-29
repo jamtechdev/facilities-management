@@ -3,8 +3,10 @@ import $ from 'jquery';
 import * as bootstrap from 'bootstrap';
 import 'datatables.net';
 import 'datatables.net-bs5';
+// Toastr requires jQuery to be available globally first
 import toastr from 'toastr';
-import 'toastr/build/toastr.min.css';
+// Toastr CSS is imported in app.css to ensure proper loading
+import './image-error-handler';
 
 // Make jQuery globally available BEFORE anything else
 window.$ = window.jQuery = $;
@@ -42,6 +44,15 @@ window.toastr = toastr;
 
 // Global helper function for consistent toast notifications
 window.showToast = function(type, message, title = '', customOptions = {}) {
+    // Ensure toastr is available
+    if (typeof window.toastr === 'undefined' && typeof toastr === 'undefined') {
+        console.warn('Toastr not loaded, falling back to alert');
+        alert(message);
+        return;
+    }
+    
+    const toastrInstance = window.toastr || toastr;
+    
     const titles = {
         success: 'Success',
         error: 'Error',
@@ -65,22 +76,28 @@ window.showToast = function(type, message, title = '', customOptions = {}) {
         ...customOptions
     };
     
-    switch(type) {
-        case 'success':
-            toastr.success(message, toastTitle, options);
-            break;
-        case 'error':
-        case 'danger':
-            toastr.error(message, toastTitle, options);
-            break;
-        case 'warning':
-            toastr.warning(message, toastTitle, options);
-            break;
-        case 'info':
-            toastr.info(message, toastTitle, options);
-            break;
-        default:
-            toastr.info(message, toastTitle, options);
+    try {
+        switch(type) {
+            case 'success':
+                toastrInstance.success(message, toastTitle, options);
+                break;
+            case 'error':
+            case 'danger':
+                toastrInstance.error(message, toastTitle, options);
+                break;
+            case 'warning':
+                toastrInstance.warning(message, toastTitle, options);
+                break;
+            case 'info':
+                toastrInstance.info(message, toastTitle, options);
+                break;
+            default:
+                toastrInstance.info(message, toastTitle, options);
+        }
+    } catch (e) {
+        console.error('Error showing toast:', e);
+        // Fallback to alert if toastr fails
+        alert(message);
     }
 };
 

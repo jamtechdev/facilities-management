@@ -1,2 +1,103 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 @import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
+@import 'toastr/build/toastr.min.css';
+
+/* ============================================
+   Global CSS Variables - Consolidated Root
+   ============================================ */
+:root {
+    /* Primary Colors */
+    --primary-green: #84c373;
+    --primary-dark: #5a8a4d;
+    --primary-light: #a8d99a;
+    --primary-lighter: #c8e9bd;
+    --primary-lightest: #e8f5e4;
+
+    /* Gradients */
+    --primary-gradient: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
+    --primary-gradient-light: linear-gradient(135deg, #a8d99a 0%, #84c373 100%);
+    --hero-overlay: linear-gradient(135deg, rgba(132, 195, 115, 0.95) 0%, rgba(90, 138, 77, 0.95) 100%);
+
+    /* Text & Background */
+    --text-dark: #2d4a25;
+    --bg-light: #f8fbf7;
+
+    /* Border & Focus */
+    --border-color: #e0e0e0;
+    --focus-shadow: rgba(132, 195, 115, 0.25);
+
+    /* Shadows */
+    --shadow-sm: 0 2px 8px rgba(132, 195, 115, 0.1);
+    --shadow-md: 0 4px 16px rgba(132, 195, 115, 0.15);
+    --shadow-lg: 0 8px 32px rgba(132, 195, 115, 0.2);
+    --shadow-xl: 0 12px 48px rgba(132, 195, 115, 0.25);
+}
+
+/* Override Bootstrap Primary Color to Green */
+.btn-primary {
+    background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
+    border-color: #84c373;
+    color: white;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background: linear-gradient(135deg, #6ba85a 0%, #5a8a4d 100%);
+    border-color: #6ba85a;
+    color: white;
+}
+
+.btn-outline-primary {
+    border-color: #84c373;
+    color: #84c373;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+    background: #84c373;
+    border-color: #84c373;
+    color: white;
+}
+
+/* ============================================
+   Bootstrap Collapse Fixes - Global
+   ============================================ */
+.collapse {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.collapse.show,
+.collapse.collapsing {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Prevent Bootstrap from adding margins on collapse */
+.navbar-collapse {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.navbar-collapse.show,
+.navbar-collapse.collapsing {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Mobile collapse fixes */
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        margin-top: 1rem !important;
+        padding-top: 1rem !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .navbar-collapse.show,
+    .navbar-collapse.collapsing {
+        margin-top: 1rem !important;
+        padding-top: 1rem !important;
+    }
+}

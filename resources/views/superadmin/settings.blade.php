@@ -53,7 +53,7 @@
     <div class="profile-header">
         <div class="profile-header-content">
             <div class="profile-avatar">
-                <i class="bi bi-gear-fill" style="font-size: 2rem;"></i>
+                <i class="bi bi-gear-fill icon-2rem"></i>
             </div>
             <div class="profile-info">
                 <h1>Settings</h1>
@@ -117,6 +117,13 @@
                                 <label class="form-check-label" for="sms_notifications">
                                     <strong>SMS Notifications</strong>
                                     <small class="d-block text-muted">Receive notifications via SMS (if configured)</small>
+                                </label>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="push_notifications" name="push_notifications" {{ $settings->push_notifications ?? true ? 'checked' : '' }}>
+                                <label class="form-check-label" for="push_notifications">
+                                    <strong>Push Notifications</strong>
+                                    <small class="d-block text-muted">Receive push notifications via Firebase (requires browser permission)</small>
                                 </label>
                             </div>
                         </div>
@@ -397,7 +404,7 @@
                         data[key] = value;
                     }
                 }
-                
+
                 const btn = this.querySelector('button[type="submit"]');
                 const originalText = btn.innerHTML;
                 btn.disabled = true;
@@ -455,7 +462,7 @@
                         data[key] = value;
                     }
                 }
-                
+
                 const btn = this.querySelector('button[type="submit"]');
                 const originalText = btn.innerHTML;
                 btn.disabled = true;
@@ -513,7 +520,7 @@
                         data[key] = value;
                     }
                 }
-                
+
                 const btn = this.querySelector('button[type="submit"]');
                 const originalText = btn.innerHTML;
                 btn.disabled = true;
@@ -571,7 +578,7 @@
                         data[key] = value;
                     }
                 }
-                
+
                 const btn = this.querySelector('button[type="submit"]');
                 const originalText = btn.innerHTML;
                 btn.disabled = true;
@@ -613,4 +620,3 @@
 </script>
 @endpush
 @endsection
-

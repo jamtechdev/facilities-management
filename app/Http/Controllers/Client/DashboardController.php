@@ -13,6 +13,17 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
+
+        // Ensure user has client dashboard permission
+        if (!$user->can('view client dashboard')) {
+            abort(403, 'You do not have permission to access the client dashboard.');
+        }
+
+        // Prevent other role users from accessing client dashboard
+        if ($user->can('view admin dashboard') || $user->can('view staff dashboard') || $user->can('view lead dashboard')) {
+            abort(403, 'You must use your designated dashboard.');
+        }
+
         $client = $user->client;
 
         if (!$client) {
@@ -32,6 +43,18 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        return view('client.dashboard', compact('client', 'recentServices', 'recentFeedback'));
+        // Get assigned staff with all their details
+        $staff = $client->staff()->with([
+            'user',
+            'timesheets' => function ($query) use ($client) {
+                $query->where('client_id', $client->id);
+            },
+            'jobPhotos' => function ($query) use ($client) {
+                $query->where('client_id', $client->id);
+            },
+            'documents'
+        ])->wherePivot('is_active', true)->get();
+
+        return view('client.dashboard', compact('client', 'recentServices', 'recentFeedback', 'staff'));
     }
 }
