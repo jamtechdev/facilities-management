@@ -25,7 +25,7 @@
                     <h5><i class="bi bi-person-plus me-2"></i>Lead Information</h5>
                 </div>
                 <div class="form-card-body">
-                    <form id="createLeadForm" method="POST" action="{{ route('admin.leads.store') }}">
+                    <form id="createLeadForm" method="POST" action="{{ \App\Helpers\RouteHelper::url('leads.store') }}">
                         @csrf
 
                         <div class="row g-4">

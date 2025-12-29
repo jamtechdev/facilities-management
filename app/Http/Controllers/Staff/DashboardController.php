@@ -14,6 +14,17 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
+
+        // Ensure user has staff dashboard permission
+        if (!$user->can('view staff dashboard')) {
+            abort(403, 'You do not have permission to access the staff dashboard.');
+        }
+
+        // Prevent other role users from accessing staff dashboard
+        if ($user->can('view admin dashboard') || $user->can('view client dashboard') || $user->can('view lead dashboard')) {
+            abort(403, 'You must use your designated dashboard.');
+        }
+
         $staff = $user->staff;
 
         if (!$staff) {

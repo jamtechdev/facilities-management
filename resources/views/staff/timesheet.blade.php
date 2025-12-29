@@ -16,8 +16,8 @@
     <!-- Header -->
     <div class="timesheet-header">
         <div class="timesheet-header-content">
-            <h1 class="mb-2" style="font-size: 1.75rem; font-weight: 700;">Timesheet Management</h1>
-            <p class="mb-0" style="opacity: 0.9;">Clock in, clock out, and track your work hours</p>
+            <h1 class="mb-2 heading-1-75rem">Timesheet Management</h1>
+            <p class="mb-0 text-opacity-90">Clock in, clock out, and track your work hours</p>
         </div>
     </div>
 
@@ -153,7 +153,7 @@
 
                 <div class="col-lg-6">
                     <div class="clock-form-card">
-                        <div class="clock-form-header" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);">
+                        <div class="clock-form-header clock-form-header-red">
                             <h5 class="mb-0"><i class="bi bi-stop-circle me-2"></i>Active Sessions</h5>
                             <small>Clock out from your active work sessions</small>
                         </div>
@@ -186,7 +186,7 @@
                                 </div>
                             @empty
                                 <div class="text-center py-4">
-                                    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                                    <i class="bi bi-inbox text-muted icon-3rem"></i>
                                     <p class="text-muted mt-3 mb-0">No active sessions</p>
                                 </div>
                             @endforelse
@@ -336,7 +336,7 @@
                                 </div>
                             @empty
                                 <div class="text-center py-5">
-                                    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                                    <i class="bi bi-inbox text-muted icon-3rem"></i>
                                     <p class="text-muted mt-3 mb-0">No recent activity</p>
                                 </div>
                             @endforelse
@@ -376,7 +376,7 @@
                                 </div>
                             @else
                                 <div class="text-center py-5">
-                                    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                                    <i class="bi bi-inbox text-muted icon-3rem"></i>
                                     <p class="text-muted mt-3 mb-0">No time history found</p>
                                 </div>
                             @endif

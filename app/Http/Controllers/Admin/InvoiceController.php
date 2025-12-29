@@ -57,7 +57,7 @@ class InvoiceController extends Controller
         try {
             return DB::transaction(function() use ($request) {
                 $client = Client::findOrFail($request->client_id);
-                
+
                 // Calculate total hours from timesheets in the billing period
                 $timesheets = Timesheet::where('client_id', $client->id)
                     ->whereBetween('work_date', [$request->billing_period_start, $request->billing_period_end])
@@ -91,7 +91,7 @@ class InvoiceController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'Invoice created successfully.',
-                    'redirect' => route('admin.invoices.show', $invoice)
+                    'redirect' => route('admin.invoices.index')
                 ], 201);
             });
         } catch (\Exception $e) {
@@ -156,9 +156,9 @@ class InvoiceController extends Controller
     public function downloadPdf(Invoice $invoice)
     {
         $invoice->load(['client', 'createdBy']);
-        
+
         $pdf = Pdf::loadView('superadmin.invoices.pdf', compact('invoice'));
-        
+
         return $pdf->download('invoice-' . $invoice->invoice_number . '.pdf');
     }
 
@@ -182,4 +182,3 @@ class InvoiceController extends Controller
         }
     }
 }
-

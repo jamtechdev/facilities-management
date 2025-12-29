@@ -14,6 +14,34 @@
     transition: all 0.3s ease;
 }
 
+.sidebar-modern.collapsed {
+    width: 80px;
+}
+
+.sidebar-modern.collapsed .nav-text,
+.sidebar-modern.collapsed .sidebar-logo span:not(.sidebar-logo-icon),
+.sidebar-modern.collapsed .nav-section-title,
+.sidebar-modern.collapsed .user-name,
+.sidebar-modern.collapsed .user-role {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.sidebar-modern.collapsed .nav-link-modern {
+    justify-content: center;
+    padding: 12px;
+}
+
+.sidebar-modern.collapsed .nav-icon {
+    margin-right: 0;
+}
+
+.sidebar-modern.collapsed .sidebar-logo {
+    justify-content: center;
+}
+
 .sidebar-header {
     padding: 25px 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -199,6 +227,10 @@
     padding-top: 60px;
     }
 
+.sidebar-modern.collapsed ~ .main-content-wrapper {
+    margin-left: 0;
+}
+
     @media (max-width: 992px) {
         .main-content-wrapper {
             padding-top: 60px;
@@ -250,11 +282,28 @@
     border-radius: 8px;
     transition: all 0.3s ease;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
 }
 
 .btn-sidebar-toggle:hover {
     background: rgba(132, 195, 115, 0.1);
     color: #84c373;
+}
+
+.btn-sidebar-toggle:active {
+    transform: scale(0.95);
+}
+
+.btn-sidebar-toggle i {
+    transition: transform 0.3s ease;
+}
+
+.sidebar-modern.collapsed ~ .main-content-wrapper .btn-sidebar-toggle i {
+    transform: rotate(180deg);
 }
 
 .navbar-breadcrumb {
@@ -584,21 +633,25 @@ body {
     }
     .sidebar-modern {
         transform: translateX(-100%);
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
     .sidebar-modern.mobile-open {
         transform: translateX(0);
         box-shadow: 4px 0 30px rgba(0, 0, 0, 0.3);
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
     .main-content-wrapper {
-        margin-left: 0;
-        width: 100%;
-            overflow-x: hidden;
-            max-width: 100%;
-            padding-top: 0;
-            margin-top: 0;
-        }
+        margin-left: 0 !important;
+        width: 100% !important;
+        overflow-x: hidden;
+        max-width: 100%;
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
 
         .main-content-area {
             overflow-x: hidden;

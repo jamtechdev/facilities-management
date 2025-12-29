@@ -3,6 +3,7 @@
 namespace App\DataTables;
 
 use App\Models\Client;
+use App\Helpers\RouteHelper;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Illuminate\Support\HtmlString;
@@ -50,14 +51,14 @@ class ClientDataTable extends DataTable
 
             // View button - requires view client details permission
             if ($user->can('view client details')) {
-                $actions .= '<a href="' . route('admin.clients.show', $client) . '" class="btn btn-outline-primary" title="View">
+                $actions .= '<a href="' . RouteHelper::url('clients.show', $client) . '" class="btn btn-outline-primary" title="View">
                         <i class="bi bi-eye"></i>
                     </a>';
             }
 
             // Edit button
             if ($user->can('edit clients')) {
-                $actions .= '<a href="' . route('admin.clients.edit', $client) . '" class="btn btn-outline-secondary" title="Edit">
+                $actions .= '<a href="' . RouteHelper::url('clients.edit', $client) . '" class="btn btn-outline-secondary" title="Edit">
                         <i class="bi bi-pencil"></i>
                     </a>';
             }
@@ -70,12 +71,12 @@ class ClientDataTable extends DataTable
             }
 
             $actions .= '</div>';
-            
+
             // If no actions available, return a dash
             if (strlen($actions) <= strlen('<div class="btn-group btn-group-sm" role="group"></div>')) {
                 return new HtmlString('<span class="text-muted">-</span>');
             }
-            
+
             return new HtmlString($actions);
             })
             ->editColumn('created_at', function (Client $client) {
@@ -112,7 +113,7 @@ class ClientDataTable extends DataTable
                     ->className('btn btn-primary')
                     ->text('<i class="bi bi-plus-circle me-1"></i> New Client')
                     ->action('function(e, dt, node, config) {
-                        window.location.href = "' . route('admin.clients.create') . '";
+                        window.location.href = "' . RouteHelper::url('clients.create') . '";
                     }') : null,
                 Button::make('reload')
                     ->className('btn btn-secondary')
@@ -139,10 +140,10 @@ class ClientDataTable extends DataTable
                 'searchPlaceholder' => 'Search clients...',
                 'lengthMenu' => 'Show _MENU_ entries',
                 'paginate' => [
-                    'first' => 'First',
-                    'last' => 'Last',
-                    'next' => 'Next',
-                    'previous' => 'Previous'
+                    'first' => '«',
+                    'last' => '»',
+                    'next' => '›',
+                    'previous' => '‹'
                 ]
                 ],
             ]);
@@ -185,4 +186,3 @@ class ClientDataTable extends DataTable
         return 'Clients_' . date('YmdHis');
     }
 }
-

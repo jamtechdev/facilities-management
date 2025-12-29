@@ -34,7 +34,7 @@
                 </div>
             @else
                 <div class="text-center py-5">
-                    <i class="bi bi-activity text-muted" style="font-size:48px;"></i>
+                    <i class="bi bi-activity text-muted icon-48px"></i>
                     <p class="text-muted mt-3">No activity recorded yet.</p>
                 </div>
             @endif

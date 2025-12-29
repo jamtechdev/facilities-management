@@ -81,76 +81,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Rating stars
-        document.querySelectorAll('.rating-star').forEach(star => {
-            star.addEventListener('click', function() {
-                const rating = this.dataset.rating;
-                document.querySelectorAll('.rating-star').forEach((s, i) => {
-                    if (i < rating) {
-                        s.innerHTML = '<i class="bi bi-star-fill text-warning"></i>';
-                    } else {
-                        s.innerHTML = '<i class="bi bi-star"></i>';
-                    }
-                });
-                document.getElementById('rating' + rating).checked = true;
-            });
-        });
-
-        // Form submission
-        document.getElementById('feedbackForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
-
-            try {
-                const response = await fetch('{{ route("feedback.store") }}', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                if (data.success) {
-                    if (typeof showToast !== 'undefined') {
-                        showToast('success', data.message);
-                    } else if (typeof toastr !== 'undefined') {
-                        toastr.success(data.message);
-                    } else {
-                        alert(data.message);
-                    }
-                    this.reset();
-                    document.querySelectorAll('.rating-star').forEach(s => {
-                        s.innerHTML = '<i class="bi bi-star"></i>';
-                    });
-                } else {
-                    throw new Error(data.message || 'Failed to submit feedback');
-                }
-            } catch (error) {
-                if (typeof showToast !== 'undefined') {
-                    showToast('error', error.message || 'Failed to submit feedback');
-                } else if (typeof toastr !== 'undefined') {
-                    toastr.error(error.message || 'Failed to submit feedback');
-                } else {
-                    alert(error.message || 'Failed to submit feedback');
-                }
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-            }
-        });
+        // Pass route to JS
+        window.feedbackRoute = '{{ route("feedback.store") }}';
     </script>
+    @vite(['resources/js/pages/feedback.js'])
     <style>
         .rating-input {
             display: flex;

@@ -11,10 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-    // Single permission-based middleware - manages all access by permissions
-    $middleware->alias([
-        'permission' => \App\Http\Middleware\EnsurePermission::class,
-        'role.superadmin' => \App\Http\Middleware\EnsureSuperAdminRole::class,
+        // Unified middleware for authentication, role access, and permissions
+        $middleware->alias([
+            'access' => \App\Http\Middleware\EnsureAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -32,23 +31,14 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 403);
         }
 
-        // For web requests, redirect to dashboard with error message based on permissions
+        // For web requests, redirect to dashboard with error message based on role
         $user = auth()->user();
         if ($user) {
-            $dashboardRoute = 'admin.dashboard';
-            if ($user->can('view admin dashboard')) {
-                if ($user->can('view roles')) {
-                    $dashboardRoute = 'superadmin.dashboard';
-                } else {
-                    $dashboardRoute = 'admin.dashboard';
-                }
-            } elseif ($user->can('view staff dashboard')) {
-                $dashboardRoute = 'staff.dashboard';
-            } elseif ($user->can('view client dashboard')) {
-                $dashboardRoute = 'client.dashboard';
-            } elseif ($user->can('view lead dashboard')) {
-                $dashboardRoute = 'lead.dashboard';
-            }
+            $middleware = new \App\Http\Middleware\EnsureAccess();
+            $reflection = new \ReflectionClass($middleware);
+            $method = $reflection->getMethod('getDashboardRoute');
+            $method->setAccessible(true);
+            $dashboardRoute = $method->invoke($middleware, $user);
 
             $message = $e->getMessage();
             if (empty($message) || $message === 'This action is unauthorized.') {

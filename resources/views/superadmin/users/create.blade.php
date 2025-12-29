@@ -18,7 +18,7 @@
                         <h5><i class="bi bi-person-plus me-2"></i>User Information</h5>
                     </div>
                     <div class="form-card-body">
-                        <form method="POST" action="{{ route('admin.users.store') }}">
+                        <form id="createUserForm" method="POST" action="{{ route('admin.users.store') }}">
                             @csrf
                             <div class="row g-4">
                                 <div class="col-md-6">
@@ -42,20 +42,9 @@
                                     <input type="password" class="form-control" id="password" name="password"
                                         placeholder="Enter password" required>
                                 </div>
-                                <div class="col-md-6">
-                                    <label for="role" class="form-label">
-                                        <i class="bi bi-shield-check me-1"></i>Role <span class="text-danger">*</span>
-                                    </label>
-                                    <select class="form-select" id="role" name="role" required>
-                                        <option value="">Select Role</option>
-                                        @foreach ($roles as $role)
-                                            <option value="{{ $role->name }}">{{ $role->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
                             </div>
                             <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
                                     <i class="bi bi-check-circle me-2"></i>Create User
                                 </button>
                                 <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
@@ -69,3 +58,7 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    @vite(['resources/js/forms.js'])
+@endpush

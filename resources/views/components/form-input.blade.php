@@ -36,19 +36,19 @@
                     <i class="bi {{ $icon }} text-muted"></i>
                 </span>
             @endif
-            <input 
-                type="{{ $type }}" 
-                class="{{ $inputClass }} @error($name) is-invalid @enderror" 
-                id="{{ $name }}" 
-                name="{{ $name }}" 
-                value="{{ old($name, $value) }}" 
+            <input
+                type="{{ $type }}"
+                class="{{ $inputClass }} @error($name) is-invalid @enderror"
+                id="{{ $name }}"
+                name="{{ $name }}"
+                value="{{ old($name, $value) }}"
                 @if($required) required @endif
                 @if($autofocus) autofocus @endif
                 @if($autocomplete) autocomplete="{{ $autocomplete }}" @endif
                 placeholder="{{ $placeholder }}">
             @if($type === 'password' && $showToggle)
-                <button class="btn btn-outline-secondary border-start-0" type="button" id="togglePassword">
-                    <i class="bi bi-eye" id="eyeIcon"></i>
+                <button class="btn btn-outline-secondary border-start-0" type="button" id="togglePassword_{{ $name }}">
+                    <i class="bi bi-eye" id="eyeIcon_{{ $name }}"></i>
                 </button>
             @endif
             @error($name)
@@ -59,12 +59,12 @@
             @endif
         </div>
     @else
-        <input 
-            type="{{ $type }}" 
-            class="{{ $inputClass }} @error($name) is-invalid @enderror" 
-            id="{{ $name }}" 
-            name="{{ $name }}" 
-            value="{{ old($name, $value) }}" 
+        <input
+            type="{{ $type }}"
+            class="{{ $inputClass }} @error($name) is-invalid @enderror"
+            id="{{ $name }}"
+            name="{{ $name }}"
+            value="{{ old($name, $value) }}"
             @if($required) required @endif
             @if($autofocus) autofocus @endif
             @if($autocomplete) autocomplete="{{ $autocomplete }}" @endif
@@ -80,4 +80,3 @@
         <small class="form-text text-muted">Password must be at least 8 characters long.</small>
     @endif
 </div>
-

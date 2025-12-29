@@ -12,7 +12,7 @@
     <div class="profile-header">
         <div class="profile-header-content">
             <div class="profile-avatar">
-                <i class="bi bi-receipt" style="font-size: 2.5rem;"></i>
+                <i class="bi bi-receipt icon-2-5rem"></i>
             </div>
             <div class="profile-info flex-grow-1">
                 <h1>Invoices</h1>

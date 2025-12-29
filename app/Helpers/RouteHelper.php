@@ -7,24 +7,37 @@ use Illuminate\Support\Facades\Auth;
 class RouteHelper
 {
     /**
-     * Get the route prefix based on user's dashboard permission
-     * Checks which dashboard permission user has and returns corresponding route prefix
+     * Get the route prefix based on user's role
+     * Role-based access - SuperAdmin gets 'superadmin' prefix, Admin gets 'admin' prefix
      */
     public static function getRoutePrefix(): string
     {
         $user = Auth::user();
 
         if (!$user) {
-            return 'admin'; // Default fallback
+            return 'admin';
         }
 
-        // Check dashboard permissions (priority order)
-        if ($user->can('view admin dashboard')) {
-            // Check if user can also access superadmin features (has all permissions)
-            // SuperAdmin typically has all permissions
-            if ($user->can('view roles')) {
-                return 'superadmin';
+        // Get user's role
+        $role = $user->roles->first();
+
+        if ($role) {
+            switch ($role->name) {
+                case 'SuperAdmin':
+                    return 'superadmin';
+                case 'Admin':
+                    return 'admin';
+                case 'Staff':
+                    return 'staff';
+                case 'Client':
+                    return 'client';
+                case 'Lead':
+                    return 'lead';
             }
+        }
+
+        // Fallback: Check dashboard permissions if no role assigned
+        if ($user->can('view admin dashboard')) {
             return 'admin';
         }
 
@@ -44,8 +57,69 @@ class RouteHelper
     }
 
     /**
+     * Generate a route name based on user's role
+     *
+     * @param string $routeName The route name without prefix (e.g., 'leads.index')
+     * @return string Full route name (e.g., 'superadmin.leads.index' or 'admin.leads.index')
+     */
+    public static function route(string $routeName): string
+    {
+        $prefix = self::getRoutePrefix();
+        return $prefix . '.' . $routeName;
+    }
+
+    /**
+     * Generate a route URL based on user's role
+     *
+     * @param string $routeName The route name without prefix
+     * @param mixed $parameters Route parameters
+     * @return string Route URL
+     */
+    public static function url(string $routeName, $parameters = []): string
+    {
+        try {
+            $routeName = self::route($routeName);
+            return route($routeName, $parameters);
+        } catch (\Exception $e) {
+            // Fallback: try superadmin first, then admin
+            try {
+                return route('superadmin.' . $routeName, $parameters);
+            } catch (\Exception $e2) {
+                try {
+                    return route('admin.' . $routeName, $parameters);
+                } catch (\Exception $e3) {
+                    return '#';
+                }
+            }
+        }
+    }
+
+    /**
+     * Check if current route matches the route pattern
+     *
+     * @param string $routeName Route name without prefix
+     * @return bool
+     */
+    public static function routeIs(string $routeName): bool
+    {
+        $prefix = self::getRoutePrefix();
+        return request()->routeIs($prefix . '.' . $routeName);
+    }
+
+    /**
+     * Check if current route matches any of the route patterns (admin.* or superadmin.*)
+     *
+     * @param string $routeName Route name without prefix
+     * @return bool
+     */
+    public static function routeIsAny(string $routeName): bool
+    {
+        return request()->routeIs('admin.' . $routeName) || request()->routeIs('superadmin.' . $routeName);
+    }
+
+    /**
      * Get the view prefix based on current route
-     * Since admin folder only has dashboard/profile, both use superadmin views
+     * Determines which view folder to use based on the current route name
      *
      * @return string
      */
@@ -74,55 +148,21 @@ class RouteHelper
             return 'superadmin';
         }
 
-        return 'superadmin'; // Default fallback
-    }
+        // Check other route prefixes
+        if (str_starts_with($routeName, 'staff.')) {
+            return 'staff';
+        }
 
-    /**
-     * Generate a route name based on user's role
-     *
-     * @param string $routeName The route name without prefix (e.g., 'leads.index')
-     * @return string Full route name (e.g., 'superadmin.leads.index' or 'admin.leads.index')
-     */
-    public static function route(string $routeName): string
-    {
+        if (str_starts_with($routeName, 'client.')) {
+            return 'client';
+        }
+
+        if (str_starts_with($routeName, 'lead.')) {
+            return 'lead';
+        }
+
+        // Default fallback - use route prefix if available
         $prefix = self::getRoutePrefix();
-        return $prefix . '.' . $routeName;
-    }
-
-    /**
-     * Generate a route URL based on user's role
-     *
-     * @param string $routeName The route name without prefix
-     * @param mixed $parameters Route parameters
-     * @return string Route URL
-     */
-    public static function url(string $routeName, $parameters = []): string
-    {
-        $routeName = self::route($routeName);
-        return route($routeName, $parameters);
-    }
-
-    /**
-     * Check if current route matches the route pattern
-     *
-     * @param string $routeName Route name without prefix
-     * @return bool
-     */
-    public static function routeIs(string $routeName): bool
-    {
-        $prefix = self::getRoutePrefix();
-        return request()->routeIs($prefix . '.' . $routeName);
-    }
-
-    /**
-     * Check if current route matches any of the route patterns (admin.* or superadmin.*)
-     *
-     * @param string $routeName Route name without prefix
-     * @return bool
-     */
-    public static function routeIsAny(string $routeName): bool
-    {
-        return request()->routeIs('admin.' . $routeName) || request()->routeIs('superadmin.' . $routeName);
+        return $prefix;
     }
 }
-

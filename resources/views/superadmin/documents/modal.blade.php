@@ -8,7 +8,7 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="uploadDocumentForm" enctype="multipart/form-data">
+            <form id="uploadDocumentForm" method="POST" action="#" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="documentable_type" value="{{ get_class($documentable) }}">
                 <input type="hidden" name="documentable_id" value="{{ $documentable->id }}">
@@ -53,41 +53,138 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('uploadDocumentForm');
-    
-    if (form) {
+
+    if (form && !form.dataset.initialized) {
+        form.dataset.initialized = 'true';
+        let isSubmitting = false;
+
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+            e.stopPropagation();
+
+            // Prevent double submission
+            if (isSubmitting) {
+                return false;
+            }
+            isSubmitting = true;
+
+            // Clear previous errors
+            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+
             const formData = new FormData(form);
             const submitBtn = form.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
-            
+
             axios.post('{{ route("admin.documents.store") }}', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             })
             .then(function(response) {
                 if (response.data.success) {
-                    location.reload();
+                    // Show success message
+                    if (typeof window.showToast !== 'undefined') {
+                        window.showToast('success', response.data.message || 'Document uploaded successfully');
+                    } else if (typeof window.toastr !== 'undefined') {
+                        window.toastr.success(response.data.message || 'Document uploaded successfully');
+                    } else {
+                        alert(response.data.message || 'Document uploaded successfully');
+                    }
+
+                    // Close modal and reload after short delay
+                    setTimeout(function() {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('uploadDocumentModal'));
+                        if (modal) {
+                            modal.hide();
+                        }
+                        location.reload();
+                    }, 500);
+                } else {
+                    // Handle case where success is false
+                    const errorMessage = response.data.message || 'Failed to upload document';
+                    if (typeof window.showToast !== 'undefined') {
+                        window.showToast('error', errorMessage);
+                    } else if (typeof window.toastr !== 'undefined') {
+                        window.toastr.error(errorMessage);
+                    } else {
+                        alert(errorMessage);
+                    }
+                    isSubmitting = false;
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
                 }
             })
             .catch(function(error) {
+                isSubmitting = false;
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
-                if (typeof showToast !== 'undefined') {
-                    showToast('error', error.response?.data?.message || 'Failed to upload document');
-                } else if (typeof toastr !== 'undefined') {
-                    toastr.error(error.response?.data?.message || 'Failed to upload document');
+
+                // Handle validation errors
+                if (error.response?.status === 422 && error.response?.data?.errors) {
+                    const errors = error.response.data.errors;
+                    let firstErrorMessage = null;
+
+                    // Display field errors and collect first error message
+                    Object.keys(errors).forEach(field => {
+                        const fieldElement = form.querySelector(`[name="${field}"]`);
+                        if (fieldElement) {
+                            fieldElement.classList.add('is-invalid');
+                            const errorMessagesArray = Array.isArray(errors[field]) ? errors[field] : [errors[field]];
+
+                            // Get first error message for toast
+                            if (!firstErrorMessage && errorMessagesArray.length > 0) {
+                                firstErrorMessage = errorMessagesArray[0];
+                            }
+
+                            // Add invalid feedback (only first error per field)
+                            if (errorMessagesArray.length > 0) {
+                                // Remove existing feedback if any
+                                const existingFeedback = fieldElement.parentElement.querySelector('.invalid-feedback');
+                                if (existingFeedback) {
+                                    existingFeedback.remove();
+                                }
+
+                                const feedback = document.createElement('div');
+                                feedback.className = 'invalid-feedback';
+                                feedback.textContent = errorMessagesArray[0];
+                                fieldElement.parentElement.appendChild(feedback);
+                            }
+                        } else {
+                            // If field not found, use first error message
+                            const errorMessagesArray = Array.isArray(errors[field]) ? errors[field] : [errors[field]];
+                            if (!firstErrorMessage && errorMessagesArray.length > 0) {
+                                firstErrorMessage = errorMessagesArray[0];
+                            }
+                        }
+                    });
+
+                    // Show only first error message in toast (to avoid duplicates)
+                    const messageToShow = error.response?.data?.message || firstErrorMessage || 'Validation failed. Please check the form.';
+                    if (typeof window.showToast !== 'undefined') {
+                        window.showToast('error', messageToShow);
+                    } else if (typeof window.toastr !== 'undefined') {
+                        window.toastr.error(messageToShow);
+                    } else {
+                        alert(messageToShow);
+                    }
                 } else {
-                    alert(error.response?.data?.message || 'Failed to upload document');
+                    // Handle other errors
+                    const errorMessage = error.response?.data?.message || error.message || 'Failed to upload document';
+                    if (typeof window.showToast !== 'undefined') {
+                        window.showToast('error', errorMessage);
+                    } else if (typeof window.toastr !== 'undefined') {
+                        window.toastr.error(errorMessage);
+                    } else {
+                        alert(errorMessage);
+                    }
                 }
             });
         });
     }
 });
 </script>
-

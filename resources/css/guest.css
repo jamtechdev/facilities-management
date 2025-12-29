@@ -1,17 +1,4 @@
 /* Guest Layout Styles */
-:root {
-    --primary-green: #84c373;
-    --primary-dark: #5a8a4d;
-    --primary-light: #a8d99a;
-    --primary-lighter: #c8e9bd;
-    --primary-lightest: #e8f5e4;
-    --primary-gradient: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
-    --text-dark: #2d4a25;
-    --bg-light: #f8fbf7;
-    --shadow-sm: 0 2px 8px rgba(132, 195, 115, 0.1);
-    --shadow-md: 0 4px 16px rgba(132, 195, 115, 0.15);
-    --shadow-lg: 0 8px 32px rgba(132, 195, 115, 0.2);
-}
 
 /* Navbar Styles */
 .navbar-guest {
@@ -131,10 +118,106 @@ body:has(.register-page) {
     overflow: hidden;
 }
 
+/* Navbar Collapse Fixes */
+.navbar-collapse {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.navbar-collapse.show,
+.navbar-collapse.collapsing {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.navbar-nav {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.navbar-nav .nav-item {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.navbar-nav .nav-link {
+    margin: 0 !important;
+}
+
 /* Responsive */
+@media (max-width: 992px) {
+    .navbar-collapse {
+        margin-top: 1rem !important;
+        padding-top: 1rem !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .navbar-collapse.show,
+    .navbar-collapse.collapsing {
+        margin-top: 1rem !important;
+        padding-top: 1rem !important;
+    }
+
+    .navbar-nav {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .navbar-nav .nav-item {
+        margin: 0.25rem 0 !important;
+        padding: 0 !important;
+    }
+
+    .navbar-nav .nav-link {
+        margin: 0 !important;
+        padding: 0.75rem 1rem !important;
+        border-radius: 8px;
+    }
+}
+
 @media (max-width: 768px) {
     .navbar-guest .navbar-brand img {
         height: 35px !important;
     }
+
+    .navbar-collapse {
+        margin-top: 0.75rem !important;
+        padding-top: 0.75rem !important;
+    }
+
+    .navbar-collapse.show,
+    .navbar-collapse.collapsing {
+        margin-top: 0.75rem !important;
+        padding-top: 0.75rem !important;
+    }
+
+    .navbar-nav .nav-item {
+        margin: 0.2rem 0 !important;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 0.625rem 0.875rem !important;
+    }
 }
 
+@media (max-width: 576px) {
+    .navbar-collapse {
+        margin-top: 0.5rem !important;
+        padding-top: 0.5rem !important;
+    }
+
+    .navbar-collapse.show,
+    .navbar-collapse.collapsing {
+        margin-top: 0.5rem !important;
+        padding-top: 0.5rem !important;
+    }
+
+    .navbar-nav .nav-item {
+        margin: 0.15rem 0 !important;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.9rem;
+    }
+}

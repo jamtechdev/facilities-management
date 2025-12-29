@@ -1,8 +1,8 @@
 <nav class="navbar-top sticky-top">
     <div class="navbar-top-container">
         <div class="navbar-top-left">
-            <button class="btn-sidebar-toggle d-md-none" type="button" id="sidebarToggle">
-                <i class="bi bi-list"></i>
+            <button class="btn-sidebar-toggle" type="button" id="sidebarToggle" title="Toggle Sidebar">
+                <i class="bi bi-chevron-left" id="sidebarToggleIcon"></i>
             </button>
             <div class="navbar-breadcrumb">
                 <span class="breadcrumb-item">@yield('title', 'Dashboard')</span>
@@ -22,7 +22,7 @@
                         <span class="navbar-badge">{{ $notificationCount > 99 ? '99+' : $notificationCount }}</span>
                     @endif
                 </button>
-                <div class="dropdown-menu dropdown-menu-end notification-dropdown" style="min-width: 350px; max-width: 400px; max-height: 500px; overflow-y: auto;">
+                <div class="dropdown-menu dropdown-menu-end notification-dropdown">
                     <div class="dropdown-header d-flex justify-content-between align-items-center">
                         <strong>Notifications</strong>
                         <small class="text-muted">Follow-up Reminders</small>
@@ -43,7 +43,7 @@
                                     $isOverdue = $notification->due_date->isPast();
                                     $daysUntil = $notification->due_date->diffInDays(\Carbon\Carbon::now(), false);
                                 @endphp
-                                <a href="{{ route('admin.leads.show', $notification->lead) }}" class="dropdown-item notification-item {{ $isOverdue ? 'notification-overdue' : '' }}">
+                                <a href="{{ \App\Helpers\RouteHelper::url('leads.show', $notification->lead) }}" class="dropdown-item notification-item {{ $isOverdue ? 'notification-overdue' : '' }}">
                                     <div class="d-flex align-items-start">
                                         <div class="flex-shrink-0">
                                             <i class="bi bi-calendar-event text-{{ $isOverdue ? 'danger' : 'warning' }}"></i>
@@ -68,14 +68,14 @@
                             @endforeach
                         @else
                             <div class="dropdown-item text-center py-3">
-                                <i class="bi bi-check-circle text-success" style="font-size: 32px;"></i>
+                                <i class="bi bi-check-circle text-success notification-icon-large"></i>
                                 <p class="text-muted mt-2 mb-0">No notifications</p>
                             </div>
                         @endif
                     </div>
                     @if($notifications->count() > 10)
                         <div class="dropdown-footer text-center py-2">
-                            <a href="{{ route('admin.dashboard') }}" class="text-decoration-none small">View all notifications</a>
+                            <a href="{{ \App\Helpers\RouteHelper::url('dashboard') }}" class="text-decoration-none small">View all notifications</a>
                         </div>
                     @endif
                 </div>
@@ -97,15 +97,19 @@
                         <div class="navbar-user-name">{{ auth()->user()->name }}</div>
                         <div class="navbar-user-role">
                             @php
-                                if(auth()->user()->hasRole('Admin')) {
-                                    $roleName = 'Admin';
-                                    $roleColor = 'danger';
-                                } elseif(auth()->user()->hasRole('SuperAdmin')) {
-                                    $roleName = 'Super Admin';
-                                    $roleColor = 'primary';
-                                } elseif(auth()->user()->hasRole('Staff')) {
-                                    $roleName = 'Staff';
-                                    $roleColor = 'success';
+                                $user = auth()->user();
+                                $role = $user->roles->first();
+                                if($role) {
+                                    $roleName = $role->name;
+                                    // Map role names to colors
+                                    $roleColorMap = [
+                                        'SuperAdmin' => 'danger',
+                                        'Admin' => 'primary',
+                                        'Staff' => 'success',
+                                        'Client' => 'info',
+                                        'Lead' => 'warning',
+                                    ];
+                                    $roleColor = $roleColorMap[$roleName] ?? 'secondary';
                                 } else {
                                     $roleName = 'User';
                                     $roleColor = 'secondary';
@@ -117,24 +121,14 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-end user-dropdown-menu">
                     <h6 class="dropdown-header">Account</h6>
-                    @php
-                        $profileRoute = 'admin.profile';
-                        if(auth()->user()->hasRole('SuperAdmin')) {
-                            $profileRoute = 'superadmin.profile';
-                        } elseif(auth()->user()->hasRole('Admin')) {
-                            $profileRoute = 'admin.profile';
-                        } elseif(auth()->user()->hasRole('Staff')) {
-                            $profileRoute = 'staff.profile';
-                        } elseif(auth()->user()->hasRole('Client')) {
-                            $profileRoute = 'client.profile';
-                        }
-                    @endphp
-                    <a class="dropdown-item user-dropdown-item" href="{{ route($profileRoute) }}">
+                    <a class="dropdown-item user-dropdown-item" href="{{ \App\Helpers\RouteHelper::url('profile') }}">
                         <i class="bi bi-person-circle me-2"></i>Profile
                     </a>
-                    <a class="dropdown-item user-dropdown-item" href="#">
-                        <i class="bi bi-gear me-2"></i>Settings
-                    </a>
+                    @if(auth()->user()->can('view admin dashboard'))
+                        <a class="dropdown-item user-dropdown-item {{ \App\Helpers\RouteHelper::routeIsAny('settings') ? 'active' : '' }}" href="{{ \App\Helpers\RouteHelper::url('settings') }}">
+                            <i class="bi bi-gear me-2"></i>Settings
+                        </a>
+                    @endif
                     <div class="dropdown-divider"></div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
@@ -147,4 +141,3 @@
         </div>
     </div>
 </nav>
-

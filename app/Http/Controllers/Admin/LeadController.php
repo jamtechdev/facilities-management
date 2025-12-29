@@ -107,7 +107,7 @@ class LeadController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Lead updated successfully.',
-                'redirect' => RouteHelper::url('leads.show', $lead)
+                'redirect' => RouteHelper::url('leads.index')
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -133,6 +133,50 @@ class LeadController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete lead: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update lead stage (for inline editing in DataTable)
+     * Only updates stage, does NOT convert to client
+     */
+    public function updateStage(Request $request, Lead $lead): JsonResponse
+    {
+        $user = auth()->user();
+
+        // Only SuperAdmin (users with view roles permission) can update stage directly
+        if (!$user->can('view roles')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to update lead stage.'
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'stage' => 'required|in:new_lead,in_progress,qualified,not_qualified,junk'
+        ]);
+
+        try {
+            // Only update stage field - do NOT trigger conversion
+            // Use updateQuietly to bypass model events and observers
+            // This ensures no auto-conversion happens when stage changes from DataTable
+            $lead->updateQuietly(['stage' => $validated['stage']]);
+
+            // Refresh the model to get updated data
+            $lead->refresh();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Lead stage updated successfully.',
+                'stage' => $lead->stage,
+                'is_qualified' => $lead->stage === 'qualified',
+                'is_converted' => (bool)$lead->converted_to_client_id
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update lead stage: ' . $e->getMessage()
             ], 500);
         }
     }

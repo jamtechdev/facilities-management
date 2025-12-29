@@ -13,7 +13,7 @@
     <div class="profile-header">
         <div class="profile-header-content">
             <div class="profile-avatar">
-                <i class="bi bi-people" style="font-size: 2.5rem;"></i>
+                <i class="bi bi-people icon-2-5rem"></i>
             </div>
             <div class="profile-info flex-grow-1">
                 <h1>Staff Management</h1>

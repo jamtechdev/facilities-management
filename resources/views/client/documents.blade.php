@@ -38,7 +38,7 @@
                 </div>
             @empty
                 <div class="text-center py-5">
-                    <i class="bi bi-file-earmark-text" style="font-size: 4rem; color: #dee2e6;"></i>
+                    <i class="bi bi-file-earmark-text empty-state-icon-medium"></i>
                     <h4 class="mt-3 text-muted">No Documents Found</h4>
                     <p class="text-muted">Uploaded documents will appear here once available.</p>
                 </div>

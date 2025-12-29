@@ -23,17 +23,12 @@
     animation: pulse 8s ease-in-out infinite;
 }
 
-@keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.5; }
-    50% { transform: scale(1.1); opacity: 0.8; }
-}
-
 .timesheet-header-content {
     position: relative;
     z-index: 1;
 }
 
-/* Modern Tabs */
+/* Modern Tabs - Uses common pattern from utilities.css */
 .timesheet-tabs {
     border-bottom: 2px solid rgba(132, 195, 115, 0.2);
     margin-bottom: 2rem;

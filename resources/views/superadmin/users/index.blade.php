@@ -12,7 +12,7 @@
         <div class="profile-header">
             <div class="profile-header-content">
                 <div class="profile-avatar">
-                    <i class="bi bi-person-gear" style="font-size: 2.5rem;"></i>
+                    <i class="bi bi-person-gear icon-2-5rem"></i>
                 </div>
                 <div class="profile-info flex-grow-1">
                     <h1>Users Management</h1>
@@ -32,29 +32,10 @@
             <div class="col-lg-12 mb-4 order-0">
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-0">
-                    <div class="card-body p-0">
                         <div class="table-responsive">
                             {!! $dataTable->table(['class' => 'table table-striped table-hover w-100']) !!}
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- View User Modal -->
-    <div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="viewUserModalLabel">User Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="userDetails">
-                    <!-- User details will be loaded here -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -67,37 +48,11 @@
     <script>
         // jQuery is loaded globally from npm via layout
         $(document).ready(function() {
-            // View User
-            $(document).on('click', '.view-user', function(e) {
-                e.preventDefault();
-                let url = $(this).attr('href');
-
-                $('#userDetails').html('<p class="text-muted">Loading...</p>');
-
-                $.get(url, function(user) {
-                    let roles = user.roles.map(r => `<span class="badge bg-primary me-1">${r.name}</span>`)
-                        .join('');
-
-                    let html = `
-                <p><strong>Name:</strong> ${user.name}</p>
-                <p><strong>Email:</strong> ${user.email}</p>
-                <p><strong>Roles:</strong> ${roles || '<span class="text-muted">No roles</span>'}</p>
-                <p><strong>Created At:</strong> ${user.created_at}</p>
-                <p><strong>Updated At:</strong> ${user.updated_at ?? 'N/A'}</p>
-            `;
-
-                    $('#userDetails').html(html);
-                }).fail(function(xhr) {
-                    $('#userDetails').html('<p class="text-danger">Error loading user details. Please try again.</p>');
-                    console.error('Error loading user:', xhr);
-                });
-            });
-
             // Delete User
             $(document).on('click', '.delete-user', function(e) {
                 e.preventDefault();
-                let url = $(this).attr('href'); // destroy route
                 let id = $(this).data('id');
+                let url = '{{ \App\Helpers\RouteHelper::url("users.destroy", ":id") }}'.replace(':id', id);
 
                 if (confirm("Are you sure you want to delete this user?")) {
                     $.ajax({

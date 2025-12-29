@@ -106,7 +106,7 @@ class ClientController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Client updated successfully.',
-                'redirect' => RouteHelper::url('clients.show', $client)
+                'redirect' => RouteHelper::url('clients.index')
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

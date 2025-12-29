@@ -7,7 +7,7 @@
         <div class="row mb-4">
             <div class="col">
                 <h1 class="h3 mb-0">Edit User</h1>
-                <p class="text-muted">Update user information and roles</p>
+                <p class="text-muted">Update user information</p>
             </div>
         </div>
 
@@ -18,7 +18,7 @@
                         <h5><i class="bi bi-pencil-square me-2"></i>Edit User Information</h5>
                     </div>
                     <div class="form-card-body">
-                        <form method="POST" action="{{ route('admin.users.update', $user->id) }}">
+                        <form id="editUserForm" method="POST" action="{{ route('admin.users.update', $user->id) }}">
                             @csrf
                             @method('PUT')
 
@@ -44,23 +44,10 @@
                                     <input type="password" class="form-control" id="password" name="password"
                                            placeholder="Enter new password">
                                 </div>
-                                <div class="col-md-6">
-                                    <label for="role" class="form-label">
-                                        <i class="bi bi-shield-check me-1"></i>Role <span class="text-danger">*</span>
-                                    </label>
-                                    <select class="form-select" id="role" name="role" required>
-                                        <option value="">Select Role</option>
-                                        @foreach ($roles as $role)
-                                            <option value="{{ $role->name }}" {{ $user->hasRole($role->name) ? 'selected' : '' }}>
-                                                {{ $role->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
                             </div>
 
                             <div class="form-actions mt-4">
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
                                     <i class="bi bi-check-circle me-2"></i>Update User
                                 </button>
                                 <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
@@ -74,3 +61,7 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    @vite(['resources/js/forms.js'])
+@endpush

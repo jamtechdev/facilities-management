@@ -3,7 +3,7 @@
 @endphp
 
 <nav class="sidebar-nav">
-    @if ($user->hasAnyRole(['SuperAdmin', 'Admin']))
+    @if ($user->can('view admin dashboard'))
         <div class="nav-section">
             <div class="nav-section-title">Main</div>
             @can('view admin dashboard')
@@ -15,13 +15,6 @@
                     </a>
                 </div>
             @endcan
-            <div class="nav-item-modern">
-                <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('settings') ? 'active' : '' }}"
-                    href="{{ \App\Helpers\RouteHelper::url('settings') }}">
-                    <span class="nav-icon"><i class="bi bi-gear"></i></span>
-                    <span class="nav-text">Settings</span>
-                </a>
-            </div>
         </div>
 
         @if($user->can('view leads') || $user->can('view clients') || $user->can('view staff'))
@@ -84,7 +77,7 @@
         </div>
         @endif
 
-        @if($user->can('view inventory'))
+        @if($user->can('view inventory') || $user->can('view roles'))
         <div class="nav-section">
             <div class="nav-section-title">Operations</div>
             @can('view inventory')
@@ -93,6 +86,15 @@
                         href="{{ \App\Helpers\RouteHelper::url('inventory.index') }}">
                         <span class="nav-icon"><i class="bi bi-box-seam"></i></span>
                         <span class="nav-text">Inventory</span>
+                    </a>
+                </div>
+            @endcan
+            @can('view roles')
+                <div class="nav-item-modern">
+                    <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('documents.gallery') ? 'active' : '' }}"
+                        href="{{ \App\Helpers\RouteHelper::url('documents.gallery') }}">
+                        <span class="nav-icon"><i class="bi bi-folder2-open"></i></span>
+                        <span class="nav-text">Document Gallery</span>
                     </a>
                 </div>
             @endcan
@@ -123,7 +125,7 @@
             @endcan
         </div>
         @endif
-    @elseif($user->hasRole('Staff'))
+    @elseif($user->can('view staff dashboard'))
         <div class="nav-section">
             <div class="nav-section-title">Main</div>
             @can('view staff dashboard')
@@ -154,7 +156,7 @@
                 </a>
             </div>
         </div>
-    @elseif($user->hasRole('Client'))
+    @elseif($user->can('view client dashboard'))
         <div class="nav-section">
             <div class="nav-section-title">Main</div>
             <div class="nav-item-modern">
@@ -162,6 +164,13 @@
                     href="{{ route('client.dashboard') }}">
                     <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
                     <span class="nav-text">Dashboard</span>
+                </a>
+            </div>
+            <div class="nav-item-modern">
+                <a class="nav-link-modern {{ request()->routeIs('client.staff*') ? 'active' : '' }}"
+                    href="{{ route('client.staff.index') }}">
+                    <span class="nav-icon"><i class="bi bi-people"></i></span>
+                    <span class="nav-text">Our Staff</span>
                 </a>
             </div>
         </div>
@@ -182,6 +191,10 @@
                     <span class="nav-text">Before & After Photos</span>
                 </a>
             </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Communication</div>
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('client.feedback*') ? 'active' : '' }}"
                     href="{{ route('client.feedback') }}">
@@ -189,10 +202,6 @@
                     <span class="nav-text">Feedback</span>
                 </a>
             </div>
-        </div>
-
-        <div class="nav-section">
-            <div class="nav-section-title">Documents</div>
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('client.documents*') ? 'active' : '' }}"
                     href="{{ route('client.documents') }}">
@@ -203,23 +212,14 @@
         </div>
 
         <div class="nav-section">
-            <div class="nav-section-title">Financial</div>
+            <div class="nav-section-title">Account</div>
             <div class="nav-item-modern">
-                <a class="nav-link-modern {{ request()->routeIs('client.invoices*') ? 'active' : '' }}"
-                    href="{{ route('client.invoices') }}">
-                    <span class="nav-icon"><i class="bi bi-receipt"></i></span>
-                    <span class="nav-text">Invoices</span>
+                <a class="nav-link-modern {{ request()->routeIs('client.profile*') ? 'active' : '' }}"
+                    href="{{ route('client.profile') }}">
+                    <span class="nav-icon"><i class="bi bi-person-circle"></i></span>
+                    <span class="nav-text">Profile</span>
                 </a>
             </div>
-            @if (Route::has('client.inventory.index'))
-                <div class="nav-item-modern">
-                    <a class="nav-link-modern {{ request()->routeIs('client.inventory*') ? 'active' : '' }}"
-                        href="#">
-                        <span class="nav-icon"><i class="bi bi-box-seam"></i></span>
-                        <span class="nav-text">Inventory</span>
-                    </a>
-                </div>
-            @endif
         </div>
     @endif
 
@@ -234,12 +234,14 @@
             <div class="user-name">{{ $user->name }}</div>
             <div class="user-role">
                 @php
-                    if($user->hasRole('Admin')) {
+                    if($user->can('view roles')) {
                         $roleName = 'Super Admin';
-                    } elseif($user->hasRole('SuperAdmin')) {
+                    } elseif($user->can('view admin dashboard')) {
                         $roleName = 'Admin';
-                    } elseif($user->hasRole('Staff')) {
+                    } elseif($user->can('view staff dashboard')) {
                         $roleName = 'Staff';
+                    } elseif($user->can('view client dashboard')) {
+                        $roleName = 'Client';
                     } else {
                         $roleName = 'User';
                     }

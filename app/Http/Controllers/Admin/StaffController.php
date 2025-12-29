@@ -97,7 +97,7 @@ class StaffController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Staff updated successfully.',
-                'redirect' => route('admin.staff.show', $staff)
+                'redirect' => route('admin.staff.index')
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

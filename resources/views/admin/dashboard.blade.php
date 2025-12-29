@@ -7,7 +7,7 @@
 @endpush
 
 @section('content')
-<div class="container-fluid superadmin-dashboard-content">
+<div class="container-fluid admin-dashboard-content">
     <!-- Real-time Clock Widget -->
     <div class="clock-widget">
         <div class="clock-content">
@@ -21,7 +21,7 @@
                     <div class="clock-welcome-name">{{ auth()->user()->name }}</div>
                 </div>
             </div>
-            
+
             <!-- Clock Section (Right Side) -->
             <div class="clock-time-section">
                 <div class="clock-icon-wrapper">
@@ -110,7 +110,7 @@
     <!-- Secondary Stats Row -->
     <div class="row g-4 mb-4">
         @can('view dashboard qualified leads card')
-        <div class="col-md-3">
+        <div class="col-xl-3 col-md-6">
             <div class="admin-stat-card">
                 <div class="stat-header">
                     <div class="stat-content">
@@ -128,7 +128,7 @@
         </div>
         @endcan
         @can('view dashboard new leads card')
-        <div class="col-md-3">
+        <div class="col-xl-3 col-md-6">
             <div class="admin-stat-card">
                 <div class="stat-header">
                     <div class="stat-content">
@@ -146,7 +146,7 @@
         </div>
         @endcan
         @can('view dashboard users card')
-        <div class="col-md-3">
+        <div class="col-xl-3 col-md-6">
             <div class="admin-stat-card">
                 <div class="stat-header">
                     <div class="stat-content">
@@ -162,7 +162,7 @@
         </div>
         @endcan
         @can('view dashboard invoices card')
-        <div class="col-md-3">
+        <div class="col-xl-3 col-md-6">
             <div class="admin-stat-card">
                 <div class="stat-header">
                     <div class="stat-content">
@@ -180,6 +180,55 @@
         </div>
         @endcan
     </div>
+
+    <!-- Charts Section -->
+    @canany(['view dashboard leads chart', 'view dashboard lead stages graph'])
+    @if((isset($leadsLast7Days) && count($leadsLast7Days) > 0) || (isset($leadStages) && count($leadStages) > 0))
+    <div class="row g-4">
+        <!-- Leads Over Time Chart -->
+        @can('view dashboard leads chart')
+        @if(isset($leadsLast7Days) && count($leadsLast7Days) > 0)
+        <div class="col-lg-8 col-md-12">
+            <div class="activity-card">
+                <div class="activity-card-header">
+                    <h5>
+                        <i class="bi bi-graph-up"></i>
+                        Leads Over Last 7 Days
+                    </h5>
+                </div>
+                <div class="activity-card-body">
+                    <div class="chart-container">
+                        <canvas id="leadsChart" data-leads='@json($leadsLast7Days)'></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+        @endcan
+
+        <!-- Lead Stages Chart -->
+        @can('view dashboard lead stages graph')
+        @if(isset($leadStages) && count($leadStages) > 0)
+        <div class="col-lg-4 col-md-12">
+            <div class="activity-card">
+                <div class="activity-card-header">
+                    <h5>
+                        <i class="bi bi-pie-chart"></i>
+                        Lead Stages Distribution
+                    </h5>
+                </div>
+                <div class="activity-card-body">
+                    <div class="chart-container">
+                        <canvas id="stagesChart" data-stages='@json($leadStages)'></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+        @endcan
+    </div>
+    @endif
+    @endcanany
 
     <!-- Follow-up Reminders and Recent Activity -->
     <div class="row g-4">
@@ -320,38 +369,230 @@
 @endsection
 
 @push('scripts')
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Dashboard Charts JavaScript
+    (function() {
+        'use strict';
+
+        // Global chart instances
+        let leadsChart = null;
+        let stagesChart = null;
+
+        // Initialize all charts when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            initLeadsChart();
+            initStagesChart();
+        });
+
+        // Initialize Leads Over Time Chart
+        function initLeadsChart() {
+            const leadsCtx = document.getElementById('leadsChart');
+            if (!leadsCtx) return;
+
+            const leadsDataElement = document.getElementById('leadsChart');
+            let leadsData = [];
+
+            if (leadsDataElement && leadsDataElement.dataset.leads) {
+                try {
+                    leadsData = JSON.parse(leadsDataElement.dataset.leads);
+                } catch (e) {
+                    console.error('Error parsing leads data:', e);
+                    return;
+                }
+            } else {
+                return;
+            }
+
+            const labels = leadsData.map(item => item.date || item.day || '');
+            const data = leadsData.map(item => item.count || 0);
+            const maxValue = Math.max(...data, 1);
+
+            if (typeof Chart !== 'undefined') {
+                leadsChart = new Chart(leadsCtx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'New Leads',
+                            data: data,
+                            borderColor: '#84c373',
+                            backgroundColor: 'rgba(132, 195, 115, 0.15)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#84c373',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 3,
+                            pointRadius: 6,
+                            pointHoverRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 15,
+                                    font: { size: 12, weight: '600' },
+                                    color: '#495057'
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(26, 31, 46, 0.95)',
+                                padding: 12,
+                                cornerRadius: 8
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: Math.ceil(maxValue * 1.2),
+                                ticks: {
+                                    precision: 0,
+                                    stepSize: 1,
+                                    font: { size: 11, weight: '500' },
+                                    color: '#6c757d'
+                                },
+                                grid: {
+                                    color: 'rgba(132, 195, 115, 0.1)',
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: { size: 11, weight: '500' },
+                                    color: '#6c757d'
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Initialize Lead Stages Doughnut Chart
+        function initStagesChart() {
+            const stagesCtx = document.getElementById('stagesChart');
+            if (!stagesCtx) return;
+
+            let stagesData = {};
+            const stagesDataElement = document.getElementById('stagesChart');
+            if (stagesDataElement && stagesDataElement.dataset.stages) {
+                try {
+                    stagesData = JSON.parse(stagesDataElement.dataset.stages);
+                } catch (e) {
+                    console.error('Error parsing stages data:', e);
+                    return;
+                }
+            } else {
+                return;
+            }
+
+            const stageColors = {
+                'new_lead': '#17a2b8',
+                'in_progress': '#0dcaf0',
+                'qualified': '#84c373',
+                'not_qualified': '#ffc107',
+                'junk': '#dc3545'
+            };
+
+            const stageLabels = Object.keys(stagesData);
+            const stageValues = Object.values(stagesData);
+            const stageColorsArray = stageLabels.map(stage => stageColors[stage] || '#6c757d');
+
+            if (typeof Chart !== 'undefined') {
+                stagesChart = new Chart(stagesCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: stageLabels.map(label =>
+                            label.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+                        ),
+                        datasets: [{
+                            data: stageValues,
+                            backgroundColor: stageColorsArray,
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 15,
+                                    font: { size: 11 },
+                                    usePointStyle: true
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Update charts on window resize
+        window.addEventListener('resize', function() {
+            if (leadsChart) leadsChart.resize();
+            if (stagesChart) stagesChart.resize();
+        });
+    })();
+</script>
 <script>
     // Real-time Clock with Running Seconds
     function updateClock() {
         const now = new Date();
-        
+
         // Time
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
         const seconds = String(now.getSeconds()).padStart(2, '0');
-        
+
         // Date
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        
+
         const dayName = days[now.getDay()];
         const monthName = months[now.getMonth()];
         const day = now.getDate();
         const year = now.getFullYear();
-        
+
         // Update elements
         const timeElement = document.getElementById('clock-time');
         const dateElement = document.getElementById('clock-date');
         const dayElement = document.getElementById('clock-day');
-        
+
         if (timeElement) timeElement.textContent = `${hours}:${minutes}:${seconds}`;
         if (dateElement) dateElement.textContent = `${monthName} ${day}, ${year}`;
         if (dayElement) dayElement.textContent = dayName;
     }
-    
+
     // Update immediately and then every second
     updateClock();
     setInterval(updateClock, 1000);
 </script>
 @endpush
-

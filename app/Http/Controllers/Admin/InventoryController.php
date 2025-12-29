@@ -22,6 +22,36 @@ class InventoryController extends Controller
     }
 
     /**
+     * Show the form for creating a new inventory item
+     */
+    public function create()
+    {
+        return view('superadmin.inventory.create');
+    }
+
+    /**
+     * Display the specified inventory item
+     */
+    public function show(Inventory $inventory)
+    {
+        // Check permission to view inventory details
+        if (!auth()->user()->can('view inventory')) {
+            abort(403, 'You do not have permission to view inventory details.');
+        }
+
+        $inventory->load('assignedTo');
+        return view('superadmin.inventory.show', compact('inventory'));
+    }
+
+    /**
+     * Show the form for editing the specified inventory item
+     */
+    public function edit(Inventory $inventory)
+    {
+        return view('superadmin.inventory.edit', compact('inventory'));
+    }
+
+    /**
      * Store a newly created inventory item
      */
     public function store(Request $request): JsonResponse
@@ -53,7 +83,7 @@ class InventoryController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Inventory item created successfully.',
-                'data' => $inventory
+                'redirect' => route('admin.inventory.index')
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -93,7 +123,7 @@ class InventoryController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Inventory item updated successfully.',
-                'data' => $inventory
+                'redirect' => route('admin.inventory.index')
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -181,4 +211,3 @@ class InventoryController extends Controller
         }
     }
 }
-

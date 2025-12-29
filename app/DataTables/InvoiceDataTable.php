@@ -3,6 +3,7 @@
 namespace App\DataTables;
 
 use App\Models\Invoice;
+use App\Helpers\RouteHelper;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Illuminate\Support\HtmlString;
@@ -52,14 +53,14 @@ class InvoiceDataTable extends DataTable
 
             // View button - requires view invoice details permission
             if ($user->can('view invoice details')) {
-                $actions .= '<a href="' . route('admin.invoices.show', $invoice) . '" class="btn btn-outline-primary" title="View">
+                $actions .= '<a href="' . RouteHelper::url('invoices.show', $invoice) . '" class="btn btn-outline-primary" title="View">
                         <i class="bi bi-eye"></i>
                     </a>';
             }
 
             // Download button
             if ($user->can('view invoices')) {
-                $actions .= '<a href="' . route('admin.invoices.download', $invoice) . '" class="btn btn-outline-info" title="Download PDF">
+                $actions .= '<a href="' . RouteHelper::url('invoices.download', $invoice) . '" class="btn btn-outline-info" title="Download PDF">
                         <i class="bi bi-download"></i>
                     </a>';
             }
@@ -72,12 +73,12 @@ class InvoiceDataTable extends DataTable
             }
 
             $actions .= '</div>';
-            
+
             // If no actions available, return a dash
             if (strlen($actions) <= strlen('<div class="btn-group btn-group-sm" role="group"></div>')) {
                 return new HtmlString('<span class="text-muted">-</span>');
             }
-            
+
             return new HtmlString($actions);
             })
             ->editColumn('total_amount', function (Invoice $invoice) {
@@ -123,7 +124,7 @@ class InvoiceDataTable extends DataTable
                     ->className('btn btn-primary')
                     ->text('<i class="bi bi-plus-circle me-1"></i> New Invoice')
                     ->action('function(e, dt, node, config) {
-                        window.location.href = "' . route('admin.invoices.create') . '";
+                        window.location.href = "' . RouteHelper::url('invoices.create') . '";
                     }') : null,
                 Button::make('reload')
                     ->className('btn btn-secondary')
@@ -150,10 +151,10 @@ class InvoiceDataTable extends DataTable
                 'searchPlaceholder' => 'Search invoices...',
                 'lengthMenu' => 'Show _MENU_ entries',
                 'paginate' => [
-                    'first' => 'First',
-                    'last' => 'Last',
-                    'next' => 'Next',
-                    'previous' => 'Previous'
+                    'first' => '«',
+                    'last' => '»',
+                    'next' => '›',
+                    'previous' => '‹'
                 ]
                 ],
             ]);
@@ -195,4 +196,3 @@ class InvoiceDataTable extends DataTable
         return 'Invoices_' . date('YmdHis');
     }
 }
-

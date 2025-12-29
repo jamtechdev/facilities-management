@@ -3,6 +3,7 @@
 namespace App\DataTables;
 
 use App\Models\Lead;
+use App\Helpers\RouteHelper;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Illuminate\Support\HtmlString;
@@ -25,6 +26,9 @@ class LeadDataTable extends DataTable
             ->setRowId('id')
             ->addIndexColumn()
             ->addColumn('stage_badge', function (Lead $lead) {
+                $user = auth()->user();
+                $canEditStage = $user->can('view roles'); // SuperAdmin can edit directly
+
                 $stageColors = [
                     'new_lead' => 'primary',
                     'in_progress' => 'info',
@@ -39,6 +43,18 @@ class LeadDataTable extends DataTable
                     'not_qualified' => 'Not Qualified',
                     'junk' => 'Junk'
                 ];
+
+                // If SuperAdmin, show editable dropdown
+                if ($canEditStage) {
+                    $options = '';
+                    foreach ($stageLabels as $stage => $label) {
+                        $selected = $lead->stage === $stage ? 'selected' : '';
+                        $options .= '<option value="' . $stage . '" ' . $selected . '>' . $label . '</option>';
+                    }
+                    return new HtmlString('<select class="form-select form-select-sm stage-select" data-lead-id="' . $lead->id . '" style="min-width: 120px;">' . $options . '</select>');
+                }
+
+                // Otherwise show badge
                 $color = $stageColors[$lead->stage] ?? 'secondary';
                 $label = $stageLabels[$lead->stage] ?? $lead->stage;
                 return new HtmlString('<span class="badge bg-' . $color . '">' . $label . '</span>');
@@ -52,14 +68,14 @@ class LeadDataTable extends DataTable
 
             // View button - requires view lead details permission
             if ($user->can('view lead details')) {
-                $actions .= '<a href="' . route('admin.leads.show', $lead) . '" class="btn btn-outline-primary" title="View">
+                $actions .= '<a href="' . RouteHelper::url('leads.show', $lead) . '" class="btn btn-outline-primary" title="View">
                         <i class="bi bi-eye"></i>
                     </a>';
             }
 
             // Edit button
             if ($user->can('edit leads')) {
-                $actions .= '<a href="' . route('admin.leads.edit', $lead) . '" class="btn btn-outline-secondary" title="Edit">
+                $actions .= '<a href="' . RouteHelper::url('leads.edit', $lead) . '" class="btn btn-outline-secondary" title="Edit">
                         <i class="bi bi-pencil"></i>
                     </a>';
             }
@@ -72,12 +88,12 @@ class LeadDataTable extends DataTable
             }
 
             $actions .= '</div>';
-            
+
             // If no actions available, return a dash
             if (strlen($actions) <= strlen('<div class="btn-group btn-group-sm" role="group"></div>')) {
                 return new HtmlString('<span class="text-muted">-</span>');
             }
-            
+
             return new HtmlString($actions);
             })
             ->editColumn('created_at', function (Lead $lead) {
@@ -116,7 +132,7 @@ class LeadDataTable extends DataTable
                     ->className('btn btn-primary')
                     ->text('<i class="bi bi-plus-circle me-1"></i> New Lead')
                     ->action('function(e, dt, node, config) {
-                        window.location.href = "' . route('admin.leads.create') . '";
+                        window.location.href = "' . RouteHelper::url('leads.create') . '";
                     }') : null,
                 Button::make('reload')
                     ->className('btn btn-secondary')
@@ -143,10 +159,10 @@ class LeadDataTable extends DataTable
                 'searchPlaceholder' => 'Search leads...',
                 'lengthMenu' => 'Show _MENU_ entries',
                 'paginate' => [
-                    'first' => 'First',
-                    'last' => 'Last',
-                    'next' => 'Next',
-                    'previous' => 'Previous'
+                    'first' => '«',
+                    'last' => '»',
+                    'next' => '›',
+                    'previous' => '‹'
                 ]
                 ],
             ]);
@@ -189,4 +205,3 @@ class LeadDataTable extends DataTable
         return 'Leads_' . date('YmdHis');
     }
 }
-

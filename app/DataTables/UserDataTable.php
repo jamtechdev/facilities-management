@@ -3,6 +3,7 @@
 namespace App\DataTables;
 
 use App\Models\User;
+use App\Helpers\RouteHelper;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Illuminate\Support\HtmlString;
@@ -55,18 +56,28 @@ class UserDataTable extends DataTable
             $currentUser = auth()->user();
             $actions = '<div class="btn-group btn-group-sm" role="group">';
 
-            // View button - requires view user details permission
+            // View button - requires view user details permission - redirect to page instead of modal
             if ($currentUser->can('view user details')) {
-                $actions .= '<a href="' . route('admin.users.show', $user->id) . '" class="btn btn-outline-primary view-user" data-id="' . $user->id . '" data-bs-toggle="modal" data-bs-target="#viewUserModal" title="View">
+                $actions .= '<a href="' . RouteHelper::url('users.show', $user->id) . '" class="btn btn-outline-primary" title="View">
                         <i class="bi bi-eye"></i>
                     </a>';
             }
 
-            // Edit button
+            // Edit button - prevent Admin from editing SuperAdmin
             if ($currentUser->can('edit users') && $user->id !== $currentUser->id) {
-                $actions .= '<a href="' . route('admin.users.edit', $user->id) . '" class="btn btn-outline-secondary" title="Edit">
-                        <i class="bi bi-pencil"></i>
-                    </a>';
+                $userRoles = $user->roles->pluck('name')->toArray();
+                $canEdit = true;
+
+                // Only SuperAdmin can edit SuperAdmin users
+                if (in_array('SuperAdmin', $userRoles) && !$currentUser->can('view roles')) {
+                    $canEdit = false;
+                }
+
+                if ($canEdit) {
+                    $actions .= '<a href="' . RouteHelper::url('users.edit', $user->id) . '" class="btn btn-outline-secondary" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>';
+                }
             }
 
             // Delete button
@@ -77,12 +88,12 @@ class UserDataTable extends DataTable
             }
 
             $actions .= '</div>';
-            
+
             // If no actions available, return a dash
             if (strlen($actions) <= strlen('<div class="btn-group btn-group-sm" role="group"></div>')) {
                 return new HtmlString('<span class="text-muted">-</span>');
             }
-            
+
             return new HtmlString($actions);
             })
 
@@ -101,7 +112,7 @@ class UserDataTable extends DataTable
      */
     public function query(User $model): QueryBuilder
     {
-        $query = $model->newQuery()->with('roles');
+        $query = $model->newQuery()->with('roles')->where('id', '!=', auth()->id());
         return $query;
     }
 
@@ -115,14 +126,14 @@ class UserDataTable extends DataTable
         return $this->builder()
             ->setTableId('users-table')
             ->columns($this->getColumns())
-            ->minifiedAjax()
+            ->minifiedAjax(RouteHelper::url('users.index'))
             ->orderBy(1)
             ->buttons(array_filter([
                 auth()->user()->can('create users') ? Button::make()
                     ->className('btn btn-primary')
                     ->text('<i class="bi bi-plus-circle"></i> New User')
                     ->action('function(e, dt, node, config) {
-                        let url = "' . route('admin.users.create') . '";
+                        let url = "' . RouteHelper::url('users.create') . '";
                         console.log("Button clicked. Redirecting to: " + url);
                         window.location.href = url;
                     }') : null,
@@ -138,6 +149,7 @@ class UserDataTable extends DataTable
                     [5, 10, 25, 50, -1],
                     ['5', '10', '25', '50', 'Show all']
                 ],
+
             'pageLength' => 10,
                 'scrollX' => true,
             'scrollCollapse' => true,
@@ -151,10 +163,8 @@ class UserDataTable extends DataTable
                 'searchPlaceholder' => 'Search users...',
                 'lengthMenu' => 'Show _MENU_ entries',
                 'paginate' => [
-                    'first' => 'First',
-                    'last' => 'Last',
-                    'next' => 'Next',
-                    'previous' => 'Previous'
+                    'next' => '›',
+                    'previous' => '‹'
                 ]
                 ],
             ]);

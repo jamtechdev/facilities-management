@@ -8,14 +8,19 @@ document.addEventListener('DOMContentLoaded', function() {
     initFormSubmissions();
 });
 
+// Prevent duplicate initialization
+let formsInitialized = false;
+
 /**
  * Initialize form submissions with AJAX
  */
 function initFormSubmissions() {
-    // Handle create forms
-    const createForms = document.querySelectorAll('form[id$="Form"]');
+    if (formsInitialized) return;
 
-    createForms.forEach(form => {
+    // Exclude forms that have their own handlers
+    const forms = document.querySelectorAll('form[id$="Form"]:not(#addCommunicationForm):not(#inventoryForm)');
+
+    forms.forEach(form => {
         const submitBtn = form.querySelector('button[type="submit"]');
 
         if (submitBtn && !form.dataset.initialized) {
@@ -27,16 +32,24 @@ function initFormSubmissions() {
             });
         }
     });
+
+    formsInitialized = true;
 }
 
 /**
  * Handle form submission
  */
 function handleFormSubmit(form, submitBtn) {
+    // Prevent duplicate submissions
+    if (form.dataset.submitting === 'true') {
+        return;
+    }
+    form.dataset.submitting = 'true';
+
     const formData = new FormData(form);
     const submitBtnText = submitBtn.innerHTML;
     const method = form.method.toUpperCase();
-    const action = form.action;
+    let action = form.action;
 
     // Disable submit button
     submitBtn.disabled = true;
@@ -45,20 +58,22 @@ function handleFormSubmit(form, submitBtn) {
     // Clear previous validation errors
     clearValidationErrors(form);
 
-    // Determine HTTP method override
-    const headers = {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-    };
-
-    if (method === 'POST' && form.querySelector('input[name="_method"]')) {
-        headers['X-HTTP-Method-Override'] = form.querySelector('input[name="_method"]').value;
-        headers['Content-Type'] = 'multipart/form-data';
-    } else if (method === 'PUT' || method === 'PATCH' || method === 'DELETE') {
-        headers['X-HTTP-Method-Override'] = method;
-        headers['Content-Type'] = 'multipart/form-data';
+    // Get the actual HTTP method (check for _method input for Laravel method spoofing)
+    let httpMethod = method;
+    const methodInput = form.querySelector('input[name="_method"]');
+    if (methodInput) {
+        httpMethod = methodInput.value.toUpperCase();
     }
 
-    // Make AJAX request
+    const headers = {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        'X-Requested-With': 'XMLHttpRequest'
+    };
+
+    // Make AJAX request with proper method
+    // For PUT/PATCH/DELETE, Laravel uses method spoofing via _method field in formData
+    // So we always POST, but the _method field in FormData tells Laravel the actual method
+    // The formData already contains _method from the hidden input, so just POST it
     axios.post(action, formData, { headers })
         .then(function(response) {
             if (response.data.success) {
@@ -90,12 +105,14 @@ function handleFormSubmit(form, submitBtn) {
                     alert(errorMessage);
                 }
                 // Re-enable submit button
+                form.dataset.submitting = 'false';
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = submitBtnText;
             }
         })
         .catch(function(error) {
             // Re-enable submit button
+            form.dataset.submitting = 'false';
             submitBtn.disabled = false;
             submitBtn.innerHTML = submitBtnText;
 
@@ -104,8 +121,8 @@ function handleFormSubmit(form, submitBtn) {
                 displayValidationErrors(error.response.data.errors, form);
             } else {
                 const errorMessage = error.response?.data?.message || error.message || 'An error occurred. Please try again.';
-                if (typeof showToast !== 'undefined') {
-                    showToast('error', errorMessage);
+                if (typeof window.showToast !== 'undefined') {
+                    window.showToast('error', errorMessage);
                 } else if (typeof toastr !== 'undefined') {
                     toastr.error(errorMessage);
                 } else {
@@ -180,8 +197,8 @@ function initDeleteConfirmations() {
                     }
                 })
                 .catch(function(error) {
-                    if (typeof showToast !== 'undefined') {
-                        showToast('error', error.response?.data?.message || 'Failed to delete item');
+                    if (typeof window.showToast !== 'undefined') {
+                        window.showToast('error', error.response?.data?.message || 'Failed to delete item');
                     } else if (typeof toastr !== 'undefined') {
                         toastr.error(error.response?.data?.message || 'Failed to delete item');
                     } else {

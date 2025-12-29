@@ -1,10 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Client Feedback')
+@section('title', 'My Feedback')
 
 @push('styles')
-    @vite(['resources/css/profile.css'])
-    @vite(['resources/css/client-dashboard.css'])
+    @vite(['resources/css/profile.css', 'resources/css/client-dashboard.css'])
+@endpush
+
+@push('scripts')
+    @vite(['resources/js/pages/feedback.js'])
 @endpush
 
 @section('content')
@@ -12,16 +15,66 @@
         <!-- Header -->
         <div class="client-dashboard-header mb-4">
             <div class="client-dashboard-header-content">
-                <h1 class="client-greeting">Client Feedback</h1>
-                <p class="client-subtitle">See what our clients are saying</p>
+                <h1 class="client-greeting">My Feedback</h1>
+                <p class="client-subtitle">View your submitted feedback and share your experience</p>
             </div>
         </div>
 
-        <!-- Feedback Grid -->
+        <!-- Submit Feedback Form -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="service-card">
+                    <div class="service-card-header">
+                        <i class="bi bi-chat-square-text"></i>
+                        <h5>Submit New Feedback</h5>
+                    </div>
+                    <div class="service-card-body">
+                        <form id="feedbackForm" method="POST" action="{{ route('client.feedback.store') }}">
+                            @csrf
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="rating" class="form-label">Rating <span class="text-danger">*</span></label>
+                                    <div class="rating-input">
+                                        <input type="radio" name="rating" id="rating5" value="5" class="d-none" required>
+                                        <label for="rating5" class="rating-star" data-rating="5"><i class="bi bi-star"></i></label>
+                                        <input type="radio" name="rating" id="rating4" value="4" class="d-none">
+                                        <label for="rating4" class="rating-star" data-rating="4"><i class="bi bi-star"></i></label>
+                                        <input type="radio" name="rating" id="rating3" value="3" class="d-none">
+                                        <label for="rating3" class="rating-star" data-rating="3"><i class="bi bi-star"></i></label>
+                                        <input type="radio" name="rating" id="rating2" value="2" class="d-none">
+                                        <label for="rating2" class="rating-star" data-rating="2"><i class="bi bi-star"></i></label>
+                                        <input type="radio" name="rating" id="rating1" value="1" class="d-none">
+                                        <label for="rating1" class="rating-star" data-rating="1"><i class="bi bi-star"></i></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label for="message" class="form-label">Your Feedback <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="message" name="message" rows="4" required minlength="10" placeholder="Please share your experience with our services..."></textarea>
+                                    <small class="text-muted">Minimum 10 characters required</small>
+                                </div>
+                                <div class="col-md-12">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-send me-2"></i>Submit Feedback
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Your Feedback History -->
+        <div class="row">
+            <div class="col-12 mb-3">
+                <h5 class="mb-0">Your Feedback History</h5>
+            </div>
+        </div>
+
         <div class="row">
             @if ($feedbacks->count() > 0)
                 @foreach ($feedbacks as $feedback)
-                    <div class="col-md-4"> <!-- 3 cards per row -->
+                    <div class="col-md-6 col-lg-4 mb-4">
                         <div class="feedback-card">
                             <div class="feedback-card-header">
                                 <div>
@@ -30,14 +83,13 @@
                                 </div>
                                 <div class="feedback-rating">
                                     @for ($i = 1; $i <= 5; $i++)
-                                        <i class="bi {{ $i <= $feedback->rating ? 'bi-star-fill' : 'bi-star' }}"></i>
+                                        <i class="bi {{ $i <= ($feedback->rating ?? 0) ? 'bi-star-fill text-warning' : 'bi-star' }}"></i>
                                     @endfor
                                 </div>
                             </div>
                             <div class="feedback-card-body">
                                 <p class="feedback-message">{{ $feedback->message }}</p>
                                 <p class="feedback-meta">
-                                    <i class="bi bi-envelope me-1"></i> {{ $feedback->email }} |
                                     <i class="bi bi-calendar3 me-1"></i> {{ $feedback->created_at->format('d M Y') }}
                                     @if ($feedback->is_processed)
                                         <span class="badge bg-success ms-2">Processed</span>
@@ -50,13 +102,56 @@
                     </div>
                 @endforeach
 
+                <!-- Pagination -->
+                @if($feedbacks->hasPages())
+                    <div class="col-12 mt-4">
+                        {{ $feedbacks->links() }}
+                    </div>
+                @endif
             @else
-                <div class="text-center py-5">
-                    <i class="bi bi-chat-square-text" style="font-size: 4rem; color: #dee2e6;"></i>
-                    <h4 class="mt-3 text-muted">No Feedback Yet</h4>
-                    <p class="text-muted">Client feedback will appear here once submitted.</p>
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="bi bi-chat-square-text empty-state-icon-medium"></i>
+                        <h4 class="mt-3 text-muted">No Feedback Submitted Yet</h4>
+                        <p class="text-muted">Use the form above to share your feedback with us.</p>
+                    </div>
                 </div>
             @endif
         </div>
     </div>
+
+    <style>
+        .rating-input {
+            display: flex;
+            gap: 5px;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+
+        .rating-star {
+            font-size: 2rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .rating-star:hover,
+        .rating-star:hover ~ .rating-star {
+            color: #ffc107;
+        }
+
+        .rating-input input[type="radio"]:checked ~ label,
+        .rating-input input[type="radio"]:checked ~ label ~ label {
+            color: #ffc107;
+        }
+
+        .rating-input label {
+            margin: 0;
+        }
+    </style>
+
+    <script>
+        // Pass route to JS
+        window.feedbackRoute = '{{ route("client.feedback.store") }}';
+    </script>
 @endsection

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\EnsureAccess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -15,7 +16,7 @@ class LoginController extends Controller
     public function showLoginForm()
     {
         if (auth()->check()) {
-            return $this->redirectToDashboard();
+            return EnsureAccess::redirectToDashboard();
         }
         return view('auth.login');
     }
@@ -37,9 +38,9 @@ class LoginController extends Controller
             $user = Auth::user();
 
             // Check if user has at least one dashboard permission
-            if (!$user->can('view admin dashboard') && 
-                !$user->can('view staff dashboard') && 
-                !$user->can('view client dashboard') && 
+            if (!$user->can('view admin dashboard') &&
+                !$user->can('view staff dashboard') &&
+                !$user->can('view client dashboard') &&
                 !$user->can('view lead dashboard')) {
                 Auth::logout();
                 throw ValidationException::withMessages([
@@ -48,7 +49,7 @@ class LoginController extends Controller
             }
 
             $request->session()->regenerate();
-            return $this->redirectToDashboard();
+            return EnsureAccess::redirectToDashboard();
         }
 
         throw ValidationException::withMessages([
@@ -65,38 +66,5 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect()->route('welcome');
-    }
-
-    /**
-     * Redirect user to their appropriate dashboard based on role.
-     */
-    protected function redirectToDashboard()
-    {
-        $user = auth()->user();
-
-        // Redirect based on dashboard permissions (priority order)
-        if ($user->can('view admin dashboard')) {
-            // Check if user can access superadmin features
-            if ($user->can('view roles')) {
-                return redirect()->route('superadmin.dashboard');
-            }
-            return redirect()->route('admin.dashboard');
-        }
-
-        if ($user->can('view staff dashboard')) {
-            return redirect()->route('staff.dashboard');
-        }
-
-        if ($user->can('view client dashboard')) {
-            return redirect()->route('client.dashboard');
-        }
-
-        if ($user->can('view lead dashboard')) {
-            return redirect()->route('lead.dashboard');
-        }
-
-        // If user somehow doesn't have any dashboard permission, logout and redirect to login
-        Auth::logout();
-        return redirect()->route('login')->with('error', 'You do not have permission to access this system.');
     }
 }

@@ -24,11 +24,6 @@
     animation: pulse 8s ease-in-out infinite;
 }
 
-@keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.5; }
-    50% { transform: scale(1.1); opacity: 0.8; }
-}
-
 .profile-header-content {
     position: relative;
     z-index: 1;
@@ -108,7 +103,7 @@
     margin: 0;
 }
 
-/* Modern Tabs */
+/* Modern Tabs - Uses common pattern from utilities.css */
 .profile-tabs {
     border-bottom: 2px solid rgba(132, 195, 115, 0.2);
     margin-bottom: 2rem;
@@ -278,7 +273,7 @@
 /* Document List */
 .document-item {
     padding: 1rem;
-    border-left: 4px solid #84c373;
+
     background: rgba(132, 195, 115, 0.05);
     border-radius: 8px;
     margin-bottom: 1rem;
@@ -450,17 +445,16 @@
         padding: 0.75rem 0;
         font-size: 0.875rem;
     }
-    
+
     .empty-state-icon-large {
         font-size: 2.5rem;
     }
-    
+
     .empty-state-icon-xl {
         font-size: 3rem;
     }
-    
+
     .profile-card-body-scrollable {
         max-height: 400px;
     }
 }
-

@@ -3,6 +3,7 @@
 namespace App\DataTables;
 
 use App\Models\Staff;
+use App\Helpers\RouteHelper;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Illuminate\Support\HtmlString;
@@ -43,14 +44,14 @@ class StaffDataTable extends DataTable
 
             // View button - requires view staff details permission
             if ($user->can('view staff details')) {
-                $actions .= '<a href="' . route('admin.staff.show', $staff) . '" class="btn btn-outline-primary" title="View">
+                $actions .= '<a href="' . RouteHelper::url('staff.show', $staff) . '" class="btn btn-outline-primary" title="View">
                         <i class="bi bi-eye"></i>
                     </a>';
             }
 
             // Edit button
             if ($user->can('edit staff')) {
-                $actions .= '<a href="' . route('admin.staff.edit', $staff) . '" class="btn btn-outline-secondary" title="Edit">
+                $actions .= '<a href="' . RouteHelper::url('staff.edit', $staff) . '" class="btn btn-outline-secondary" title="Edit">
                         <i class="bi bi-pencil"></i>
                     </a>';
             }
@@ -63,12 +64,12 @@ class StaffDataTable extends DataTable
             }
 
             $actions .= '</div>';
-            
+
             // If no actions available, return a dash
             if (strlen($actions) <= strlen('<div class="btn-group btn-group-sm" role="group"></div>')) {
                 return new HtmlString('<span class="text-muted">-</span>');
             }
-            
+
             return new HtmlString($actions);
             })
             ->editColumn('created_at', function (Staff $staff) {
@@ -105,7 +106,7 @@ class StaffDataTable extends DataTable
                     ->className('btn btn-primary')
                     ->text('<i class="bi bi-plus-circle me-1"></i> New Staff')
                     ->action('function(e, dt, node, config) {
-                        window.location.href = "' . route('admin.staff.create') . '";
+                        window.location.href = "' . RouteHelper::url('staff.create') . '";
                     }') : null,
                 Button::make('reload')
                     ->className('btn btn-secondary')
@@ -132,10 +133,10 @@ class StaffDataTable extends DataTable
                 'searchPlaceholder' => 'Search staff...',
                 'lengthMenu' => 'Show _MENU_ entries',
                 'paginate' => [
-                    'first' => 'First',
-                    'last' => 'Last',
-                    'next' => 'Next',
-                    'previous' => 'Previous'
+                    'first' => '«',
+                    'last' => '»',
+                    'next' => '›',
+                    'previous' => '‹'
                 ]
                 ],
             ]);
@@ -176,4 +177,3 @@ class StaffDataTable extends DataTable
         return 'Staff_' . date('YmdHis');
     }
 }
-

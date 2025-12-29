@@ -1,6 +1,6 @@
 /* Client Dashboard Styles */
 
-/* Client Dashboard Header */
+/* Client Dashboard Header - Uses common pattern from utilities.css */
 .client-dashboard-header {
     background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
     border-radius: 16px;
@@ -118,32 +118,6 @@
     --card-accent-dark: #fcc419;
 }
 
-/* Service Card */
-.service-card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(132, 195, 115, 0.15);
-    overflow: hidden;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.service-card-header {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    padding: 1.5rem;
-    border-bottom: 2px solid rgba(132, 195, 115, 0.2);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.service-card-header i {
-    font-size: 1.5rem;
-    color: #84c373;
-}
-
 /* Feedback Card */
 .feedback-card {
     background: white;
@@ -231,7 +205,7 @@
     font-weight: 700;
 }
 
-/* Recent Services Card */
+/* Service Card */
 .service-card {
     background: white;
     border-radius: 16px;
@@ -716,5 +690,62 @@
     .service-card-header h5,
     .profile-card-header h5 {
         font-size: 1rem;
+    }
+}
+
+/* Staff Details Section */
+.staff-details-section {
+    padding-bottom: 1.5rem;
+}
+
+.staff-details-section .nav-tabs {
+    border-bottom: 2px solid #e9ecef;
+    margin-bottom: 1.5rem;
+}
+
+.staff-details-section .nav-tabs .nav-link {
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #6c757d;
+    font-weight: 600;
+    padding: 0.75rem 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.staff-details-section .nav-tabs .nav-link:hover {
+    color: #84c373;
+    border-bottom-color: rgba(132, 195, 115, 0.3);
+}
+
+.staff-details-section .nav-tabs .nav-link.active {
+    color: #84c373;
+    border-bottom-color: #84c373;
+    background: transparent;
+}
+
+.staff-details-section .document-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+}
+
+.staff-details-section .document-item:last-child {
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .staff-details-section .nav-tabs .nav-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .staff-details-section .document-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
     }
 }
