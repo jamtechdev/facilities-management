@@ -23,6 +23,7 @@ class LeadService
                 $data['assigned_staff_id'] = null;
             }
 
+            $data['user_id'] = auth()->id();
             $lead = Lead::create($data);
 
             // Create automated follow-up tasks (30/60/90 days)

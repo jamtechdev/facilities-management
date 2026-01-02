@@ -76,6 +76,11 @@ class UserController extends Controller
         if (!auth()->user()->can('view user details')) {
             abort(403, 'You do not have permission to view user details.');
         }
+
+        if ($user->hasRole('Super Admin')) {
+            abort(403, 'You cannot view Super Admin details.');
+        }
+
         $user->load('roles');
         $viewPrefix = RouteHelper::getViewPrefix();
         return view($viewPrefix . '.users.show', compact('user'));
@@ -84,6 +89,15 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $currentUser = auth()->user();
+
+        if ($user->hasRole('Super Admin')) {
+            abort(403, 'You cannot edit Super Admin.');
+        }
+
+        // Khud ko edit nahi kar sakta
+        if ($user->id === $currentUser->id) {
+            abort(403, 'You cannot edit your own user account.');
+        }
 
         // Check permission to edit users
         if (!$currentUser->can('edit users')) {
@@ -108,6 +122,21 @@ class UserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'You do not have permission to edit users.'
+            ], 403);
+        }
+
+        if ($user->hasRole('Super Admin')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot update Super Admin.'
+            ], 403);
+        }
+
+        // Khud ko edit nahi kar sakta
+        if ($user->id === $currentUser->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot edit your own user account.'
             ], 403);
         }
 
@@ -162,7 +191,20 @@ class UserController extends Controller
             ], 403);
         }
 
-        // Prevent users from deleting themselves
+        if ($user->hasRole('Super Admin')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot delete Super Admin.'
+            ], 403);
+        }
+
+        if ($user->id === $currentUser->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot delete your own user account.'
+            ], 403);
+        }
+
         if ($user->id === $currentUser->id) {
             return response()->json([
                 'success' => false,

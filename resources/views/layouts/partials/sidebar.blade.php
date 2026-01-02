@@ -114,7 +114,7 @@
                 </div>
             @endcan
 
-            @can('view users')
+            {{-- @can('view users')
                 <div class="nav-item-modern">
                     <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('users.*') ? 'active' : '' }}"
                         href="{{ \App\Helpers\RouteHelper::url('users.index') }}">
@@ -122,7 +122,7 @@
                         <span class="nav-text">Users</span>
                     </a>
                 </div>
-            @endcan
+            @endcan --}}
         </div>
         @endif
     @elseif($user->can('view staff dashboard'))
@@ -175,7 +175,7 @@
             </div>
         </div>
 
-        <div class="nav-section">
+        {{-- <div class="nav-section">
             <div class="nav-section-title">Services</div>
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('client.services*') ? 'active' : '' }}"
@@ -191,7 +191,7 @@
                     <span class="nav-text">Before & After Photos</span>
                 </a>
             </div>
-        </div>
+        </div> --}}
 
         <div class="nav-section">
             <div class="nav-section-title">Communication</div>
@@ -211,7 +211,7 @@
             </div>
         </div>
 
-        <div class="nav-section">
+        {{-- <div class="nav-section">
             <div class="nav-section-title">Account</div>
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('client.profile*') ? 'active' : '' }}"
@@ -220,7 +220,7 @@
                     <span class="nav-text">Profile</span>
                 </a>
             </div>
-        </div>
+        </div> --}}
     @endif
 
 </nav>
