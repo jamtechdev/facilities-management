@@ -23,6 +23,7 @@ export default defineConfig({
                 'resources/css/entity-details.css',
                 'resources/css/clock-widget.css',
                 'resources/css/document-gallery.css',
+                'resources/css/preloader.css',
                 // JavaScript Files
                 'resources/js/jquery-global.js',
                 'resources/js/app.js',
@@ -34,8 +35,10 @@ export default defineConfig({
                 'resources/js/image-modal.js',
                     'resources/js/datatables-init.js',
                     'resources/js/datatables-handlers.js',
-                    'resources/js/entity-details.js',
-                    'resources/js/global-loader.js',
+                'resources/js/entity-details.js',
+                'resources/js/global-loader.js',
+                'resources/js/preloader.js',
+                'resources/js/navbar-collapse-fix.js',
                 'resources/js/dashboard-charts.js',
                 'resources/js/document-gallery.js',
                 // Page-specific JS Files
