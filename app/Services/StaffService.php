@@ -53,10 +53,25 @@ class StaffService
     public function update(Staff $staff, array $data): Staff
     {
         return DB::transaction(function() use ($staff, $data) {
-            // Handle password update
-            if (isset($data['password']) && !empty($data['password'])) {
+            // Ensure we have the user relationship loaded
+            if (!$staff->relationLoaded('user')) {
+                $staff->load('user');
+            }
+
+            // Handle password update - ONLY update the staff's user, not the logged-in admin
+            if (isset($data['password']) && !empty(trim($data['password']))) {
                 if ($staff->user) {
+                    // Update the staff member's user password, not the admin's
                     $staff->user->update(['password' => Hash::make($data['password'])]);
+                } else {
+                    // If staff doesn't have a user, create one
+                    $user = User::create([
+                        'name' => $data['name'] ?? $staff->name,
+                        'email' => $data['email'] ?? $staff->email,
+                        'password' => Hash::make($data['password']),
+                    ]);
+                    $user->assignRole('Staff');
+                    $data['user_id'] = $user->id;
                 }
                 unset($data['password']);
             }
@@ -96,6 +111,8 @@ class StaffService
                 $clientId => array_merge([
                     'assigned_weekly_hours' => $data['assigned_weekly_hours'] ?? 0,
                     'assigned_monthly_hours' => $data['assigned_monthly_hours'] ?? 0,
+                    'assignment_start_date' => $data['assignment_start_date'] ?? now()->format('Y-m-d'),
+                    'assignment_end_date' => $data['assignment_end_date'] ?? null,
                     'is_active' => true,
                 ], $data)
             ]);

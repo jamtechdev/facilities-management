@@ -53,10 +53,25 @@ class ClientService
     public function update(Client $client, array $data): Client
     {
         return DB::transaction(function() use ($client, $data) {
-            // Handle password update
-            if (isset($data['password']) && !empty($data['password'])) {
+            // Ensure we have the user relationship loaded
+            if (!$client->relationLoaded('user')) {
+                $client->load('user');
+            }
+
+            // Handle password update - ONLY update the client's user, not the logged-in admin
+            if (isset($data['password']) && !empty(trim($data['password']))) {
                 if ($client->user) {
+                    // Update the client's user password, not the admin's
                     $client->user->update(['password' => Hash::make($data['password'])]);
+                } else {
+                    // If client doesn't have a user, create one
+                    $user = User::create([
+                        'name' => $data['contact_person'] ?? $client->contact_person ?? $client->company_name,
+                        'email' => $data['email'] ?? $client->email,
+                        'password' => Hash::make($data['password']),
+                    ]);
+                    $user->assignRole('Client');
+                    $data['user_id'] = $user->id;
                 }
                 unset($data['password']);
             }
@@ -96,6 +111,8 @@ class ClientService
                 $staffId => array_merge([
                     'assigned_weekly_hours' => $data['assigned_weekly_hours'] ?? 0,
                     'assigned_monthly_hours' => $data['assigned_monthly_hours'] ?? 0,
+                    'assignment_start_date' => $data['assignment_start_date'] ?? now()->format('Y-m-d'),
+                    'assignment_end_date' => $data['assignment_end_date'] ?? null,
                     'is_active' => true,
                 ], $data)
             ]);
