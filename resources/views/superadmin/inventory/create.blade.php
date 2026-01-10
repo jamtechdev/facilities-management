@@ -19,7 +19,7 @@
                 <p>Create a new inventory item</p>
             </div>
             <div class="profile-header-actions">
-                <a href="{{ route('admin.inventory.index') }}" class="btn btn-outline-light">
+                <a href="{{ \App\Helpers\RouteHelper::url('inventory.index') }}" class="btn btn-outline-light">
                     <i class="bi bi-arrow-left me-2"></i>Back to Inventory
                 </a>
             </div>
@@ -33,7 +33,7 @@
                     <h5><i class="bi bi-box-seam me-2"></i>Inventory Information</h5>
                 </div>
                 <div class="form-card-body">
-                    <form id="inventoryForm" method="POST" action="{{ route('admin.inventory.store') }}">
+                    <form id="inventoryForm" method="POST" action="{{ \App\Helpers\RouteHelper::url('inventory.store') }}">
                         @csrf
                         <div id="formErrors" class="alert alert-danger d-none"></div>
 
@@ -118,7 +118,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('inventoryForm');
             if (form) {
-                form.dataset.indexRoute = '{{ route("admin.inventory.index") }}';
+                form.dataset.indexRoute = '{{ \App\Helpers\RouteHelper::url("inventory.index") }}';
             }
         });
     </script>

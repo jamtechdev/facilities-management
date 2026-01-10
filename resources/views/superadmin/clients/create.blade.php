@@ -11,7 +11,7 @@
                     <h1 class="h3 mb-0">Create New Client</h1>
                     <p class="text-muted">Add a new client to your system</p>
                 </div>
-                <a href="{{ route('admin.clients.index') }}" class="btn btn-outline-secondary">
+                <a href="{{ \App\Helpers\RouteHelper::url('clients.index') }}" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-2"></i>Back to Clients
                 </a>
             </div>
@@ -25,7 +25,7 @@
                     <h5><i class="bi bi-building-add me-2"></i>Client Information</h5>
                 </div>
                 <div class="form-card-body">
-                    <form id="createClientForm" method="POST" action="{{ route('admin.clients.store') }}">
+                    <form id="createClientForm" method="POST" action="{{ \App\Helpers\RouteHelper::url('clients.store') }}">
                         @csrf
 
                         <div class="row g-4">
@@ -55,6 +55,17 @@
                                 @error('email')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-lock me-1"></i>Password <span class="text-danger">*</span>
+                                </label>
+                                <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" value="{{ old('password') }}" placeholder="Enter password" required>
+                                @error('password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="form-text text-muted">Minimum 8 characters</small>
                             </div>
 
                             <div class="col-md-6">
@@ -142,7 +153,7 @@
                             <button type="submit" class="btn btn-primary" id="submitBtn">
                                 <i class="bi bi-check-circle me-2"></i>Create Client
                             </button>
-                            <a href="{{ route('admin.clients.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ \App\Helpers\RouteHelper::url('clients.index') }}" class="btn btn-outline-secondary">
                                 <i class="bi bi-x-circle me-2"></i>Cancel
                             </a>
                         </div>
@@ -157,4 +168,3 @@
 @push('scripts')
     @vite(['resources/js/forms.js'])
 @endpush
-

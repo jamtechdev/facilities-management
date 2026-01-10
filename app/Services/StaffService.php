@@ -16,15 +16,24 @@ class StaffService
     public function create(array $data): Staff
     {
         return DB::transaction(function() use ($data) {
+            // Handle password
+            $password = $data['password'] ?? 'password';
+            unset($data['password']);
+
             // Create user if email provided and user doesn't exist
             if (isset($data['email']) && !isset($data['user_id'])) {
                 $user = User::firstOrCreate(
                     ['email' => $data['email']],
                     [
                         'name' => $data['name'],
-                        'password' => Hash::make('password'), // Default password
+                        'password' => Hash::make($password),
                     ]
                 );
+
+                // Update password if user already exists
+                if ($user->wasRecentlyCreated === false) {
+                    $user->update(['password' => Hash::make($password)]);
+                }
 
                 // Assign Staff role if not already assigned
                 if (!$user->hasRole('Staff')) {
@@ -44,6 +53,14 @@ class StaffService
     public function update(Staff $staff, array $data): Staff
     {
         return DB::transaction(function() use ($staff, $data) {
+            // Handle password update
+            if (isset($data['password']) && !empty($data['password'])) {
+                if ($staff->user) {
+                    $staff->user->update(['password' => Hash::make($data['password'])]);
+                }
+                unset($data['password']);
+            }
+
             // Update user if email changed
             if (isset($data['email']) && $staff->user && $staff->user->email !== $data['email']) {
                 $staff->user->update(['email' => $data['email']]);
@@ -95,4 +112,3 @@ class StaffService
         });
     }
 }
-

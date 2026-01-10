@@ -23,10 +23,10 @@ use Illuminate\Support\Facades\Storage;
         :phone="$staff->mobile"
         type="lead">
         <x-slot name="actions">
-            <a href="{{ route('admin.staff.edit', $staff) }}" class="btn btn-light me-2">
+            <a href="{{ \App\Helpers\RouteHelper::url('staff.edit', $staff) }}" class="btn btn-light me-2">
                 <i class="bi bi-pencil me-2"></i>Edit
             </a>
-            <a href="{{ route('admin.staff.index') }}" class="btn btn-outline-light">
+            <a href="{{ \App\Helpers\RouteHelper::url('staff.index') }}" class="btn btn-outline-light">
                 <i class="bi bi-arrow-left me-2"></i>Back
             </a>
         </x-slot>
@@ -122,7 +122,7 @@ use Illuminate\Support\Facades\Storage;
                             <div class="info-card">
                                 <div class="info-label">Company</div>
                                 <div class="info-value">
-                                    <a href="{{ route('admin.clients.show', $client) }}" class="text-decoration-none">
+                                    <a href="{{ \App\Helpers\RouteHelper::url('clients.show', $client) }}" class="text-decoration-none">
                                         {{ $client->company_name }}
                                     </a>
                                 </div>
@@ -177,7 +177,7 @@ use Illuminate\Support\Facades\Storage;
                                     <td>{{ $timesheet->clock_in_time->format('M d, Y') }}</td>
                                     <td>
                                         @if($timesheet->client)
-                                            <a href="{{ route('admin.clients.show', $timesheet->client) }}" class="text-decoration-none">
+                                            <a href="{{ \App\Helpers\RouteHelper::url('clients.show', $timesheet->client) }}" class="text-decoration-none">
                                                 {{ $timesheet->client->company_name }}
                                             </a>
                                         @else
@@ -314,7 +314,7 @@ use Illuminate\Support\Facades\Storage;
                             <div class="info-card">
                                 <div class="info-label">Lead Name</div>
                                 <div class="info-value">
-                                    <a href="{{ route('admin.leads.show', $lead) }}" class="text-decoration-none">
+                                    <a href="{{ \App\Helpers\RouteHelper::url('leads.show', $lead) }}" class="text-decoration-none">
                                         {{ $lead->name }}
                                     </a>
                                 </div>

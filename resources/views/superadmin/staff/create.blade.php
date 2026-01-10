@@ -11,7 +11,7 @@
                     <h1 class="h3 mb-0">Create New Staff</h1>
                     <p class="text-muted">Add a new staff member to your system</p>
                 </div>
-                <a href="{{ route('admin.staff.index') }}" class="btn btn-outline-secondary">
+                <a href="{{ \App\Helpers\RouteHelper::url('staff.index') }}" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-2"></i>Back to Staff
                 </a>
             </div>
@@ -25,7 +25,7 @@
                     <h5><i class="bi bi-person-plus me-2"></i>Staff Information</h5>
                 </div>
                 <div class="form-card-body">
-                    <form id="createStaffForm" method="POST" action="{{ route('admin.staff.store') }}">
+                    <form id="createStaffForm" method="POST" action="{{ \App\Helpers\RouteHelper::url('staff.store') }}">
                         @csrf
 
                         <div class="row g-4">
@@ -47,6 +47,17 @@
                                 @error('email')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-lock me-1"></i>Password <span class="text-danger">*</span>
+                                </label>
+                                <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" value="{{ old('password') }}" placeholder="Enter password" required>
+                                @error('password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="form-text text-muted">Minimum 8 characters</small>
                             </div>
 
                             <div class="col-md-6">
@@ -90,6 +101,24 @@
                             </div>
 
                             <div class="col-md-6">
+                                <label for="client_id" class="form-label">
+                                    <i class="bi bi-building me-1"></i>Assign to Client (Optional)
+                                </label>
+                                <select class="form-select @error('client_id') is-invalid @enderror" id="client_id" name="client_id">
+                                    <option value="">Select Client</option>
+                                    @foreach($clients ?? [] as $client)
+                                        <option value="{{ $client->id }}" {{ old('client_id') == $client->id ? 'selected' : '' }}>
+                                            {{ $client->company_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('client_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="form-text text-muted">You can assign staff to a client later</small>
+                            </div>
+
+                            <div class="col-md-6">
                                 <div class="form-check mt-4">
                                     <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="is_active">
@@ -103,7 +132,7 @@
                             <button type="submit" class="btn btn-primary" id="submitBtn">
                                 <i class="bi bi-check-circle me-2"></i>Create Staff
                             </button>
-                            <a href="{{ route('admin.staff.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ \App\Helpers\RouteHelper::url('staff.index') }}" class="btn btn-outline-secondary">
                                 <i class="bi bi-x-circle me-2"></i>Cancel
                             </a>
                         </div>

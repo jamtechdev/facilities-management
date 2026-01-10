@@ -18,7 +18,7 @@
                         <h5><i class="bi bi-pencil-square me-2"></i>Edit User Information</h5>
                     </div>
                     <div class="form-card-body">
-                        <form id="editUserForm" method="POST" action="{{ route('admin.users.update', $user->id) }}">
+                        <form id="editUserForm" method="POST" action="{{ \App\Helpers\RouteHelper::url('users.update', $user->id) }}">
                             @csrf
                             @method('PUT')
 
@@ -50,7 +50,7 @@
                                 <button type="submit" class="btn btn-primary" id="submitBtn">
                                     <i class="bi bi-check-circle me-2"></i>Update User
                                 </button>
-                                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
+                                <a href="{{ \App\Helpers\RouteHelper::url('users.index') }}" class="btn btn-outline-secondary">
                                     <i class="bi bi-x-circle me-2"></i>Cancel
                                 </a>
                             </div>

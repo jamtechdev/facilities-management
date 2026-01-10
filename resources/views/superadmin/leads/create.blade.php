@@ -11,7 +11,7 @@
                     <h1 class="h3 mb-0">Create New Lead</h1>
                     <p class="text-muted">Add a new lead to your CRM system</p>
                 </div>
-                <a href="{{ route('admin.leads.index') }}" class="btn btn-outline-secondary">
+                <a href="{{ \App\Helpers\RouteHelper::url('leads.index') }}" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-2"></i>Back to Leads
                 </a>
             </div>
@@ -150,7 +150,7 @@
                             <button type="submit" class="btn btn-primary" id="submitBtn">
                                 <i class="bi bi-check-circle me-2"></i>Create Lead
                             </button>
-                            <a href="{{ route('admin.leads.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ \App\Helpers\RouteHelper::url('leads.index') }}" class="btn btn-outline-secondary">
                                 <i class="bi bi-x-circle me-2"></i>Cancel
                             </a>
                         </div>
@@ -165,4 +165,3 @@
 @push('scripts')
     @vite(['resources/js/forms.js'])
 @endpush
-
