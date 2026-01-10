@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Staff;
+use App\Models\Client;
 use App\DataTables\StaffDataTable;
 use App\Http\Requests\StoreStaffRequest;
 use App\Http\Requests\UpdateStaffRequest;
 use App\Services\StaffService;
+use App\Helpers\RouteHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -33,7 +35,8 @@ class StaffController extends Controller
      */
     public function create()
     {
-        return view('superadmin.staff.create');
+        $clients = Client::where('is_active', true)->orderBy('company_name')->get();
+        return view('superadmin.staff.create', compact('clients'));
     }
 
     /**
@@ -42,12 +45,24 @@ class StaffController extends Controller
     public function store(StoreStaffRequest $request): JsonResponse
     {
         try {
-            $staff = $this->staffService->create($request->validated());
+            $data = $request->validated();
+            $clientId = $data['client_id'] ?? null;
+            unset($data['client_id']);
+
+            $staff = $this->staffService->create($data);
+
+            // Assign to client if provided
+            if ($clientId) {
+                $this->staffService->assignToClient($staff, $clientId, [
+                    'assigned_weekly_hours' => $data['assigned_weekly_hours'] ?? 0,
+                    'assigned_monthly_hours' => $data['assigned_monthly_hours'] ?? 0,
+                ]);
+            }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Staff created successfully.',
-                'redirect' => route('admin.staff.index')
+                'redirect' => RouteHelper::url('staff.index')
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -83,7 +98,8 @@ class StaffController extends Controller
      */
     public function edit(Staff $staff)
     {
-        return view('superadmin.staff.edit', compact('staff'));
+        $clients = Client::where('is_active', true)->orderBy('company_name')->get();
+        return view('superadmin.staff.edit', compact('staff', 'clients'));
     }
 
     /**
@@ -92,12 +108,24 @@ class StaffController extends Controller
     public function update(UpdateStaffRequest $request, Staff $staff): JsonResponse
     {
         try {
-            $this->staffService->update($staff, $request->validated());
+            $data = $request->validated();
+            $clientId = $data['client_id'] ?? null;
+            unset($data['client_id']);
+
+            $this->staffService->update($staff, $data);
+
+            // Handle client assignment
+            if ($clientId) {
+                $this->staffService->assignToClient($staff, $clientId, [
+                    'assigned_weekly_hours' => $data['assigned_weekly_hours'] ?? 0,
+                    'assigned_monthly_hours' => $data['assigned_monthly_hours'] ?? 0,
+                ]);
+            }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Staff updated successfully.',
-                'redirect' => route('admin.staff.index')
+                'redirect' => RouteHelper::url('staff.index')
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

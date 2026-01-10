@@ -20,11 +20,11 @@
             </div>
             <div class="profile-header-actions">
                 @can('edit inventory')
-                <a href="{{ route('admin.inventory.edit', $inventory) }}" class="btn btn-light me-2">
+                <a href="{{ \App\Helpers\RouteHelper::url('inventory.edit', $inventory) }}" class="btn btn-light me-2">
                     <i class="bi bi-pencil me-2"></i>Edit
                 </a>
                 @endcan
-                <a href="{{ route('admin.inventory.index') }}" class="btn btn-outline-light">
+                <a href="{{ \App\Helpers\RouteHelper::url('inventory.index') }}" class="btn btn-outline-light">
                     <i class="bi bi-arrow-left me-2"></i>Back
                 </a>
             </div>

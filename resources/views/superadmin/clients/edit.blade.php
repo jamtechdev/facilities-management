@@ -11,7 +11,7 @@
                     <h1 class="h3 mb-0">Edit Client</h1>
                     <p class="text-muted">{{ $client->company_name }}</p>
                 </div>
-                <a href="{{ route('admin.clients.show', $client) }}" class="btn btn-outline-secondary">
+                <a href="{{ \App\Helpers\RouteHelper::url('clients.show', $client) }}" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-2"></i>Back to Client
                 </a>
             </div>
@@ -25,7 +25,7 @@
                     <h5><i class="bi bi-pencil-square me-2"></i>Edit Client Information</h5>
                 </div>
                 <div class="form-card-body">
-                    <form id="updateClientForm" method="POST" action="{{ route('admin.clients.update', $client) }}">
+                    <form id="updateClientForm" method="POST" action="{{ \App\Helpers\RouteHelper::url('clients.update', $client) }}">
                         @csrf
                         @method('PUT')
 
@@ -48,10 +48,21 @@
 
                             <div class="col-md-6">
                                 <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $client->email) }}" required>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $client->email) }}" autocomplete="off" required>
                                 @error('email')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-lock me-1"></i>Password
+                                </label>
+                                <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" autocomplete="new-password" placeholder="Leave blank to keep current password">
+                                @error('password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="form-text text-muted">Leave blank to keep current password</small>
                             </div>
 
                             <div class="col-md-6">
@@ -139,7 +150,7 @@
                             <button type="submit" class="btn btn-primary" id="submitBtn">
                                 <i class="bi bi-check-circle me-2"></i>Update Client
                             </button>
-                            <a href="{{ route('admin.clients.show', $client) }}" class="btn btn-outline-secondary">
+                            <a href="{{ \App\Helpers\RouteHelper::url('clients.show', $client) }}" class="btn btn-outline-secondary">
                                 <i class="bi bi-x-circle me-2"></i>Cancel
                             </a>
                         </div>
@@ -154,4 +165,3 @@
 @push('scripts')
     @vite(['resources/js/forms.js'])
 @endpush
-

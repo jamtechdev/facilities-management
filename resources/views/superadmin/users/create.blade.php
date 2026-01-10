@@ -18,7 +18,7 @@
                         <h5><i class="bi bi-person-plus me-2"></i>User Information</h5>
                     </div>
                     <div class="form-card-body">
-                        <form id="createUserForm" method="POST" action="{{ route('admin.users.store') }}">
+                        <form id="createUserForm" method="POST" action="{{ \App\Helpers\RouteHelper::url('users.store') }}">
                             @csrf
                             <div class="row g-4">
                                 <div class="col-md-6">
@@ -47,7 +47,7 @@
                                 <button type="submit" class="btn btn-primary" id="submitBtn">
                                     <i class="bi bi-check-circle me-2"></i>Create User
                                 </button>
-                                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
+                                <a href="{{ \App\Helpers\RouteHelper::url('users.index') }}" class="btn btn-outline-secondary">
                                     <i class="bi bi-x-circle me-2"></i>Cancel
                                 </a>
                             </div>

@@ -38,11 +38,13 @@ class StoreStaffRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:staff,email'],
+            'password' => ['required', 'string', 'min:8'],
             'mobile' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:500'],
             'hourly_rate' => ['nullable', 'numeric', 'min:0'],
             'assigned_weekly_hours' => ['nullable', 'numeric', 'min:0'],
             'assigned_monthly_hours' => ['nullable', 'numeric', 'min:0'],
+            'client_id' => ['nullable', 'exists:clients,id'],
             'is_active' => ['nullable', 'boolean'],
         ];
     }

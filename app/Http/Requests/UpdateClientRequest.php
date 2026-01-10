@@ -41,6 +41,7 @@ class UpdateClientRequest extends FormRequest
             'company_name' => ['required', 'string', 'max:255'],
             'contact_person' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('clients', 'email')->ignore($clientId)],
+            'password' => ['nullable', 'string', 'min:8'],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:500'],
             'city' => ['nullable', 'string', 'max:255'],

@@ -171,7 +171,7 @@
 
     .clock-date {
         font-size: 0.875rem;
-    
+    }
 }
 
 @media (max-width: 576px) {
@@ -185,4 +185,3 @@
         font-size: 1.25rem;
     }
 }
-

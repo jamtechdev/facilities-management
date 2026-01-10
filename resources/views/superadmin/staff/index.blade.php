@@ -21,7 +21,7 @@
             </div>
             @can('create staff')
             <div class="profile-header-actions">
-                <a href="{{ route('admin.staff.create') }}" class="btn btn-light btn-lg px-4 py-2 shadow-lg rounded-pill fw-semibold">
+                <a href="{{ \App\Helpers\RouteHelper::url('staff.create') }}" class="btn btn-light btn-lg px-4 py-2 shadow-lg rounded-pill fw-semibold">
                     <i class="bi bi-plus-circle me-2"></i>Create New Staff
                 </a>
             </div>
@@ -47,4 +47,3 @@
 @push('scripts')
 {!! $dataTable->scripts(attributes: ['type' => 'module']) !!}
 @endpush
-

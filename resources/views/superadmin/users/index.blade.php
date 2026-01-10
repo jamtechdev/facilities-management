@@ -20,7 +20,7 @@
                 </div>
                 @can('create users')
                 <div class="profile-header-actions">
-                    <a href="{{ route('admin.users.create') }}" class="btn btn-light btn-lg px-4 py-2 shadow-lg rounded-pill fw-semibold">
+                    <a href="{{ \App\Helpers\RouteHelper::url('users.create') }}" class="btn btn-light btn-lg px-4 py-2 shadow-lg rounded-pill fw-semibold">
                         <i class="bi bi-plus-circle me-2"></i>Create New User
                     </a>
                 </div>
