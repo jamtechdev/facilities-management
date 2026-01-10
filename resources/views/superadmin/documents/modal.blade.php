@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
 
-            axios.post('{{ route("admin.documents.store") }}', formData, {
+            axios.post('{{ \App\Helpers\RouteHelper::url('documents.store') }}', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,

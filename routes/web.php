@@ -142,6 +142,7 @@ Route::middleware(['access:view roles'])->prefix('superadmin')->name('superadmin
         Route::get('leads', [\App\Http\Controllers\Admin\LeadController::class, 'index'])->name('leads.index');
         Route::get('leads/create', [\App\Http\Controllers\Admin\LeadController::class, 'create'])->name('leads.create');
         Route::post('leads', [\App\Http\Controllers\Admin\LeadController::class, 'store'])->name('leads.store');
+        Route::post('leads/{lead}/update-stage', [\App\Http\Controllers\Admin\LeadController::class, 'updateStage'])->name('leads.update-stage');
         Route::post('leads/{lead}/convert', [\App\Http\Controllers\Admin\LeadController::class, 'convertToClient'])->name('leads.convert');
     });
     Route::middleware('access:view lead details')->group(function () {

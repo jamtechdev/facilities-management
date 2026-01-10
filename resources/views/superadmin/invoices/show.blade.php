@@ -19,10 +19,10 @@
                     <p>{{ $invoice->client->company_name }}</p>
                     </div>
                 <div class="profile-header-actions">
-                    <a href="{{ route('admin.invoices.download', $invoice) }}" class="btn btn-light me-2">
+                    <a href="{{ \App\Helpers\RouteHelper::url('invoices.download', $invoice) }}" class="btn btn-light me-2">
                             <i class="bi bi-download me-2"></i>Download PDF
                         </a>
-                    <a href="{{ route('admin.invoices.index') }}" class="btn btn-outline-light">
+                    <a href="{{ \App\Helpers\RouteHelper::url('invoices.index') }}" class="btn btn-outline-light">
                             <i class="bi bi-arrow-left me-2"></i>Back
                         </a>
                 </div>
@@ -159,7 +159,7 @@
                     //     }
                     // });
 
-                    const response = await fetch('{{ route('admin.invoices.update-status', $invoice) }}', {
+                    const response = await fetch('{{ \App\Helpers\RouteHelper::url('invoices.update-status', $invoice) }}', {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',

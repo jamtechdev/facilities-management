@@ -2,6 +2,7 @@
 
 namespace App\DataTables;
 
+use App\Helpers\RouteHelper;
 use App\Models\Inventory;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -66,14 +67,14 @@ class InventoryDataTable extends DataTable
 
             // View button - requires view inventory permission
             if ($user->can('view inventory')) {
-                $actions .= '<a href="' . route('admin.inventory.show', $inventory) . '" class="btn btn-outline-primary" title="View">
+                $actions .= '<a href="' . RouteHelper::url('inventory.show', $inventory) . '" class="btn btn-outline-primary" title="View">
                         <i class="bi bi-eye"></i>
                     </a>';
             }
 
             // Edit button - redirect to edit page
             if ($user->can('edit inventory')) {
-                $actions .= '<a href="' . route('admin.inventory.edit', $inventory) . '" class="btn btn-outline-secondary" title="Edit">
+                $actions .= '<a href="' . RouteHelper::url('inventory.edit', $inventory) . '" class="btn btn-outline-secondary" title="Edit">
                         <i class="bi bi-pencil"></i>
                     </a>';
             }

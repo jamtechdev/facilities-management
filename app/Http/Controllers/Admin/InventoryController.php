@@ -83,7 +83,7 @@ class InventoryController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Inventory item created successfully.',
-                'redirect' => route('admin.inventory.index')
+                'redirect' => route('superadmin.inventory.index')
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -123,7 +123,7 @@ class InventoryController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Inventory item updated successfully.',
-                'redirect' => route('admin.inventory.index')
+                'redirect' => route('superadmin.inventory.index')
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
