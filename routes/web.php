@@ -80,7 +80,7 @@ Route::middleware(['access:view staff dashboard'])->prefix('staff')->name('staff
 // Client routes - Unified access middleware (authentication, role access, and permissions)
 Route::middleware(['access:view client dashboard'])->prefix('client')->name('client.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Client\DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/profile', [\App\Http\Controllers\Client\ProfileController::class, 'index'])->name('profile');
+    // Route::get('/profile', [\App\Http\Controllers\Client\ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [\App\Http\Controllers\Client\ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/documents', [\App\Http\Controllers\Client\ProfileController::class, 'uploadDocument'])->name('profile.documents.store');
     Route::get('/profile/documents/{document}/download', [\App\Http\Controllers\Client\ProfileController::class, 'downloadDocument'])->name('profile.documents.download');
@@ -142,6 +142,7 @@ Route::middleware(['access:view roles'])->prefix('superadmin')->name('superadmin
         Route::get('leads', [\App\Http\Controllers\Admin\LeadController::class, 'index'])->name('leads.index');
         Route::get('leads/create', [\App\Http\Controllers\Admin\LeadController::class, 'create'])->name('leads.create');
         Route::post('leads', [\App\Http\Controllers\Admin\LeadController::class, 'store'])->name('leads.store');
+        Route::post('leads/{lead}/update-stage', [\App\Http\Controllers\Admin\LeadController::class, 'updateStage'])->name('leads.update-stage');
         Route::post('leads/{lead}/convert', [\App\Http\Controllers\Admin\LeadController::class, 'convertToClient'])->name('leads.convert');
     });
     Route::middleware('access:view lead details')->group(function () {

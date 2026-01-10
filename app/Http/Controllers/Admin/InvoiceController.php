@@ -91,7 +91,7 @@ class InvoiceController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'Invoice created successfully.',
-                    'redirect' => route('admin.invoices.index')
+                    'redirect' => route('superadmin.invoices.index')
                 ], 201);
             });
         } catch (\Exception $e) {

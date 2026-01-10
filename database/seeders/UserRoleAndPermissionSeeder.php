@@ -61,6 +61,7 @@ class UserRoleAndPermissionSeeder extends Seeder
             'create staff',
             'edit staff',
             'delete staff',
+            'assign staff',
             // Timesheet permissions
             'view timesheets',
             'create timesheets',

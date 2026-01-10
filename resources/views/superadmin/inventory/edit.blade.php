@@ -101,7 +101,7 @@
                             <button type="submit" class="btn btn-primary" id="submitBtn">
                                 <i class="bi bi-check-circle me-2"></i>Update Item
                             </button>
-                            <a href="{{ route('admin.inventory.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ \App\Helpers\RouteHelper::url('inventory.index') }}" class="btn btn-outline-secondary">
                                 <i class="bi bi-x-circle me-2"></i>Cancel
                             </a>
                         </div>

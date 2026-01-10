@@ -116,7 +116,7 @@
                     <div class="stat-content">
                         <div class="stat-label">Qualified Leads</div>
                         <div class="stat-value">{{ number_format($stats['qualified_leads'] ?? 0) }}</div>
-                        <a href="{{ route('admin.leads.index', ['stage' => 'qualified']) }}" class="stat-link">
+                        <a href="{{ \App\Helpers\RouteHelper::url('leads.index') }}?stage=qualified" class="stat-link">
                             View all <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
@@ -134,7 +134,7 @@
                     <div class="stat-content">
                         <div class="stat-label">New Leads Today</div>
                         <div class="stat-value">{{ number_format($stats['new_leads'] ?? 0) }}</div>
-                        <a href="{{ route('admin.leads.index', ['stage' => 'new_lead']) }}" class="stat-link">
+                        <a href="{{ \App\Helpers\RouteHelper::url('leads.index') }}?stage=new_lead" class="stat-link">
                             View all <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
@@ -168,9 +168,7 @@
                     <div class="stat-content">
                         <div class="stat-label">Total Invoices</div>
                         <div class="stat-value">{{ number_format($stats['total_invoices'] ?? 0) }}</div>
-                        <a href="{{ route('admin.invoices.index') }}" class="stat-link">
-                            View all <i class="bi bi-arrow-right"></i>
-                        </a>
+                        <a href="{{ \App\Helpers\RouteHelper::url('invoices.index') }}" class="stat-link">View All</a>
                     </div>
                     <div class="stat-icon-wrapper">
                         <i class="bi bi-receipt-cutoff"></i>
@@ -317,9 +315,7 @@
                         <i class="bi bi-clock-history"></i>
                         Recent Activity
                     </h5>
-                    <a href="{{ route('admin.leads.index') }}" class="btn btn-sm dashboard-btn-green">
-                        View All
-                    </a>
+                    <a href="{{ \App\Helpers\RouteHelper::url('leads.index') }}" class="btn btn-sm dashboard-btn-green">View All</a>
                 </div>
                 <div class="activity-card-body">
                     @if($recentActivity->count() > 0)

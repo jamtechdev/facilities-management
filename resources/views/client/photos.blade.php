@@ -3,8 +3,8 @@
 @section('title', 'Before & After Gallery')
 
 @push('styles')
-@vite(['resources/css/profile.css'])
- @vite(['resources/css/client-dashboard.css'])
+    @vite(['resources/css/profile.css'])
+    @vite(['resources/css/client-dashboard.css'])
 @endpush
 
 @section('content')
@@ -24,7 +24,6 @@
                 </div>
             </div>
         </div>
-
 
         <!-- Gallery Cards -->
         <div class="row mt-4">
@@ -55,6 +54,8 @@
                                                 @endif
                                             </div>
                                         </div>
+
+
                                         <!-- After -->
                                         <div class="col-6">
                                             <div class="photo-container">
@@ -75,7 +76,9 @@
                                                 @endif
                                             </div>
                                         </div>
+
                                     </div>
+
                                     <!-- Footer Info -->
                                     <div class="session-info">
                                         <p class="fw-bold mb-1">

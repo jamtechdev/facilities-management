@@ -112,8 +112,22 @@ class UserDataTable extends DataTable
      */
     public function query(User $model): QueryBuilder
     {
-        $query = $model->newQuery()->with('roles')->where('id', '!=', auth()->id());
-        return $query;
+        // $query = $model->newQuery()->with('roles')->where('id', '!=', auth()->id());
+        // return $query;
+        $currentUser = auth()->user();
+
+    $query = $model->newQuery()->with('roles');
+
+    // 2. Agar current user Admin hai (aur SuperAdmin nahi), toh SuperAdmin users ko hide kar do
+    if ($currentUser->hasRole('Admin') && !$currentUser->hasRole('SuperAdmin')) {
+        $query->whereDoesntHave('roles', function ($q) {
+            $q->where('name', 'SuperAdmin'); // Ya 'Super Admin' – jo bhi aapke DB mein hai
+        });
+    }
+
+    // Agar SuperAdmin login hai toh sab dikhega (including other SuperAdmins)
+
+    return $query;
     }
 
     /**

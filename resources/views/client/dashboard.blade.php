@@ -143,7 +143,7 @@ use Illuminate\Support\Facades\Storage;
 
         <!-- Feedback Card -->
         <div class="col-lg-5">
-            <div class="feedback-card">
+            {{-- <div class="feedback-card">
                 <div class="feedback-card-header">
                     <i class="bi bi-chat-square-text"></i>
                     <h5>Recent Feedback</h5>
@@ -167,7 +167,7 @@ use Illuminate\Support\Facades\Storage;
                         </div>
                     @endif
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Profile Card -->
             <div class="profile-card mt-4">
@@ -202,7 +202,7 @@ use Illuminate\Support\Facades\Storage;
     </div>
 
     <!-- Assigned Staff Section -->
-    <div class="row g-4 mt-2">
+    {{-- <div class="row g-4 mt-2">
         <div class="col-12">
             <div class="service-card">
                 <div class="service-card-header">
@@ -449,7 +449,7 @@ use Illuminate\Support\Facades\Storage;
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 </div>
 
 <!-- Image Modal -->
