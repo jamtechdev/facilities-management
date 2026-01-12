@@ -15,6 +15,15 @@
     overflow-x: auto;
     overflow-y: visible;
     -webkit-overflow-scrolling: touch;
+    transition: width 0.3s ease;
+}
+
+/* Ensure table container properly resizes when sidebar toggles */
+.container-fluid .row .col-12 .dataTables_wrapper,
+.main-content-area .container-fluid .row .col-12 .dataTables_wrapper {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* DataTables Scrollbar Styling - Thin and Green Theme */
@@ -148,6 +157,16 @@ table.dataTable {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     table-layout: auto;
     min-width: 100%;
+    transition: width 0.3s ease;
+}
+
+/* Ensure table properly recalculates width on container resize */
+.table-responsive {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    transition: width 0.3s ease;
 }
 
 /* Table Container Scrollbar */

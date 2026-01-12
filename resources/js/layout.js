@@ -11,6 +11,7 @@
         initSidebarToggle();
         initBootstrapTooltips();
         initNavbarScrollEffect();
+        initDataTablesResize();
     });
 
     /**
@@ -90,6 +91,9 @@
 
                 // Save state to localStorage
                 localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+
+                // Adjust DataTables columns after sidebar transition
+                adjustDataTablesColumns();
             }
 
             // Update icon
@@ -110,6 +114,9 @@
             }
 
             updateSidebarToggleIcon();
+
+            // Adjust DataTables columns on resize
+            adjustDataTablesColumns();
         });
 
         // Close sidebar when clicking outside on mobile
@@ -221,6 +228,63 @@
                 ticking = true;
             }
         });
+    }
+
+    /**
+     * Adjust DataTables columns when sidebar is toggled or window is resized
+     */
+    function adjustDataTablesColumns() {
+        // Wait for CSS transition to complete (300ms) plus a small buffer
+        setTimeout(function() {
+            if (typeof window.$ !== 'undefined' && typeof window.$.fn.DataTable !== 'undefined') {
+                // Find all DataTables instances on the page
+                window.$('.dataTable').each(function() {
+                    const table = window.$(this);
+
+                    try {
+                        // Check if DataTable is initialized
+                        if (table.length && window.$.fn.DataTable.isDataTable(table[0])) {
+                            const dataTable = table.DataTable();
+
+                            if (dataTable && typeof dataTable.columns !== 'undefined') {
+                                // Recalculate column widths
+                                dataTable.columns.adjust();
+                                // Redraw the table to apply changes (false = don't reset pagination)
+                                dataTable.draw(false);
+                            }
+                        }
+                    } catch (e) {
+                        // Silently fail if DataTable is not fully initialized
+                        console.debug('DataTable adjust skipped:', e);
+                    }
+                });
+            }
+        }, 350); // 300ms transition + 50ms buffer
+    }
+
+    /**
+     * Initialize DataTables resize handler
+     */
+    function initDataTablesResize() {
+        // Also listen for window resize events with debouncing
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                adjustDataTablesColumns();
+            }, 250);
+        });
+
+        // Adjust on initial load if sidebar is collapsed
+        if (window.innerWidth > 992) {
+            const sidebar = document.querySelector('.sidebar-modern');
+            if (sidebar && sidebar.classList.contains('collapsed')) {
+                // Wait for page to fully load
+                setTimeout(function() {
+                    adjustDataTablesColumns();
+                }, 500);
+            }
+        }
     }
 
 })();
