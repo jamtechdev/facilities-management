@@ -22,17 +22,29 @@
 
         if (!sidebarToggleIcon || !sidebar) return;
 
-        if (sidebar.classList.contains('collapsed')) {
-            sidebarToggleIcon.classList.remove('bi-chevron-left');
-            sidebarToggleIcon.classList.add('bi-chevron-right');
+        // On mobile, icon should show based on mobile-open state, not collapsed
+        if (window.innerWidth <= 992) {
+            if (sidebar.classList.contains('mobile-open')) {
+                sidebarToggleIcon.classList.remove('bi-chevron-right');
+                sidebarToggleIcon.classList.add('bi-chevron-left');
+            } else {
+                sidebarToggleIcon.classList.remove('bi-chevron-left');
+                sidebarToggleIcon.classList.add('bi-chevron-right');
+            }
         } else {
-            sidebarToggleIcon.classList.remove('bi-chevron-right');
-            sidebarToggleIcon.classList.add('bi-chevron-left');
+            // Desktop: use collapsed state
+            if (sidebar.classList.contains('collapsed')) {
+                sidebarToggleIcon.classList.remove('bi-chevron-left');
+                sidebarToggleIcon.classList.add('bi-chevron-right');
+            } else {
+                sidebarToggleIcon.classList.remove('bi-chevron-right');
+                sidebarToggleIcon.classList.add('bi-chevron-left');
+            }
         }
     }
 
     /**
-     * Sidebar Toggle (Collapsible)
+     * Sidebar Toggle (Collapsible on Desktop, Open/Close on Mobile)
      */
     function initSidebarToggle() {
         const sidebarToggle = document.getElementById('sidebarToggle');
@@ -40,28 +52,27 @@
 
         if (!sidebarToggle || !sidebar) return;
 
-        // Load saved state from localStorage
-        const savedState = localStorage.getItem('sidebarCollapsed');
-        if (savedState === 'true') {
-            sidebar.classList.add('collapsed');
+        // Load saved state from localStorage (only for desktop)
+        if (window.innerWidth > 992) {
+            const savedState = localStorage.getItem('sidebarCollapsed');
+            if (savedState === 'true') {
+                sidebar.classList.add('collapsed');
+            }
+        } else {
+            // On mobile, remove collapsed state if present
+            sidebar.classList.remove('collapsed');
         }
 
         // Update icon based on initial state
         updateSidebarToggleIcon();
 
         sidebarToggle.addEventListener('click', function() {
-            // Toggle collapsed state
-            sidebar.classList.toggle('collapsed');
-
-            // Update icon
-            updateSidebarToggleIcon();
-
-            // Save state to localStorage
-            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
-
-            // On mobile, also handle mobile-open class
+            // On mobile: only toggle mobile-open, don't collapse
             if (window.innerWidth <= 992) {
                 sidebar.classList.toggle('mobile-open');
+
+                // Remove collapsed state on mobile if present
+                sidebar.classList.remove('collapsed');
 
                 // Add overlay for mobile
                 if (sidebar.classList.contains('mobile-open')) {
@@ -69,11 +80,35 @@
                 } else {
                     removeMobileOverlay();
                 }
+            } else {
+                // On desktop: toggle collapsed state
+                sidebar.classList.toggle('collapsed');
+
+                // Remove mobile-open state on desktop
+                sidebar.classList.remove('mobile-open');
+                removeMobileOverlay();
+
+                // Save state to localStorage
+                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
             }
+
+            // Update icon
+            updateSidebarToggleIcon();
         });
 
         // Update icon on window resize
         window.addEventListener('resize', function() {
+            // On mobile, remove collapsed state
+            if (window.innerWidth <= 992) {
+                sidebar.classList.remove('collapsed');
+            }
+
+            // On desktop, remove mobile-open state
+            if (window.innerWidth > 992) {
+                sidebar.classList.remove('mobile-open');
+                removeMobileOverlay();
+            }
+
             updateSidebarToggleIcon();
         });
 
@@ -86,15 +121,8 @@
                 if (!isClickInsideSidebar && !isClickOnToggle && sidebar.classList.contains('mobile-open')) {
                     sidebar.classList.remove('mobile-open');
                     removeMobileOverlay();
+                    updateSidebarToggleIcon();
                 }
-            }
-        });
-
-        // Close sidebar on window resize if desktop
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 992) {
-                sidebar.classList.remove('mobile-open');
-                removeMobileOverlay();
             }
         });
     }

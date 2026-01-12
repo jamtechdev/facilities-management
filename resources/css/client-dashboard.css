@@ -591,8 +591,37 @@
 }
 
 
+/* Client Dashboard Content Container */
+.client-dashboard-content {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+/* Desktop Responsive */
+@media (max-width: 1400px) and (min-width: 1201px) {
+    .client-dashboard-content {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+}
+
+@media (max-width: 1200px) {
+    .client-dashboard-content {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
+    .client-dashboard-content {
+        padding: 1rem 0.75rem;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
 
     /* Mobile: Cards full width, one per line */
     .client-dashboard-content .row>[class*="col-"] {
@@ -643,6 +672,12 @@
 }
 
 @media (max-width: 576px) {
+    .client-dashboard-content {
+        padding: 0.75rem 0.5rem;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
 
     /* Mobile: Ensure cards are full width */
     .client-dashboard-content .row>[class*="col-"] {
