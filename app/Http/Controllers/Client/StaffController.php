@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Staff;
+use App\Helpers\RouteHelper;
 use Illuminate\Http\Request;
 
 class StaffController extends Controller
@@ -17,7 +18,7 @@ class StaffController extends Controller
         $client = $user->client;
 
         if (!$client) {
-            return redirect()->route('client.dashboard')->with('error', 'Client profile not found.');
+            return redirect()->to(RouteHelper::url('dashboard'))->with('error', 'Client profile not found.');
         }
 
         // Get assigned staff with basic info
@@ -38,7 +39,7 @@ class StaffController extends Controller
         $client = $user->client;
 
         if (!$client) {
-            return redirect()->route('client.dashboard')->with('error', 'Client profile not found.');
+            return redirect()->to(RouteHelper::url('dashboard'))->with('error', 'Client profile not found.');
         }
 
         // Verify staff is assigned to this client

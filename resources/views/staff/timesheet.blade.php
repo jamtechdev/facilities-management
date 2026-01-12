@@ -50,10 +50,20 @@
                     <div class="assignment-card-modern">
                         <div class="assignment-card-header">
                             <div class="assignment-title">Today's Assignment</div>
-                            <div class="assignment-name">{{ $primaryAssignment->company_name ?? 'No assignment yet' }}</div>
+                            <div class="assignment-name">
+                                @if($assignedClients->count() > 0)
+                                    {{ $primaryAssignment->company_name ?? 'No assignment yet' }}
+                                @else
+                                    No companies assigned
+                                @endif
+                            </div>
                             <div class="assignment-address">
                                 <i class="bi bi-geo-alt me-2"></i>
-                                {{ $primaryAssignment->address ?? ($primaryAssignment->city ?? 'Address not available') }}
+                                @if($assignedClients->count() > 0 && $primaryAssignment)
+                                    {{ $primaryAssignment->address ?? ($primaryAssignment->city ?? 'Address not available') }}
+                                @else
+                                    Please contact administrator to get assigned
+                                @endif
                             </div>
                         </div>
                         <div class="assignment-card-body">
@@ -93,10 +103,13 @@
                                 <div class="d-flex justify-content-between">
                                     <div>
                                         <small class="text-muted text-uppercase d-block">Elapsed</small>
-                                        <strong class="text-primary">
-                                            {{ now()->diffInMinutes($activeTimesheet->clock_in_time) >= 60 
-                                                ? number_format(now()->diffInMinutes($activeTimesheet->clock_in_time) / 60, 2) . 'h' 
-                                                : now()->diffInMinutes($activeTimesheet->clock_in_time) . 'm' }}
+                                        <strong class="text-primary" id="elapsed-time-{{ $activeTimesheet->id }}" data-clock-in-time="{{ $activeTimesheet->clock_in_time->toIso8601String() }}">
+                                            @php
+                                                $elapsedMinutes = max(0, now()->diffInMinutes($activeTimesheet->clock_in_time));
+                                            @endphp
+                                            {{ $elapsedMinutes >= 60
+                                                ? number_format($elapsedMinutes / 60, 2) . 'h'
+                                                : $elapsedMinutes . 'm' }}
                                         </strong>
                                     </div>
                                     <div>
@@ -124,28 +137,62 @@
                             <small>Upload a "before" photo to start your shift</small>
                         </div>
                         <div class="clock-form-body">
+                            @if($todayTimesheets->whereNull('clock_out_time')->count() > 0)
+                                <div class="alert alert-warning mb-3">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    <strong>Active Session Found</strong>
+                                    <p class="mb-0 mt-2 small">You have an active clock-in session. Please clock out from your active session below before starting a new one.</p>
+                                </div>
+                            @endif
                             <form id="clockInForm" enctype="multipart/form-data">
                                 @csrf
                                 <div class="mb-3">
                                     <label for="client_id" class="form-label fw-bold">Select Company</label>
-                                    <select class="form-select form-select-lg" id="client_id" name="client_id" required>
-                                        <option value="">Choose company...</option>
-                                        @foreach($assignedClients as $client)
-                                            <option value="{{ $client->id }}">{{ $client->company_name }}</option>
-                                        @endforeach
-                                    </select>
+                                    @if($assignedClients->count() > 0)
+                                        <select class="form-select form-select-lg" id="client_id" name="client_id" required {{ $todayTimesheets->whereNull('clock_out_time')->count() > 0 ? 'disabled' : '' }}>
+                                            <option value="">Choose company...</option>
+                                            @foreach($assignedClients as $client)
+                                                <option value="{{ $client->id }}">{{ $client->company_name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <small class="form-text text-muted">Select the company you want to clock in for</small>
+                                        @if($todayTimesheets->whereNull('clock_out_time')->count() > 0)
+                                            <small class="form-text text-danger d-block mt-1">
+                                                <i class="bi bi-lock me-1"></i>Disabled - Please clock out first
+                                            </small>
+                                        @endif
+                                    @else
+                                        <div class="alert alert-warning mb-0">
+                                            <i class="bi bi-exclamation-triangle me-2"></i>
+                                            <strong>No companies assigned</strong>
+                                            <p class="mb-0 mt-1 small">You haven't been assigned to any companies yet. Please contact your administrator to get assigned to a company.</p>
+                                        </div>
+                                    @endif
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Before Photo</label>
-                                    <label class="photo-upload-area w-100 d-block" for="clockInPhoto">
+                                    <label class="photo-upload-area w-100 d-block {{ $todayTimesheets->whereNull('clock_out_time')->count() > 0 ? 'opacity-50' : '' }}" for="clockInPhoto" style="{{ $todayTimesheets->whereNull('clock_out_time')->count() > 0 ? 'pointer-events: none;' : '' }}">
                                         <i class="bi bi-cloud-upload"></i>
                                         <div id="clockInPhotoLabel" class="mt-2 fw-bold">Tap to upload shift start photo</div>
-                                        <input type="file" id="clockInPhoto" name="photo" accept="image/*" capture="environment" class="d-none" required>
+                                        <input type="file" id="clockInPhoto" name="photo" accept="image/*" capture="environment" class="d-none" required {{ $todayTimesheets->whereNull('clock_out_time')->count() > 0 ? 'disabled' : '' }}>
                                     </label>
+                                    <div id="clockInPhotoPreview" class="mt-2" style="display: none;">
+                                        <img id="clockInPhotoPreviewImg" src="" alt="Preview" class="img-thumbnail" style="max-width: 200px; max-height: 200px; object-fit: cover;">
+                                    </div>
+                                    @if($todayTimesheets->whereNull('clock_out_time')->count() > 0)
+                                        <small class="form-text text-danger d-block mt-1">
+                                            <i class="bi bi-lock me-1"></i>Disabled - Please clock out first
+                                        </small>
+                                    @endif
                                 </div>
-                                <button type="submit" class="btn btn-success w-100 btn-lg" id="clockInBtn">
+                                <button type="submit" class="btn btn-success w-100 btn-lg" id="clockInBtn" {{ ($assignedClients->count() == 0 || $todayTimesheets->whereNull('clock_out_time')->count() > 0) ? 'disabled' : '' }}>
                                     <i class="bi bi-play-fill me-2"></i>Clock In
                                 </button>
+                                @if($todayTimesheets->whereNull('clock_out_time')->count() > 0)
+                                    <small class="form-text text-danger d-block mt-2 text-center">
+                                        <i class="bi bi-info-circle me-1"></i>Please clock out from your active session first
+                                    </small>
+                                @endif
                             </form>
                         </div>
                     </div>
@@ -173,7 +220,10 @@
                                         @csrf
                                         <div class="mb-2">
                                             <label class="form-label small fw-bold">After Photo</label>
-                                            <input type="file" class="form-control clockOutPhoto" name="photo" accept="image/*" capture="environment" required>
+                                            <input type="file" class="form-control clockOutPhoto" name="photo" accept="image/*" capture="environment" required data-timesheet-id="{{ $timesheet->id }}">
+                                            <div class="clockOutPhotoPreview mt-2" id="clockOutPhotoPreview_{{ $timesheet->id }}" style="display: none;">
+                                                <img src="" alt="Preview" class="img-thumbnail" style="max-width: 200px; max-height: 200px; object-fit: cover;">
+                                            </div>
                                         </div>
                                         <div class="mb-2">
                                             <label class="form-label small fw-bold">Notes (optional)</label>
@@ -284,10 +334,13 @@
                                 <div class="d-flex justify-content-between">
                                     <div>
                                         <small class="text-muted text-uppercase d-block">Elapsed</small>
-                                        <strong class="text-primary">
-                                            {{ now()->diffInMinutes($activeTimesheet->clock_in_time) >= 60 
-                                                ? number_format(now()->diffInMinutes($activeTimesheet->clock_in_time) / 60, 2) . 'h' 
-                                                : now()->diffInMinutes($activeTimesheet->clock_in_time) . 'm' }}
+                                        <strong class="text-primary" id="elapsed-time-summary-{{ $activeTimesheet->id }}" data-clock-in-time="{{ $activeTimesheet->clock_in_time->toIso8601String() }}">
+                                            @php
+                                                $elapsedMinutes = max(0, now()->diffInMinutes($activeTimesheet->clock_in_time));
+                                            @endphp
+                                            {{ $elapsedMinutes >= 60
+                                                ? number_format($elapsedMinutes / 60, 2) . 'h'
+                                                : $elapsedMinutes . 'm' }}
                                         </strong>
                                     </div>
                                     <div>
@@ -396,69 +449,159 @@
 
     if (clockInPhotoInput) {
         clockInPhotoInput.addEventListener('change', function () {
+            const preview = document.getElementById('clockInPhotoPreview');
+            const previewImg = document.getElementById('clockInPhotoPreviewImg');
+
             if (this.files.length) {
                 clockInPhotoLabel.textContent = this.files[0].name;
+
+                // Show image preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(this.files[0]);
             } else {
                 clockInPhotoLabel.textContent = 'Tap to upload shift start photo';
+                preview.style.display = 'none';
+                previewImg.src = '';
             }
         });
     }
 
-    document.getElementById('clockInForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        if (!clockInPhotoInput.files.length) {
-            showAlert('warning', 'Please upload a before photo to clock in.');
+    // Clock In Form - Prevent duplicate listeners
+    (function() {
+        const clockInForm = document.getElementById('clockInForm');
+        if (!clockInForm || clockInForm.dataset.listenerAttached) {
             return;
         }
-        const formData = new FormData(this);
-        const btn = document.getElementById('clockInBtn');
-        const originalText = btn.innerHTML;
-        
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+        clockInForm.dataset.listenerAttached = 'true';
 
-        try {
-            const response = await fetch('{{ route("staff.timesheet.clock-in") }}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        let isSubmitting = false;
+
+        clockInForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Prevent duplicate submissions
+            if (isSubmitting) {
+                return;
+            }
+            isSubmitting = true;
+
+            if (!clockInPhotoInput || !clockInPhotoInput.files.length) {
+                showAlert('warning', 'Please upload a before photo to clock in.');
+                isSubmitting = false;
+                return;
+            }
+
+            const formData = new FormData(this);
+            const btn = document.getElementById('clockInBtn');
+            const originalText = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+
+            try {
+                const response = await fetch('{{ \App\Helpers\RouteHelper::url("timesheet.clock-in") }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('success', data.message);
+                    setTimeout(() => location.reload(), 1200);
+                } else {
+                    // Show user-friendly error message
+                    let errorMessage = data.message || 'Failed to clock in';
+
+                    // If there's an active session, provide helpful message
+                    if (data.has_active_session) {
+                        errorMessage = data.message || 'You have an active session. Please clock out first.';
+                        showAlert('warning', errorMessage);
+                        // Scroll to active sessions section
+                        setTimeout(() => {
+                            const activeSessionsSection = document.querySelector('.clock-form-header-red')?.closest('.clock-form-card');
+                            if (activeSessionsSection) {
+                                activeSessionsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                        }, 500);
+                    } else {
+                        showAlert('danger', errorMessage);
+                    }
+
+                    isSubmitting = false;
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            } catch (error) {
+                showAlert('danger', 'Failed to clock in: ' + (error.message || 'Unknown error'));
+                isSubmitting = false;
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
+        });
+    })();
 
-            const data = await response.json();
+    // Clock Out Photo Preview
+    document.querySelectorAll('.clockOutPhoto').forEach(photoInput => {
+        photoInput.addEventListener('change', function() {
+            const timesheetId = this.dataset.timesheetId;
+            const preview = document.getElementById('clockOutPhotoPreview_' + timesheetId);
+            const previewImg = preview?.querySelector('img');
 
-            if (data.success) {
-                showAlert('success', data.message);
-                setTimeout(() => location.reload(), 1200);
-            } else {
-                showAlert('danger', data.message || 'Failed to clock in');
+            if (this.files.length && preview && previewImg) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(this.files[0]);
+            } else if (preview) {
+                preview.style.display = 'none';
             }
-        } catch (error) {
-            showAlert('danger', 'Failed to clock in: ' + (error.message || 'Unknown error'));
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-        }
+        });
     });
 
+    // Clock Out Forms - Prevent duplicate listeners
     document.querySelectorAll('.clockOutForm').forEach(form => {
+        // Skip if listener already attached
+        if (form.dataset.listenerAttached) {
+            return;
+        }
+        form.dataset.listenerAttached = 'true';
+
+        let isSubmitting = false;
+
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
+
+            // Prevent duplicate submissions
+            if (isSubmitting) {
+                return;
+            }
+            isSubmitting = true;
+
             const photoInput = this.querySelector('.clockOutPhoto');
-            if (!photoInput.files.length) {
+            if (!photoInput || !photoInput.files.length) {
                 showAlert('warning', 'Please upload an after photo to clock out.');
+                isSubmitting = false;
                 return;
             }
 
             const formData = new FormData();
             formData.append('timesheet_id', this.dataset.timesheetId);
-            formData.append('notes', this.querySelector('textarea[name="notes"]').value);
+            formData.append('notes', this.querySelector('textarea[name="notes"]')?.value || '');
             formData.append('photo', photoInput.files[0]);
 
             const btn = this.querySelector('button[type="submit"]');
@@ -467,7 +610,7 @@
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Processing...';
 
             try {
-                const response = await fetch('{{ route("staff.timesheet.clock-out") }}', {
+                const response = await fetch('{{ \App\Helpers\RouteHelper::url("timesheet.clock-out") }}', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -487,10 +630,13 @@
                     setTimeout(() => location.reload(), 1200);
                 } else {
                     showAlert('danger', data.message || 'Failed to clock out');
+                    isSubmitting = false;
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
                 }
             } catch (error) {
                 showAlert('danger', 'Failed to clock out: ' + (error.message || 'Unknown error'));
-            } finally {
+                isSubmitting = false;
                 btn.disabled = false;
                 btn.innerHTML = originalText;
             }
@@ -507,6 +653,36 @@
             alert(message);
         }
     }
+
+    // Real-time elapsed time update for active sessions
+    function updateElapsedTime() {
+        document.querySelectorAll('[id^="elapsed-time"]').forEach(element => {
+            const clockInTime = element.dataset.clockInTime;
+
+            if (clockInTime) {
+                const clockIn = new Date(clockInTime);
+                const now = new Date();
+                const diffMs = Math.max(0, now - clockIn);
+                const diffMinutes = Math.floor(diffMs / 60000);
+
+                if (diffMinutes >= 60) {
+                    const hours = (diffMinutes / 60).toFixed(2);
+                    element.textContent = hours + 'h';
+                } else {
+                    element.textContent = diffMinutes + 'm';
+                }
+            }
+        });
+    }
+
+    // Update elapsed time every minute if there's an active session
+    @if($activeTimesheet)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update immediately and then every 60 seconds
+            updateElapsedTime();
+            setInterval(updateElapsedTime, 60000);
+        });
+    @endif
 </script>
 @endpush
 @endsection

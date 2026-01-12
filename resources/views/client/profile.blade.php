@@ -196,12 +196,12 @@
                                             </small>
                                         </div>
                                         <div class="document-item-actions">
-                                            <a href="{{ route('client.profile.documents.download', $document->id) }}"
+                                            <a href="{{ \App\Helpers\RouteHelper::url('profile.documents.download', $document->id) }}"
                                                 class="btn btn-sm btn-outline-primary me-1" title="Download">
                                                 <i class="bi bi-download"></i>
                                             </a>
                                             <button class="btn btn-sm btn-outline-danger delete-document-btn"
-                                                data-delete-url="{{ route('client.profile.documents.destroy', $document->id) }}"
+                                                data-delete-url="{{ \App\Helpers\RouteHelper::url('profile.documents.destroy', $document->id) }}"
                                                 title="Delete">
                                                 <i class="bi bi-trash"></i>
                                             </button>
@@ -225,48 +225,66 @@
 
     @push('scripts')
         <script>
-            // Profile Update
-            document.getElementById('profileForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const formData = new FormData(this);
-                const btn = this.querySelector('button[type="submit"]');
-                const originalText = btn.innerHTML;
-
-                btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
-
-                try {
-                    const response = await fetch('{{ route('client.profile.update') }}', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        showAlert('success', data.message || 'Profile updated successfully!');
-                    } else {
-                        let errorMsg = data.message || 'Update failed';
-                        if (data.errors) {
-                            errorMsg += '<br><small>' + Object.values(data.errors).flat().join('<br>') + '</small>';
-                        }
-                        showAlert('danger', errorMsg);
-                    }
-                } catch (error) {
-                    showAlert('danger', 'Network error. Please try again.');
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
+            // Profile Update - Prevent duplicate listeners
+            (function() {
+                const profileForm = document.getElementById('profileForm');
+                if (!profileForm || profileForm.dataset.listenerAttached) {
+                    return;
                 }
-            });
+                profileForm.dataset.listenerAttached = 'true';
+
+                let isSubmitting = false;
+
+                profileForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    // Prevent duplicate submissions
+                    if (isSubmitting) {
+                        return;
+                    }
+                    isSubmitting = true;
+
+                    const formData = new FormData(this);
+                    const btn = this.querySelector('button[type="submit"]');
+                    const originalText = btn.innerHTML;
+
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+
+                    try {
+                        const response = await fetch('{{ \App\Helpers\RouteHelper::url('profile.update') }}', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            showAlert('success', data.message || 'Profile updated successfully!');
+                        } else {
+                            let errorMsg = data.message || 'Update failed';
+                            if (data.errors) {
+                                errorMsg += '<br><small>' + Object.values(data.errors).flat().join('<br>') + '</small>';
+                            }
+                            showAlert('danger', errorMsg);
+                        }
+                    } catch (error) {
+                        showAlert('danger', 'Network error. Please try again.');
+                    } finally {
+                        isSubmitting = false;
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                    }
+                });
+            })();
 
             // Document Upload
             const documentForm = document.getElementById('documentUploadForm');
@@ -281,7 +299,7 @@
                     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
 
                     try {
-                        const response = await fetch('{{ route('client.profile.documents.store') }}', {
+                        const response = await fetch('{{ \App\Helpers\RouteHelper::url('profile.documents.store') }}', {
                             method: 'POST',
                             body: formData,
                             headers: {
@@ -361,7 +379,7 @@
                     alert(message);
                 }
             }
-            
+
             // Legacy code removed - keeping for reference
             if (false) {
                     setTimeout(() => {

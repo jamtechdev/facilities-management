@@ -118,7 +118,8 @@
                                 @enderror
                             </div>
 
-                            <div class="col-md-6">
+                            {{-- Staff assignment from lead page is disabled - Staff should be assigned to clients directly --}}
+                            {{-- <div class="col-md-6">
                                 <label for="assigned_staff_id" class="form-label">
                                     <i class="bi bi-person-check me-1"></i>Assigned Staff
                                 </label>
@@ -133,7 +134,7 @@
                                 @error('assigned_staff_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                            </div>
+                            </div> --}}
 
                             <div class="col-12">
                                 <label for="notes" class="form-label">

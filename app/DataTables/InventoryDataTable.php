@@ -129,7 +129,7 @@ class InventoryDataTable extends DataTable
                     ->className('btn btn-primary')
                     ->text('<i class="bi bi-plus-circle me-1"></i> New Item')
                     ->action('function(e, dt, node, config) {
-                        window.location.href = "' . route('admin.inventory.create') . '";
+                        window.location.href = "' . RouteHelper::url('inventory.create') . '";
                     }') : null,
                 Button::make('reload')
                     ->className('btn btn-secondary')

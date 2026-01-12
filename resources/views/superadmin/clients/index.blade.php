@@ -46,4 +46,10 @@
 
 @push('scripts')
 {!! $dataTable->scripts(attributes: ['type' => 'module']) !!}
+<script>
+    // Pass delete route to JS for delete operations
+    if (typeof window.deleteClientRoute === 'undefined') {
+        window.deleteClientRoute = '{{ \App\Helpers\RouteHelper::url("clients.destroy", ":id") }}';
+    }
+</script>
 @endpush

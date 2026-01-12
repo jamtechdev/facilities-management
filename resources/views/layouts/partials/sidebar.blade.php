@@ -131,7 +131,7 @@
             @can('view staff dashboard')
                 <div class="nav-item-modern">
                     <a class="nav-link-modern {{ request()->routeIs('staff.dashboard') ? 'active' : '' }}"
-                        href="{{ route('staff.dashboard') }}">
+                        href="{{ \App\Helpers\RouteHelper::url('dashboard') }}">
                         <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
                         <span class="nav-text">Dashboard</span>
                     </a>
@@ -141,7 +141,7 @@
             @can('view timesheets')
                 <div class="nav-item-modern">
                     <a class="nav-link-modern {{ request()->routeIs('staff.timesheet*') ? 'active' : '' }}"
-                        href="{{ route('staff.timesheet') }}">
+                        href="{{ \App\Helpers\RouteHelper::url('timesheet') }}">
                         <span class="nav-icon"><i class="bi bi-clock-history"></i></span>
                         <span class="nav-text">Timesheet</span>
                     </a>
@@ -150,7 +150,7 @@
 
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('staff.activity') ? 'active' : '' }}"
-                    href="{{ route('staff.activity') }}">
+                    href="{{ \App\Helpers\RouteHelper::url('activity') }}">
                     <span class="nav-icon"><i class="bi bi-activity"></i></span>
                     <span class="nav-text">Activity Log</span>
                 </a>
@@ -161,14 +161,14 @@
             <div class="nav-section-title">Main</div>
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('client.dashboard') ? 'active' : '' }}"
-                    href="{{ route('client.dashboard') }}">
+                    href="{{ \App\Helpers\RouteHelper::url('dashboard') }}">
                     <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
                     <span class="nav-text">Dashboard</span>
                 </a>
             </div>
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('client.staff*') ? 'active' : '' }}"
-                    href="{{ route('client.staff.index') }}">
+                    href="{{ \App\Helpers\RouteHelper::url('staff.index') }}">
                     <span class="nav-icon"><i class="bi bi-people"></i></span>
                     <span class="nav-text">Our Staff</span>
                 </a>
@@ -179,14 +179,14 @@
             <div class="nav-section-title">Services</div>
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('client.services*') ? 'active' : '' }}"
-                    href="{{ route('client.services') }}">
+                    href="{{ \App\Helpers\RouteHelper::url('services') }}">
                     <span class="nav-icon"><i class="bi bi-calendar-check"></i></span>
                     <span class="nav-text">Service History</span>
                 </a>
             </div>
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('client.photos*') ? 'active' : '' }}"
-                    href="{{ route('client.photos') }}">
+                    href="{{ \App\Helpers\RouteHelper::url('photos') }}">
                     <span class="nav-icon"><i class="bi bi-images"></i></span>
                     <span class="nav-text">Before & After Photos</span>
                 </a>
@@ -197,14 +197,14 @@
             <div class="nav-section-title">Communication</div>
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('client.feedback*') ? 'active' : '' }}"
-                    href="{{ route('client.feedback') }}">
+                    href="{{ \App\Helpers\RouteHelper::url('feedback') }}">
                     <span class="nav-icon"><i class="bi bi-chat-dots"></i></span>
                     <span class="nav-text">Feedback</span>
                 </a>
             </div>
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('client.documents*') ? 'active' : '' }}"
-                    href="{{ route('client.documents') }}">
+                    href="{{ \App\Helpers\RouteHelper::url('documents') }}">
                     <span class="nav-icon"><i class="bi bi-file-earmark-text"></i></span>
                     <span class="nav-text">Documents</span>
                 </a>
@@ -215,7 +215,7 @@
             <div class="nav-section-title">Account</div>
             <div class="nav-item-modern">
                 <a class="nav-link-modern {{ request()->routeIs('client.profile*') ? 'active' : '' }}"
-                    href="{{ route('client.profile') }}">
+                    href="{{ \App\Helpers\RouteHelper::url('profile') }}">
                     <span class="nav-icon"><i class="bi bi-person-circle"></i></span>
                     <span class="nav-text">Profile</span>
                 </a>

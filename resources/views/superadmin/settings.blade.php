@@ -383,11 +383,18 @@
 @push('scripts')
 <script>
     (function() {
+        // Prevent multiple initializations
+        if (window.settingsPageInitialized) {
+            return;
+        }
+        window.settingsPageInitialized = true;
+
         let isSubmitting = false;
 
         // Notifications Form
         const notificationsForm = document.getElementById('notificationsForm');
-        if (notificationsForm) {
+        if (notificationsForm && !notificationsForm.dataset.listenerAttached) {
+            notificationsForm.dataset.listenerAttached = 'true';
             notificationsForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 if (isSubmitting) return;
@@ -395,13 +402,13 @@
 
                 const formData = new FormData(this);
                 // Convert checkboxes to boolean values
-                const data = {};
+                const formDataObj = {};
                 for (let [key, value] of formData.entries()) {
                     const checkbox = this.querySelector(`[name="${key}"][type="checkbox"]`);
                     if (checkbox) {
-                        data[key] = checkbox.checked;
+                        formDataObj[key] = checkbox.checked;
                     } else {
-                        data[key] = value;
+                        formDataObj[key] = value;
                     }
                 }
 
@@ -411,9 +418,9 @@
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
 
                 try {
-                    const response = await fetch('{{ route("superadmin.settings.notifications.update") }}', {
+                    const response = await fetch('{{ \App\Helpers\RouteHelper::url("settings.notifications.update") }}', {
                         method: 'POST',
-                        body: JSON.stringify(data),
+                        body: JSON.stringify(formDataObj),
                         headers: {
                             'Content-Type': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest',
@@ -421,14 +428,14 @@
                         }
                     });
 
-                    const data = await response.json();
-                    if (data.success) {
+                    const responseData = await response.json();
+                    if (responseData.success) {
                         if (typeof showToast !== 'undefined') {
-                            showToast('success', data.message);
+                            showToast('success', responseData.message);
                         }
                     } else {
                         if (typeof showToast !== 'undefined') {
-                            showToast('error', data.message || 'Failed to update settings');
+                            showToast('error', responseData.message || 'Failed to update settings');
                         }
                     }
                 } catch (error) {
@@ -445,7 +452,8 @@
 
         // Messages Form
         const messagesForm = document.getElementById('messagesForm');
-        if (messagesForm) {
+        if (messagesForm && !messagesForm.dataset.listenerAttached) {
+            messagesForm.dataset.listenerAttached = 'true';
             messagesForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 if (isSubmitting) return;
@@ -453,13 +461,13 @@
 
                 const formData = new FormData(this);
                 // Convert checkboxes to boolean values
-                const data = {};
+                const formDataObj = {};
                 for (let [key, value] of formData.entries()) {
                     const checkbox = this.querySelector(`[name="${key}"][type="checkbox"]`);
                     if (checkbox) {
-                        data[key] = checkbox.checked;
+                        formDataObj[key] = checkbox.checked;
                     } else {
-                        data[key] = value;
+                        formDataObj[key] = value;
                     }
                 }
 
@@ -469,9 +477,9 @@
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
 
                 try {
-                    const response = await fetch('{{ route("superadmin.settings.messages.update") }}', {
+                    const response = await fetch('{{ \App\Helpers\RouteHelper::url("settings.messages.update") }}', {
                         method: 'POST',
-                        body: JSON.stringify(data),
+                        body: JSON.stringify(formDataObj),
                         headers: {
                             'Content-Type': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest',
@@ -479,14 +487,14 @@
                         }
                     });
 
-                    const data = await response.json();
-                    if (data.success) {
+                    const responseData = await response.json();
+                    if (responseData.success) {
                         if (typeof showToast !== 'undefined') {
-                            showToast('success', data.message);
+                            showToast('success', responseData.message);
                         }
                     } else {
                         if (typeof showToast !== 'undefined') {
-                            showToast('error', data.message || 'Failed to update settings');
+                            showToast('error', responseData.message || 'Failed to update settings');
                         }
                     }
                 } catch (error) {
@@ -503,7 +511,8 @@
 
         // General Form
         const generalForm = document.getElementById('generalForm');
-        if (generalForm) {
+        if (generalForm && !generalForm.dataset.listenerAttached) {
+            generalForm.dataset.listenerAttached = 'true';
             generalForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 if (isSubmitting) return;
@@ -511,13 +520,13 @@
 
                 const formData = new FormData(this);
                 // Convert checkboxes to boolean values
-                const data = {};
+                const formDataObj = {};
                 for (let [key, value] of formData.entries()) {
                     const checkbox = this.querySelector(`[name="${key}"][type="checkbox"]`);
                     if (checkbox) {
-                        data[key] = checkbox.checked;
+                        formDataObj[key] = checkbox.checked;
                     } else {
-                        data[key] = value;
+                        formDataObj[key] = value;
                     }
                 }
 
@@ -527,9 +536,9 @@
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
 
                 try {
-                    const response = await fetch('{{ route("superadmin.settings.general.update") }}', {
+                    const response = await fetch('{{ \App\Helpers\RouteHelper::url("settings.general.update") }}', {
                         method: 'POST',
-                        body: JSON.stringify(data),
+                        body: JSON.stringify(formDataObj),
                         headers: {
                             'Content-Type': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest',
@@ -537,14 +546,14 @@
                         }
                     });
 
-                    const data = await response.json();
-                    if (data.success) {
+                    const responseData = await response.json();
+                    if (responseData.success) {
                         if (typeof showToast !== 'undefined') {
-                            showToast('success', data.message);
+                            showToast('success', responseData.message);
                         }
                     } else {
                         if (typeof showToast !== 'undefined') {
-                            showToast('error', data.message || 'Failed to update settings');
+                            showToast('error', responseData.message || 'Failed to update settings');
                         }
                     }
                 } catch (error) {
@@ -561,7 +570,8 @@
 
         // Project Form
         const projectForm = document.getElementById('projectForm');
-        if (projectForm) {
+        if (projectForm && !projectForm.dataset.listenerAttached) {
+            projectForm.dataset.listenerAttached = 'true';
             projectForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 if (isSubmitting) return;
@@ -569,13 +579,13 @@
 
                 const formData = new FormData(this);
                 // Convert checkboxes to boolean values
-                const data = {};
+                const formDataObj = {};
                 for (let [key, value] of formData.entries()) {
                     const checkbox = this.querySelector(`[name="${key}"][type="checkbox"]`);
                     if (checkbox) {
-                        data[key] = checkbox.checked;
+                        formDataObj[key] = checkbox.checked;
                     } else {
-                        data[key] = value;
+                        formDataObj[key] = value;
                     }
                 }
 
@@ -585,9 +595,9 @@
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
 
                 try {
-                    const response = await fetch('{{ route("superadmin.settings.project.update") }}', {
+                    const response = await fetch('{{ \App\Helpers\RouteHelper::url("settings.project.update") }}', {
                         method: 'POST',
-                        body: JSON.stringify(data),
+                        body: JSON.stringify(formDataObj),
                         headers: {
                             'Content-Type': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest',
@@ -595,14 +605,14 @@
                         }
                     });
 
-                    const data = await response.json();
-                    if (data.success) {
+                    const responseData = await response.json();
+                    if (responseData.success) {
                         if (typeof showToast !== 'undefined') {
-                            showToast('success', data.message);
+                            showToast('success', responseData.message);
                         }
                     } else {
                         if (typeof showToast !== 'undefined') {
-                            showToast('error', data.message || 'Failed to update settings');
+                            showToast('error', responseData.message || 'Failed to update settings');
                         }
                     }
                 } catch (error) {

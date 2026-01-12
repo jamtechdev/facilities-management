@@ -21,6 +21,7 @@ class Timesheet extends Model
         'payable_hours',
         'notes',
         'is_approved',
+        'status',
         'approved_by',
         'approved_at',
     ];
@@ -34,6 +35,11 @@ class Timesheet extends Model
         'is_approved' => 'boolean',
         'approved_at' => 'datetime',
     ];
+
+    // Status constants
+    const STATUS_PENDING = 'pending';
+    const STATUS_COMPLETED = 'completed';
+    const STATUS_APPROVED = 'approved';
 
     // Relationships
     public function staff(): BelongsTo
@@ -49,6 +55,11 @@ class Timesheet extends Model
     public function jobPhotos(): HasMany
     {
         return $this->hasMany(JobPhoto::class);
+    }
+
+    public function feedback(): HasMany
+    {
+        return $this->hasMany(Feedback::class);
     }
 
     public function approvedBy(): BelongsTo

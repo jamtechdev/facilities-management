@@ -51,16 +51,17 @@ class DashboardController extends Controller
             $stats['revenue'] = Invoice::where('status', 'paid')->sum('total_amount');
         }
 
-        if ($user->can('view dashboard users card')) {
-            $stats['total_users'] = User::count();
-            // Count users with admin dashboard permission but not view roles permission
-            $stats['total_admins'] = User::permission('view admin dashboard')
-                ->whereDoesntHave('permissions', function($q) {
-                    $q->where('name', 'view roles');
-                })->count();
-            // Count users with view roles permission (SuperAdmin)
-            $stats['total_superadmins'] = User::permission('view roles')->count();
-        }
+        // Total Users card commented out - stats calculation disabled
+        // if ($user->can('view dashboard users card')) {
+        //     $stats['total_users'] = User::count();
+        //     // Count users with admin dashboard permission but not view roles permission
+        //     $stats['total_admins'] = User::permission('view admin dashboard')
+        //         ->whereDoesntHave('permissions', function($q) {
+        //             $q->where('name', 'view roles');
+        //         })->count();
+        //     // Count users with view roles permission (SuperAdmin)
+        //     $stats['total_superadmins'] = User::permission('view roles')->count();
+        // }
 
         // Automated follow-up reminders - only load if user has permission
         $followUpReminders = collect();

@@ -19,7 +19,7 @@
         <!-- Staff Header -->
         <x-header-card :title="$staff->name" :email="$staff->email" :phone="$staff->mobile" type="lead">
             <x-slot name="actions">
-                <a href="{{ route('client.staff.index') }}" class="btn btn-outline-light">
+                <a href="{{ \App\Helpers\RouteHelper::url('staff.index') }}" class="btn btn-outline-light">
                     <i class="bi bi-arrow-left me-2"></i>Back to Staff
                 </a>
             </x-slot>
@@ -154,8 +154,10 @@
                                             @endif
                                         </td>
                                         <td>
-                                            @if ($timesheet->is_approved)
+                                            @if($timesheet->status === 'approved' || $timesheet->is_approved)
                                                 <span class="badge bg-success">Approved</span>
+                                            @elseif($timesheet->status === 'completed')
+                                                <span class="badge bg-info">Completed</span>
                                             @else
                                                 <span class="badge bg-warning">Pending</span>
                                             @endif

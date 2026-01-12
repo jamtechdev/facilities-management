@@ -18,7 +18,7 @@ function initFormSubmissions() {
     if (formsInitialized) return;
 
     // Exclude forms that have their own handlers
-    const forms = document.querySelectorAll('form[id$="Form"]:not(#addCommunicationForm):not(#inventoryForm)');
+    const forms = document.querySelectorAll('form[id$="Form"]:not(#addCommunicationForm):not(#inventoryForm):not(#profileForm):not(#clockInForm)');
 
     forms.forEach(form => {
         const submitBtn = form.querySelector('button[type="submit"]');

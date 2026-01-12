@@ -113,7 +113,8 @@
                                 @enderror
                             </div>
 
-                            <div class="col-md-6">
+                            {{-- Staff assignment from lead page is disabled - Staff should be assigned to clients directly --}}
+                            {{-- <div class="col-md-6">
                                 <label for="assigned_staff_id" class="form-label">Assigned Staff</label>
                                 <select class="form-select @error('assigned_staff_id') is-invalid @enderror" id="assigned_staff_id" name="assigned_staff_id">
                                     <option value="">Select Staff</option>
@@ -126,7 +127,7 @@
                                 @error('assigned_staff_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                            </div>
+                            </div> --}}
 
                             <div class="col-12">
                                 <label for="notes" class="form-label">Notes</label>

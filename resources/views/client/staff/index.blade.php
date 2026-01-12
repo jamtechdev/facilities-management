@@ -71,7 +71,7 @@
                                 @endif
                             </div>
                             <div class="d-grid">
-                                <a href="{{ route('client.staff.show', $staffMember) }}" class="btn btn-primary">
+                                <a href="{{ \App\Helpers\RouteHelper::url('staff.show', $staffMember) }}" class="btn btn-primary">
                                     <i class="bi bi-eye me-2"></i>View Details
                                 </a>
                             </div>

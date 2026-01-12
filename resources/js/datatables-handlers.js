@@ -35,21 +35,25 @@
                     url = $button.data('delete-url') || window.deleteStaffRoute?.replace(':id', $button.data('id')) || `/admin/staff/${$button.data('id')}`;
                 } else if ($button.hasClass('delete-invoice')) {
                     entityType = 'invoice';
-                    url = $button.data('delete-url') || window.deleteInvoiceRoute?.replace(':id', $button.data('id')) || `/admin/invoices/${$button.data('id')}`;
+                    const invoiceId = $button.data('id');
+                    // Get prefix from current URL
+                    const pathParts = window.location.pathname.split('/').filter(p => p);
+                    const prefix = pathParts[0] || 'admin';
+                    url = $button.data('delete-url') || window.deleteInvoiceRoute?.replace(':id', invoiceId) || `/${prefix}/invoices/${invoiceId}`;
                 } else if ($button.hasClass('delete-inventory')) {
                     entityType = 'inventory item';
                     const inventoryId = $button.data('id');
                     // Get prefix from current URL
                     const pathParts = window.location.pathname.split('/').filter(p => p);
                     const prefix = pathParts[0] || 'admin';
-                    url = `/${prefix}/inventory/${inventoryId}`;
+                    url = $button.data('delete-url') || window.deleteInventoryRoute?.replace(':id', inventoryId) || `/${prefix}/inventory/${inventoryId}`;
                 } else if ($button.hasClass('delete-user')) {
                     entityType = 'user';
                     const userId = $button.data('id');
                     // Get prefix from current URL
                     const pathParts = window.location.pathname.split('/').filter(p => p);
                     const prefix = pathParts[0] || 'admin';
-                    url = `/${prefix}/users/${userId}`;
+                    url = $button.data('delete-url') || window.deleteUserRoute?.replace(':id', userId) || `/${prefix}/users/${userId}`;
                 } else {
                     return; // Unknown entity type
                 }

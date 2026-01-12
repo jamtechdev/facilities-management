@@ -4,9 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Client;
 use App\Models\Lead;
-use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 class ClientSeeder extends Seeder
@@ -97,23 +95,10 @@ class ClientSeeder extends Seeder
             ],
         ];
 
-        // Convert some qualified leads to clients
+        // Convert some qualified leads to clients (without creating users)
         foreach ($qualifiedLeads->take(2) as $index => $lead) {
-            $user = User::firstOrCreate(
-                ['email' => $lead->email],
-                [
-                    'name' => $lead->name,
-                    'password' => Hash::make('password'),
-                ]
-            );
-
-            // Assign Client role if not already assigned (keep Lead role if exists)
-            if (!$user->hasRole('Client')) {
-                $user->assignRole('Client');
-            }
-
             $client = Client::create([
-                'user_id' => $user->id,
+                'user_id' => null,
                 'company_name' => $lead->company ?? 'Company ' . ($index + 1),
                 'contact_person' => $lead->name,
                 'email' => $lead->email,
@@ -135,24 +120,12 @@ class ClientSeeder extends Seeder
             ]);
         }
 
-        // Create additional clients
+        // Create additional clients (without creating users)
         foreach ($clientsData as $data) {
-            $user = User::firstOrCreate(
-                ['email' => $data['email']],
-                [
-                    'name' => $data['contact_person'],
-                    'password' => Hash::make('password'),
-                ]
-            );
-
-            if (!$user->hasRole('Client')) {
-                $user->assignRole('Client');
-            }
-
             Client::firstOrCreate(
                 ['email' => $data['email']],
                 array_merge($data, [
-                    'user_id' => $user->id,
+                    'user_id' => null,
                     'created_at' => Carbon::now()->subDays(rand(60, 180)),
                 ])
             );
@@ -161,4 +134,3 @@ class ClientSeeder extends Seeder
         $this->command->info('Clients seeded successfully!');
     }
 }
-

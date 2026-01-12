@@ -18,6 +18,7 @@ class Feedback extends Model
         'rating',
         'client_id',
         'lead_id',
+        'timesheet_id',
         'is_processed',
     ];
 
@@ -34,5 +35,10 @@ class Feedback extends Model
     public function lead(): BelongsTo
     {
         return $this->belongsTo(Lead::class);
+    }
+
+    public function timesheet(): BelongsTo
+    {
+        return $this->belongsTo(Timesheet::class);
     }
 }

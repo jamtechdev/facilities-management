@@ -13,7 +13,7 @@
 @section('content')
 <div class="container-fluid">
     <!-- Client Header -->
-    <x-header-card 
+    <x-header-card
         :title="$client->company_name"
         :contactPerson="$client->contact_person"
         :email="$client->email"
@@ -30,7 +30,7 @@
     </x-header-card>
 
     <!-- Tabs Navigation -->
-    <x-tab-navigation 
+    <x-tab-navigation
         :tabs="[
             ['id' => 'info', 'label' => 'Information', 'icon' => 'bi-info-circle'],
             ['id' => 'staff', 'label' => 'Assigned Staff', 'icon' => 'bi-people', 'badge' => $client->staff->count()],
@@ -84,15 +84,15 @@
                     </h5>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card 
-                        label="Status" 
-                        :badge="$client->is_active ? 'Active' : 'Inactive'" 
+                    <x-info-card
+                        label="Status"
+                        :badge="$client->is_active ? 'Active' : 'Inactive'"
                         :badgeColor="$client->is_active ? 'success' : 'secondary'" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card 
-                        label="Billing Frequency" 
-                        :badge="$client->billing_frequency ? ucfirst($client->billing_frequency) : 'Not set'" 
+                    <x-info-card
+                        label="Billing Frequency"
+                        :badge="$client->billing_frequency ? ucfirst($client->billing_frequency) : 'Not set'"
                         badgeColor="info" />
                 </div>
                 <div class="col-md-6 col-lg-4">
@@ -110,9 +110,9 @@
                 </div>
                 @if($client->lead)
                     <div class="col-md-6 col-lg-4">
-                        <x-info-card 
-                            label="Converted From Lead" 
-                            :value="$client->lead->name" 
+                        <x-info-card
+                            label="Converted From Lead"
+                            :value="$client->lead->name"
                             :link="\App\Helpers\RouteHelper::url('leads.show', $client->lead)" />
                     </div>
                 @endif
@@ -135,7 +135,7 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h5 class="mb-0">Assigned Staff</h5>
             </div>
-            
+
             @if($client->staff->count() > 0)
                 @foreach($client->staff as $staff)
                     <div class="staff-card">
@@ -181,7 +181,7 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h5 class="mb-0">Service History</h5>
             </div>
-            
+
             @if($client->timesheets->count() > 0)
                 @foreach($client->timesheets->sortByDesc('work_date') as $timesheet)
                     <div class="service-history-item">
@@ -198,38 +198,40 @@
                                 <div class="mb-1">
                                     <strong class="text-primary">{{ number_format($timesheet->hours_worked, 2) }} hours</strong>
                                 </div>
-                                @if($timesheet->is_approved)
+                                @if($timesheet->status === 'approved' || $timesheet->is_approved)
                                     <span class="badge bg-success">Approved</span>
+                                @elseif($timesheet->status === 'completed')
+                                    <span class="badge bg-info">Completed</span>
                                 @else
                                     <span class="badge bg-warning">Pending</span>
                                 @endif
                             </div>
                         </div>
-                        
+
                         @if($timesheet->clock_in_time && $timesheet->clock_out_time)
                             <div class="mb-2">
                                 <small class="text-muted">
                                     <i class="bi bi-clock me-1"></i>
-                                    {{ \Carbon\Carbon::parse($timesheet->clock_in_time)->format('h:i A') }} - 
+                                    {{ \Carbon\Carbon::parse($timesheet->clock_in_time)->format('h:i A') }} -
                                     {{ \Carbon\Carbon::parse($timesheet->clock_out_time)->format('h:i A') }}
                                 </small>
                             </div>
                         @endif
-                        
+
                         @if($timesheet->notes)
                             <div class="mb-2">
                                 <small class="text-muted">{{ $timesheet->notes }}</small>
                             </div>
                         @endif
-                        
+
                         @if($timesheet->jobPhotos->count() > 0)
                             <div class="photo-gallery">
                                 @foreach($timesheet->jobPhotos as $photo)
                                     <div class="photo-item">
-                                        <img src="{{ asset('storage/' . $photo->photo_path) }}" 
-                                             alt="Job Photo" 
+                                        <img src="{{ asset('storage/' . $photo->photo_path) }}"
+                                             alt="Job Photo"
                                              class="job-photo"
-                                             data-image-modal="{{ asset('storage/' . $photo->photo_path) }}" 
+                                             data-image-modal="{{ asset('storage/' . $photo->photo_path) }}"
                                              data-image-type="{{ $photo->photo_type }}"
                                              onerror="this.src='/Image-not-found.png'; this.onerror=null;">
                                         <span class="photo-badge bg-{{ $photo->photo_type == 'before' ? 'warning' : 'success' }}">
@@ -262,7 +264,7 @@
                     <i class="bi bi-plus-circle me-2"></i>Add Communication
                 </button>
             </div>
-            
+
             @if($client->communications->count() > 0)
                 @foreach($client->communications->sortByDesc('created_at') as $communication)
                     <div class="communication-item">
@@ -304,7 +306,7 @@
                     <i class="bi bi-upload me-2"></i>Upload Document
                 </button>
             </div>
-            
+
             @if($client->documents->count() > 0)
                 @foreach($client->documents as $document)
                     <div class="document-item">
@@ -333,7 +335,7 @@
         <!-- Feedback Tab -->
         <div class="tab-pane fade" id="feedback" role="tabpanel">
             <h5 class="mb-4">Customer Feedback</h5>
-            
+
             @if($client->feedback->count() > 0)
                 @foreach($client->feedback->sortByDesc('created_at') as $fb)
                     <div class="communication-item">
@@ -370,7 +372,7 @@
                     <i class="bi bi-plus-circle me-2"></i>Create Invoice
                 </a>
             </div>
-            
+
             @if($client->invoices->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-hover">
@@ -414,7 +416,7 @@
                 <div class="text-center py-5">
                     <i class="bi bi-receipt icon-48px empty-state-icon-medium"></i>
                     <p class="text-muted mt-3">No invoices yet</p>
-                    <a href="{{ route('admin.invoices.create', ['client_id' => $client->id]) }}" class="btn btn-primary mt-2">
+                    <a href="{{ \App\Helpers\RouteHelper::url('invoices.create', ['client_id' => $client->id]) }}" class="btn btn-primary mt-2">
                         <i class="bi bi-plus-circle me-2"></i>Create First Invoice
                     </a>
                 </div>

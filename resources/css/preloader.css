@@ -42,8 +42,8 @@
   border-radius: 50%;
   border: 2px solid transparent;
   animation: rotate linear 3.5s infinite;
-  border-top-color: #605DFF;
-  border-bottom-color: #605DFF;
+  border-top-color: #84c373;
+  border-bottom-color: #84c373;
 }
 
 #preloader .preloader .waviy {

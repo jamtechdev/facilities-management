@@ -102,7 +102,7 @@
                     <!-- Clear Filters -->
                     @if(request('type') || request('entity_type') || request('search'))
                         <div class="mt-4">
-                            <a href="{{ route('superadmin.documents.gallery') }}" class="btn btn-outline-secondary w-100">
+                            <a href="{{ \App\Helpers\RouteHelper::url('documents.gallery') }}" class="btn btn-outline-secondary w-100">
                                 <i class="bi bi-x-circle me-2"></i>Clear All Filters
                             </a>
                         </div>
@@ -152,7 +152,7 @@
                                     @endif
                                     <div class="document-overlay">
                                         <div class="document-actions">
-                                            <a href="{{ route('superadmin.documents.download', $document) }}"
+                                            <a href="{{ \App\Helpers\RouteHelper::url('documents.download', $document) }}"
                                                class="btn btn-sm btn-light"
                                                target="_blank"
                                                title="Download">
@@ -263,7 +263,7 @@
                 if (confirm('Are you sure you want to delete "' + documentName + '"? This action cannot be undone.')) {
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = '{{ route("superadmin.documents.destroy", ":id") }}'.replace(':id', documentId);
+                    form.action = '{{ \App\Helpers\RouteHelper::url("documents.destroy", ":id") }}'.replace(':id', documentId);
 
                     const csrfToken = document.createElement('input');
                     csrfToken.type = 'hidden';

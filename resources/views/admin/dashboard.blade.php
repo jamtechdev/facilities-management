@@ -116,7 +116,7 @@
                     <div class="stat-content">
                         <div class="stat-label">Qualified Leads</div>
                         <div class="stat-value">{{ number_format($stats['qualified_leads'] ?? 0) }}</div>
-                        <a href="{{ route('admin.leads.index', ['stage' => 'qualified']) }}" class="stat-link">
+                        <a href="{{ \App\Helpers\RouteHelper::url('leads.index', ['stage' => 'qualified']) }}" class="stat-link">
                             View all <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
@@ -134,7 +134,7 @@
                     <div class="stat-content">
                         <div class="stat-label">New Leads Today</div>
                         <div class="stat-value">{{ number_format($stats['new_leads'] ?? 0) }}</div>
-                        <a href="{{ route('admin.leads.index', ['stage' => 'new_lead']) }}" class="stat-link">
+                        <a href="{{ \App\Helpers\RouteHelper::url('leads.index', ['stage' => 'new_lead']) }}" class="stat-link">
                             View all <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
@@ -145,7 +145,8 @@
             </div>
         </div>
         @endcan
-        @can('view dashboard users card')
+        {{-- Total Users card commented out --}}
+        {{-- @can('view dashboard users card')
         <div class="col-xl-3 col-md-6">
             <div class="admin-stat-card">
                 <div class="stat-header">
@@ -160,7 +161,7 @@
                 </div>
             </div>
         </div>
-        @endcan
+        @endcan --}}
         @can('view dashboard invoices card')
         <div class="col-xl-3 col-md-6">
             <div class="admin-stat-card">
@@ -168,7 +169,7 @@
                     <div class="stat-content">
                         <div class="stat-label">Total Invoices</div>
                         <div class="stat-value">{{ number_format($stats['total_invoices'] ?? 0) }}</div>
-                        <a href="{{ route('admin.invoices.index') }}" class="stat-link">
+                        <a href="{{ \App\Helpers\RouteHelper::url('invoices.index') }}" class="stat-link">
                             View all <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
@@ -256,7 +257,7 @@
                             @endphp
                             <div class="{{ $itemClass }}">
                                 <div class="item-title">
-                                    <a href="{{ route('admin.leads.show', $reminder->lead) }}">
+                                    <a href="{{ \App\Helpers\RouteHelper::url('leads.show', $reminder->lead) }}">
                                         <i class="bi bi-person me-2"></i>{{ $reminder->lead->name }}
                                     </a>
                                 </div>
@@ -290,7 +291,7 @@
                         @endforeach
                         @if($followUpReminders->count() > 8)
                             <div class="text-center pt-2">
-                                <a href="{{ route('admin.leads.index') }}" class="btn btn-sm dashboard-btn-green">
+                                <a href="{{ \App\Helpers\RouteHelper::url('leads.index') }}" class="btn btn-sm dashboard-btn-green">
                                     <i class="bi bi-arrow-right me-1"></i>View all reminders ({{ $followUpReminders->count() }})
                                 </a>
                             </div>
@@ -317,7 +318,7 @@
                         <i class="bi bi-clock-history"></i>
                         Recent Activity
                         </h5>
-                    <a href="{{ route('admin.leads.index') }}" class="btn btn-sm dashboard-btn-green">
+                    <a href="{{ \App\Helpers\RouteHelper::url('leads.index') }}" class="btn btn-sm dashboard-btn-green">
                         View All
                     </a>
                 </div>
@@ -327,7 +328,7 @@
                             <div class="activity-item">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <div class="item-title flex-grow-1">
-                                        <a href="{{ route('admin.leads.show', $activity) }}">
+                                        <a href="{{ \App\Helpers\RouteHelper::url('leads.show', $activity) }}">
                                             <i class="bi bi-person me-2"></i>{{ $activity->name }}
                                         </a>
                                     </div>
