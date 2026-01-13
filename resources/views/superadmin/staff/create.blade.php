@@ -62,7 +62,7 @@
 
                             <div class="col-md-6">
                                 <label for="mobile" class="form-label">Mobile</label>
-                                <input type="text" class="form-control @error('mobile') is-invalid @enderror" id="mobile" name="mobile" value="{{ old('mobile') }}">
+                                <input type="text" class="form-control @error('mobile') is-invalid @enderror" id="mobile" name="mobile" value="{{ old('mobile') }}" placeholder="+1 234 567 8900">
                                 @error('mobile')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -70,7 +70,7 @@
 
                             <div class="col-md-6">
                                 <label for="hourly_rate" class="form-label">Hourly Rate (£)</label>
-                                <input type="number" step="0.01" class="form-control @error('hourly_rate') is-invalid @enderror" id="hourly_rate" name="hourly_rate" value="{{ old('hourly_rate') }}">
+                                <input type="number" step="0.01" class="form-control @error('hourly_rate') is-invalid @enderror" id="hourly_rate" name="hourly_rate" value="{{ old('hourly_rate') }}" placeholder="0.00">
                                 @error('hourly_rate')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -78,7 +78,7 @@
 
                             <div class="col-12">
                                 <label for="address" class="form-label">Address</label>
-                                <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" rows="2">{{ old('address') }}</textarea>
+                                <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" rows="2" placeholder="Enter address">{{ old('address') }}</textarea>
                                 @error('address')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -86,7 +86,7 @@
 
                             <div class="col-md-6">
                                 <label for="assigned_weekly_hours" class="form-label">Assigned Weekly Hours</label>
-                                <input type="number" step="0.5" class="form-control @error('assigned_weekly_hours') is-invalid @enderror" id="assigned_weekly_hours" name="assigned_weekly_hours" value="{{ old('assigned_weekly_hours') }}">
+                                <input type="number" step="0.5" class="form-control @error('assigned_weekly_hours') is-invalid @enderror" id="assigned_weekly_hours" name="assigned_weekly_hours" value="{{ old('assigned_weekly_hours') }}" placeholder="Enter weekly hours">
                                 @error('assigned_weekly_hours')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -94,7 +94,7 @@
 
                             <div class="col-md-6">
                                 <label for="assigned_monthly_hours" class="form-label">Assigned Monthly Hours</label>
-                                <input type="number" step="0.5" class="form-control @error('assigned_monthly_hours') is-invalid @enderror" id="assigned_monthly_hours" name="assigned_monthly_hours" value="{{ old('assigned_monthly_hours') }}">
+                                <input type="number" step="0.5" class="form-control @error('assigned_monthly_hours') is-invalid @enderror" id="assigned_monthly_hours" name="assigned_monthly_hours" value="{{ old('assigned_monthly_hours') }}" placeholder="Enter monthly hours">
                                 @error('assigned_monthly_hours')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

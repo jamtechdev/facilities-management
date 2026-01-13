@@ -111,7 +111,8 @@ class LeadDataTable extends DataTable
     public function query(Lead $model): QueryBuilder
     {
         return $model->newQuery()
-        ->with(['assignedStaff', 'convertedToClient']);
+        ->with(['assignedStaff', 'convertedToClient'])
+        ->whereNull('converted_to_client_id');
         // ->where('stage', '!=', 'qualified');
     }
 

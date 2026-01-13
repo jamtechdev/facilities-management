@@ -61,7 +61,7 @@
 
                             <div class="col-md-6">
                                 <label for="designation" class="form-label">Designation</label>
-                                <input type="text" class="form-control @error('designation') is-invalid @enderror" id="designation" name="designation" value="{{ old('designation') }}">
+                                <input type="text" class="form-control @error('designation') is-invalid @enderror" id="designation" name="designation" value="{{ old('designation') }}" placeholder="Enter designation">
                                 @error('designation')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -79,7 +79,7 @@
 
                             <div class="col-md-6">
                                 <label for="city" class="form-label">City</label>
-                                <input type="text" class="form-control @error('city') is-invalid @enderror" id="city" name="city" value="{{ old('city') }}">
+                                <input type="text" class="form-control @error('city') is-invalid @enderror" id="city" name="city" value="{{ old('city') }}" placeholder="Enter city">
                                 @error('city')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
