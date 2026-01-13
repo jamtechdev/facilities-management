@@ -19,7 +19,7 @@ class CommunicationController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'communicable_type' => 'required|string|in:App\Models\Lead,App\Models\Client',
+            'communicable_type' => 'required|string|in:App\Models\Lead,App\Models\Client,App\Models\Invoice',
             'communicable_id' => 'required|integer',
             'type' => 'required|string|in:call,email,meeting,note',
             'subject' => 'nullable|string|max:255',
@@ -135,4 +135,3 @@ class CommunicationController extends Controller
         }
     }
 }
-

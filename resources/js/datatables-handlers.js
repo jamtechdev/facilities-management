@@ -156,6 +156,56 @@
                 });
             });
 
+            // Row click handlers - make table rows clickable to open Show page
+            // Handle clicks on table rows (but not on action buttons)
+            $(document).on('click', '#leads-table tbody tr, #clients-table tbody tr, #staff-table tbody tr, #invoices-table tbody tr', function(e) {
+                // Don't trigger if clicking on buttons, links, or select dropdowns
+                if ($(e.target).closest('button, a, .btn, .delete-lead, .delete-client, .delete-staff, .delete-invoice, .stage-select, select, .form-select').length > 0) {
+                    return;
+                }
+
+                const $row = $(this);
+                const tableId = $row.closest('table').attr('id');
+
+                // Get the ID from the row's ID attribute (setRowId('id') in DataTables)
+                // The row ID is set to the entity ID by DataTables
+                let entityId = $row.attr('id');
+
+                // Fallback: try to get from hidden ID column (usually column index 1)
+                if (!entityId) {
+                    const idCell = $row.find('td').eq(1);
+                    if (idCell.length && idCell.text().trim()) {
+                        entityId = idCell.text().trim();
+                    }
+                }
+
+                if (!entityId) return;
+
+                // Determine route based on table ID
+                let showUrl = '';
+                const pathParts = window.location.pathname.split('/').filter(p => p);
+                const prefix = pathParts[0] || 'admin'; // admin or superadmin
+
+                if (tableId === 'leads-table') {
+                    showUrl = `/${prefix}/leads/${entityId}`;
+                } else if (tableId === 'clients-table') {
+                    showUrl = `/${prefix}/clients/${entityId}`;
+                } else if (tableId === 'staff-table') {
+                    showUrl = `/${prefix}/staff/${entityId}`;
+                } else if (tableId === 'invoices-table') {
+                    showUrl = `/${prefix}/invoices/${entityId}`;
+                }
+
+                if (showUrl) {
+                    window.location.href = showUrl;
+                }
+            });
+
+            // Add cursor pointer style to table rows
+            $(document).on('draw.dt', '#leads-table, #clients-table, #staff-table, #invoices-table', function() {
+                $(this).find('tbody tr').css('cursor', 'pointer');
+            });
+
             // Generic alert function - using toastr
             window.showAlert = function(type, message) {
                 if (typeof window.showToast !== 'undefined') {

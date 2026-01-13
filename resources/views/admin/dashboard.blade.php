@@ -40,7 +40,7 @@
     <div class="row g-4 mb-4">
         @can('view dashboard leads card')
         <div class="col-xl-3 col-md-6">
-            <div class="admin-stat-card">
+            <a href="{{ \App\Helpers\RouteHelper::url('leads.index') }}" class="admin-stat-card text-decoration-none">
                 <div class="stat-header">
                     <div class="stat-content">
                         <div class="stat-label">Total Leads</div>
@@ -51,13 +51,13 @@
                         <i class="bi bi-person-lines-fill"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         @endcan
 
         @can('view dashboard clients card')
         <div class="col-xl-3 col-md-6">
-            <div class="admin-stat-card">
+            <a href="{{ \App\Helpers\RouteHelper::url('clients.index') }}" class="admin-stat-card text-decoration-none">
                 <div class="stat-header">
                     <div class="stat-content">
                         <div class="stat-label">Active Clients</div>
@@ -68,13 +68,13 @@
                         <i class="bi bi-building"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         @endcan
 
         @can('view dashboard staff card')
         <div class="col-xl-3 col-md-6">
-            <div class="admin-stat-card">
+            <a href="{{ \App\Helpers\RouteHelper::url('staff.index') }}" class="admin-stat-card text-decoration-none">
                 <div class="stat-header">
                     <div class="stat-content">
                         <div class="stat-label">Active Staff</div>
@@ -85,13 +85,13 @@
                         <i class="bi bi-people"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         @endcan
 
         @can('view dashboard revenue card')
         <div class="col-xl-3 col-md-6">
-            <div class="admin-stat-card">
+            <a href="{{ \App\Helpers\RouteHelper::url('invoices.index') }}" class="admin-stat-card text-decoration-none">
                 <div class="stat-header">
                     <div class="stat-content">
                         <div class="stat-label">Total Revenue</div>
@@ -102,7 +102,7 @@
                         <i class="bi bi-currency-pound"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         @endcan
     </div>
@@ -111,38 +111,38 @@
     <div class="row g-4 mb-4">
         @can('view dashboard qualified leads card')
         <div class="col-xl-3 col-md-6">
-            <div class="admin-stat-card">
+            <a href="{{ \App\Helpers\RouteHelper::url('leads.index', ['stage' => 'qualified']) }}" class="admin-stat-card text-decoration-none">
                 <div class="stat-header">
                     <div class="stat-content">
                         <div class="stat-label">Qualified Leads</div>
                         <div class="stat-value">{{ number_format($stats['qualified_leads'] ?? 0) }}</div>
-                        <a href="{{ \App\Helpers\RouteHelper::url('leads.index', ['stage' => 'qualified']) }}" class="stat-link">
+                        <span class="stat-link">
                             View all <i class="bi bi-arrow-right"></i>
-                        </a>
+                        </span>
                     </div>
                     <div class="stat-icon-wrapper">
                         <i class="bi bi-star-fill"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         @endcan
         @can('view dashboard new leads card')
         <div class="col-xl-3 col-md-6">
-            <div class="admin-stat-card">
+            <a href="{{ \App\Helpers\RouteHelper::url('leads.index', ['stage' => 'new_lead']) }}" class="admin-stat-card text-decoration-none">
                 <div class="stat-header">
                     <div class="stat-content">
                         <div class="stat-label">New Leads Today</div>
                         <div class="stat-value">{{ number_format($stats['new_leads'] ?? 0) }}</div>
-                        <a href="{{ \App\Helpers\RouteHelper::url('leads.index', ['stage' => 'new_lead']) }}" class="stat-link">
+                        <span class="stat-link">
                             View all <i class="bi bi-arrow-right"></i>
-                        </a>
+                        </span>
                     </div>
                     <div class="stat-icon-wrapper">
                         <i class="bi bi-plus-circle-fill"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         @endcan
         {{-- Total Users card commented out --}}
@@ -164,20 +164,20 @@
         @endcan --}}
         @can('view dashboard invoices card')
         <div class="col-xl-3 col-md-6">
-            <div class="admin-stat-card">
+            <a href="{{ \App\Helpers\RouteHelper::url('invoices.index') }}" class="admin-stat-card text-decoration-none">
                 <div class="stat-header">
                     <div class="stat-content">
                         <div class="stat-label">Total Invoices</div>
                         <div class="stat-value">{{ number_format($stats['total_invoices'] ?? 0) }}</div>
-                        <a href="{{ \App\Helpers\RouteHelper::url('invoices.index') }}" class="stat-link">
+                        <span class="stat-link">
                             View all <i class="bi bi-arrow-right"></i>
-                        </a>
+                        </span>
                     </div>
                     <div class="stat-icon-wrapper">
                         <i class="bi bi-receipt-cutoff"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         @endcan
     </div>

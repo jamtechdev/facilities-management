@@ -16,9 +16,11 @@
         :phone="$lead->phone"
         type="lead">
         <x-slot name="actions">
-            <a href="{{ \App\Helpers\RouteHelper::url('leads.edit', $lead) }}" class="btn btn-light me-2">
-                <i class="bi bi-pencil me-2"></i>Edit
-            </a>
+            @if(auth()->user()->can('view admin dashboard'))
+                <button class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#sendEmailModal">
+                    <i class="bi bi-envelope me-2"></i>Send Email
+                </button>
+            @endif
             <a href="{{ \App\Helpers\RouteHelper::url('leads.index') }}" class="btn btn-outline-light">
                 <i class="bi bi-arrow-left me-2"></i>Back
             </a>
@@ -55,22 +57,60 @@
                     </h5>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Name" :value="$lead->name" />
+                    <x-editable-info-card
+                        label="Name"
+                        :value="$lead->name"
+                        field="name"
+                        entityType="leads"
+                        :entityId="$lead->id"
+                        fieldType="text" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Email" :value="$lead->email" :link="'mailto:' . $lead->email" />
+                    <x-editable-info-card
+                        label="Email"
+                        :value="$lead->email"
+                        :link="'mailto:' . $lead->email"
+                        field="email"
+                        entityType="leads"
+                        :entityId="$lead->id"
+                        fieldType="email" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Phone" :value="$lead->phone ?? '-'" :link="$lead->phone ? 'tel:' . $lead->phone : null" />
+                    <x-editable-info-card
+                        label="Phone"
+                        :value="$lead->phone ?? '-'"
+                        :link="$lead->phone ? 'tel:' . $lead->phone : null"
+                        field="phone"
+                        entityType="leads"
+                        :entityId="$lead->id"
+                        fieldType="text" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Company" :value="$lead->company ?? '-'" />
+                    <x-editable-info-card
+                        label="Company"
+                        :value="$lead->company ?? '-'"
+                        field="company"
+                        entityType="leads"
+                        :entityId="$lead->id"
+                        fieldType="text" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Designation" :value="$lead->designation ?? '-'" />
+                    <x-editable-info-card
+                        label="Designation"
+                        :value="$lead->designation ?? '-'"
+                        field="designation"
+                        entityType="leads"
+                        :entityId="$lead->id"
+                        fieldType="text" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="City" :value="$lead->city ?? '-'" />
+                    <x-editable-info-card
+                        label="City"
+                        :value="$lead->city ?? '-'"
+                        field="city"
+                        entityType="leads"
+                        :entityId="$lead->id"
+                        fieldType="text" />
                 </div>
 
                 <!-- Lead Status Section -->
@@ -80,10 +120,14 @@
                     </h5>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card
+                    <x-editable-info-card
                         label="Source"
-                        :badge="$lead->source ?? null"
-                        badgeColor="info" />
+                        :value="$lead->source ?? '-'"
+                        field="source"
+                        entityType="leads"
+                        :entityId="$lead->id"
+                        fieldType="select"
+                        :options="['Website' => 'Website', 'Referral' => 'Referral', 'Cold Call' => 'Cold Call', 'LinkedIn' => 'LinkedIn', 'Other' => 'Other']" />
                 </div>
                 @php
                     $stageColors = [
@@ -94,12 +138,25 @@
                         'junk' => 'danger'
                     ];
                     $stageColor = $stageColors[$lead->stage] ?? 'secondary';
+                    $stageOptions = [
+                        'new_lead' => 'New Lead',
+                        'in_progress' => 'In Progress',
+                        'qualified' => 'Qualified',
+                        'not_qualified' => 'Not Qualified',
+                        'junk' => 'Junk'
+                    ];
                 @endphp
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card
+                    <x-editable-info-card
                         label="Stage"
+                        :value="ucfirst(str_replace('_', ' ', $lead->stage))"
                         :badge="ucfirst(str_replace('_', ' ', $lead->stage))"
-                        :badgeColor="$stageColor" />
+                        :badgeColor="$stageColor"
+                        field="stage"
+                        entityType="leads"
+                        :entityId="$lead->id"
+                        fieldType="select"
+                        :options="$stageOptions" />
                 </div>
                 <div class="col-md-6 col-lg-4">
                     <x-info-card
@@ -129,11 +186,15 @@
                         <x-info-card label="Converted At" :value="$lead->converted_at->format('M d, Y h:i A')" />
                     </div>
                 @endif
-                @if($lead->notes)
-                    <div class="col-12">
-                        <x-info-card label="Notes" :value="$lead->notes" />
-                    </div>
-                @endif
+                <div class="col-12">
+                    <x-editable-info-card
+                        label="Notes"
+                        :value="$lead->notes ?? '-'"
+                        field="notes"
+                        entityType="leads"
+                        :entityId="$lead->id"
+                        fieldType="textarea" />
+                </div>
             </div>
         </div>
 
@@ -280,6 +341,53 @@
     </div>
 </div>
 
+<!-- Send Email Modal (Admin/SuperAdmin Only) -->
+@if(auth()->user()->can('view admin dashboard'))
+<div class="modal fade" id="sendEmailModal" tabindex="-1" aria-labelledby="sendEmailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sendEmailModalLabel">
+                    <i class="bi bi-envelope me-2"></i>Send Email to Lead
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="sendEmailForm" action="{{ \App\Helpers\RouteHelper::url('communications.store') }}">
+                @csrf
+                <input type="hidden" name="communicable_type" value="{{ get_class($lead) }}">
+                <input type="hidden" name="communicable_id" value="{{ $lead->id }}">
+                <input type="hidden" name="type" value="email">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="send_email_to" class="form-label">Email To <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="send_email_to" name="email_to" value="{{ $lead->email }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="send_email_subject" class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="send_email_subject" name="subject" value="Follow-up: {{ $lead->company ?? $lead->name }}" placeholder="Enter email subject">
+                    </div>
+                    <div class="mb-3">
+                        <label for="send_email_message" class="form-label">Message <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="send_email_message" name="message" rows="8" required placeholder="Enter your message...">Dear {{ $lead->name }},
+
+Thank you for your interest in our services. We would like to follow up with you regarding your inquiry.
+
+Best regards,
+{{ auth()->user()->name }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send me-2"></i>Send Email
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+
 <!-- Add Communication Modal -->
 @include('superadmin.communications.modal', ['communicable' => $lead])
 
@@ -314,5 +422,5 @@
             window.convertLeadRoute = '{{ \App\Helpers\RouteHelper::url("leads.convert", $lead) }}';
         }
     </script>
-    @vite(['resources/js/entity-details.js', 'resources/js/image-modal.js'])
+    @vite(['resources/js/entity-details.js', 'resources/js/image-modal.js', 'resources/js/inline-edit.js'])
 @endpush

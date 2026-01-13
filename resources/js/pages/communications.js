@@ -10,7 +10,7 @@
     if (window.communicationsModalInitialized) {
         return; // Already initialized
     }
-    
+
     let isInitialized = false;
 
     /**
@@ -62,7 +62,7 @@
 
             // Get route from form action, data attribute, or window object
             const actionUrl = form.action || form.dataset.actionUrl || window.communicationRoute;
-            
+
             if (!actionUrl) {
                 console.error('Communication route not found');
                 submitBtn.disabled = false;
@@ -129,11 +129,133 @@
         });
     }
 
+    /**
+     * Initialize Send Email Form
+     */
+    function initSendEmailForm() {
+        const sendEmailForm = document.getElementById('sendEmailForm');
+        if (!sendEmailForm || sendEmailForm.dataset.handlerAttached === 'true') return;
+
+        sendEmailForm.dataset.handlerAttached = 'true';
+
+        sendEmailForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Prevent duplicate submissions
+            if (sendEmailForm.dataset.submitting === 'true') {
+                return false;
+            }
+            sendEmailForm.dataset.submitting = 'true';
+
+            const formData = new FormData(sendEmailForm);
+            const submitBtn = sendEmailForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+
+            const actionUrl = sendEmailForm.action || window.communicationRoute;
+
+            if (!actionUrl) {
+                console.error('Communication route not found');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                return;
+            }
+
+            // Use fetch or axios
+            if (typeof axios !== 'undefined') {
+                axios.post(actionUrl, formData, {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    }
+                })
+                .then(function(response) {
+                    sendEmailForm.dataset.submitting = 'false';
+                    if (response.data.success) {
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('sendEmailModal'));
+                        if (modal) modal.hide();
+
+                        // Show success message
+                        if (typeof window.showToast !== 'undefined') {
+                            window.showToast('success', 'Email sent successfully!');
+                        } else if (typeof toastr !== 'undefined') {
+                            toastr.success('Email sent successfully!');
+                        }
+
+                        // Reload page to show new communication in log
+                        setTimeout(() => location.reload(), 1000);
+                    }
+                })
+                .catch(function(error) {
+                    sendEmailForm.dataset.submitting = 'false';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                    const message = error.response?.data?.message || 'Failed to send email';
+                    if (typeof window.showToast !== 'undefined') {
+                        window.showToast('error', message);
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error(message);
+                    } else {
+                        alert(message);
+                    }
+                });
+            } else {
+                fetch(actionUrl, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    sendEmailForm.dataset.submitting = 'false';
+                    if (data.success) {
+                        // Close modal
+                        const modalElement = document.getElementById('sendEmailModal');
+                        if (modalElement) {
+                            const modal = bootstrap.Modal.getInstance(modalElement);
+                            if (modal) modal.hide();
+                        }
+
+                        // Show success message
+                        if (typeof window.showToast !== 'undefined') {
+                            window.showToast('success', 'Email sent successfully!');
+                        } else if (typeof toastr !== 'undefined') {
+                            toastr.success('Email sent successfully!');
+                        }
+
+                        // Reload page to show new communication in log
+                        setTimeout(() => location.reload(), 1000);
+                    }
+                })
+                .catch(error => {
+                    sendEmailForm.dataset.submitting = 'false';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                    const message = 'Failed to send email';
+                    if (typeof window.showToast !== 'undefined') {
+                        window.showToast('error', message);
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error(message);
+                    } else {
+                        alert(message);
+                    }
+                });
+            }
+        });
+    }
+
     // Initialize when DOM is ready - but only once globally
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initCommunicationsModal);
+        document.addEventListener('DOMContentLoaded', function() {
+            initCommunicationsModal();
+            initSendEmailForm();
+        });
     } else {
         initCommunicationsModal();
+        initSendEmailForm();
     }
 })();
-

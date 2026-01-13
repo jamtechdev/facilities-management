@@ -51,6 +51,9 @@
     justify-content: space-between;
     width: 100%;
         box-sizing: border-box;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
 }
 
 .admin-stat-card::before,
@@ -281,9 +284,11 @@
     border-radius: 10px;
         margin-top: 0.75rem;
         border: 1px solid rgba(132, 195, 115, 0.2);
+    pointer-events: none;
 }
 
-.stat-link:hover {
+.admin-stat-card:hover .stat-link,
+.superadmin-stat-card:hover .stat-link {
     color: #ffffff;
     background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
     transform: translateX(6px) scale(1.05);
@@ -646,6 +651,41 @@
 }
 
 /* Responsive Design */
+/* Optimized for 1366×768 resolution */
+@media (min-width: 1366px) and (max-width: 1366px) {
+    .admin-dashboard-content,
+    .superadmin-dashboard-content {
+        padding: 2rem 1.5rem;
+        padding-bottom: 2.5rem;
+    }
+
+    .admin-stat-card,
+    .superadmin-stat-card {
+        padding: 1.5rem 1.75rem;
+        min-height: 150px;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        letter-spacing: -1.5px;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.9rem;
+    }
+
+    .stat-icon-wrapper {
+        width: 58px;
+        height: 58px;
+        font-size: 25px;
+    }
+
+    .stat-description {
+        font-size: 0.9rem;
+    }
+}
+
 @media (max-width: 1400px) and (min-width: 1201px) {
     .admin-dashboard-content,
     .superadmin-dashboard-content {

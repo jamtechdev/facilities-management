@@ -47,7 +47,7 @@ use Illuminate\Support\Facades\Storage;
     <!-- Stats Cards -->
     <div class="row g-4 mb-4">
         <div class="col-md-6 col-lg-4">
-            <div class="client-stat-card primary">
+            <a href="{{ \App\Helpers\RouteHelper::url('services') }}" class="client-stat-card primary text-decoration-none">
                 <div class="stat-header">
                     <div class="stat-content">
                         <div class="stat-label">Recent Services</div>
@@ -58,10 +58,10 @@ use Illuminate\Support\Facades\Storage;
                         <i class="bi bi-briefcase"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-6 col-lg-4">
-            <div class="client-stat-card success">
+            <a href="{{ \App\Helpers\RouteHelper::url('feedback') }}" class="client-stat-card success text-decoration-none">
                 <div class="stat-header">
                     <div class="stat-content">
                         <div class="stat-label">Feedback Received</div>
@@ -72,10 +72,10 @@ use Illuminate\Support\Facades\Storage;
                         <i class="bi bi-chat-dots"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-6 col-lg-4">
-            <div class="client-stat-card info">
+            <a href="{{ \App\Helpers\RouteHelper::url('staff.index') }}" class="client-stat-card info text-decoration-none">
                 <div class="stat-header">
                     <div class="stat-content">
                         <div class="stat-label">Assigned Staff</div>
@@ -86,7 +86,7 @@ use Illuminate\Support\Facades\Storage;
                         <i class="bi bi-people"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 

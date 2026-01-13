@@ -346,3 +346,47 @@
     }
 }
 
+/* Editable Info Card Styles */
+.editable-info-card {
+    position: relative;
+}
+
+.editable-info-card .btn-edit-field {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    font-size: 12px;
+    padding: 2px 4px;
+    margin-left: 4px;
+}
+
+.editable-info-card:hover .btn-edit-field {
+    opacity: 1;
+}
+
+.editable-info-card .field-display {
+    display: inline-block;
+    min-height: 24px;
+}
+
+.editable-info-card .field-edit {
+    max-width: 100%;
+}
+
+.editable-info-card .field-actions {
+    margin-top: 8px;
+}
+
+.editable-info-card .field-actions .btn {
+    padding: 4px 12px;
+    font-size: 12px;
+}
+
+.editable-info-card .field-edit.form-control-sm {
+    padding: 4px 8px;
+    font-size: 14px;
+}
+
+.editable-info-card .field-edit.form-control {
+    padding: 6px 10px;
+    font-size: 14px;
+}

@@ -49,33 +49,25 @@ class InvoiceDataTable extends DataTable
             })
             ->addColumn('action', function (Invoice $invoice) {
             $user = auth()->user();
-            $actions = '<div class="btn-group btn-group-sm" role="group">';
+            $actions = '';
 
-            // View button - requires view invoice details permission
-            if ($user->can('view invoice details')) {
-                $actions .= '<a href="' . RouteHelper::url('invoices.show', $invoice) . '" class="btn btn-outline-primary" title="View">
-                        <i class="bi bi-eye"></i>
-                    </a>';
-            }
-
-            // Download button
+            // Download button (keep as it's useful)
             if ($user->can('view invoices')) {
-                $actions .= '<a href="' . RouteHelper::url('invoices.download', $invoice) . '" class="btn btn-outline-info" title="Download PDF">
+                $actions .= '<a href="' . RouteHelper::url('invoices.download', $invoice) . '" class="btn btn-outline-info btn-sm" title="Download PDF">
                         <i class="bi bi-download"></i>
                     </a>';
             }
 
             // Delete button
             if ($user->can('delete invoices')) {
-                $actions .= '<button type="button" class="btn btn-outline-danger delete-invoice" data-id="' . $invoice->id . '" title="Delete">
+                if ($actions) $actions .= ' ';
+                $actions .= '<button type="button" class="btn btn-outline-danger btn-sm delete-invoice" data-id="' . $invoice->id . '" title="Delete">
                         <i class="bi bi-trash"></i>
                     </button>';
             }
 
-            $actions .= '</div>';
-
             // If no actions available, return a dash
-            if (strlen($actions) <= strlen('<div class="btn-group btn-group-sm" role="group"></div>')) {
+            if (empty($actions)) {
                 return new HtmlString('<span class="text-muted">-</span>');
             }
 

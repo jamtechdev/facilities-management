@@ -7,6 +7,7 @@ use App\Models\UserSetting;
 use App\Mail\UserRegistrationMail;
 use App\Mail\NewUserNotificationMail;
 use App\Mail\NewLeadNotificationMail;
+use App\Mail\LeadWelcomeMail;
 use App\Models\Lead;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -82,46 +83,86 @@ class NotificationService
     }
 
     /**
-     * Send notification to admins/superadmins about new lead
+     * Send welcome email to lead and notify opposite role
+     * - Always sends email to lead contact (with credentials)
+     * - If Admin creates lead: notifies SuperAdmin only
+     * - If SuperAdmin creates lead: notifies Admin only
      */
-    public function notifyAdminsNewLead(Lead $lead): void
+    public function notifyAdminsNewLead(Lead $lead, $user = null, $password = null): void
     {
         try {
-            // Get all admins and superadmins
-            $admins = User::whereHas('roles', function($query) {
-                $query->whereIn('name', ['Admin', 'SuperAdmin']);
-            })->get();
+            // 1. Always send welcome email to the lead contact (with credentials)
+            try {
+                Mail::to($lead->email)->send(new LeadWelcomeMail($lead, $user, $password));
+                Log::info('Welcome email with credentials sent to lead', [
+                    'lead_id' => $lead->id,
+                    'lead_email' => $lead->email,
+                    'user_id' => $user ? $user->id : null
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send welcome email to lead', [
+                    'lead_id' => $lead->id,
+                    'lead_email' => $lead->email,
+                    'error' => $e->getMessage()
+                ]);
+            }
 
-            foreach ($admins as $admin) {
-                // Check if admin has email notifications enabled
-                $settings = UserSetting::getOrCreateForUser($admin->id);
+            // 2. Get the user who created the lead
+            $creator = $lead->user_id ? User::find($lead->user_id) : null;
 
-                if ($settings->email_notifications && $settings->notify_new_leads) {
-                    try {
-                        Mail::to($admin->email)->send(new NewLeadNotificationMail($lead));
-                        Log::info('New lead notification sent to admin', [
-                            'admin_id' => $admin->id,
-                            'lead_id' => $lead->id
-                        ]);
-                    } catch (\Exception $e) {
-                        Log::error('Failed to send new lead notification to admin', [
-                            'admin_id' => $admin->id,
-                            'error' => $e->getMessage()
+            // 3. Determine which role to notify (opposite of creator's role)
+            $roleToNotify = null;
+            if ($creator) {
+                if ($creator->hasRole('Admin')) {
+                    // If Admin created, notify SuperAdmin
+                    $roleToNotify = 'SuperAdmin';
+                } elseif ($creator->hasRole('SuperAdmin')) {
+                    // If SuperAdmin created, notify Admin
+                    $roleToNotify = 'Admin';
+                }
+            }
+
+            // If creator is null or doesn't have Admin/SuperAdmin role, don't notify anyone
+            // (only the lead welcome email was already sent)
+
+            // 4. Send notifications to the opposite role (excluding the creator)
+            if ($roleToNotify) {
+                $adminsToNotify = User::whereHas('roles', function($query) use ($roleToNotify) {
+                    $query->where('name', $roleToNotify);
+                })->where('id', '!=', $lead->user_id)->get();
+
+                foreach ($adminsToNotify as $admin) {
+                    // Check if admin has email notifications enabled
+                    $settings = UserSetting::getOrCreateForUser($admin->id);
+
+                    if ($settings->email_notifications && $settings->notify_new_leads) {
+                        try {
+                            Mail::to($admin->email)->send(new NewLeadNotificationMail($lead));
+                            Log::info('New lead notification sent to admin', [
+                                'admin_id' => $admin->id,
+                                'lead_id' => $lead->id,
+                                'role' => $roleToNotify
+                            ]);
+                        } catch (\Exception $e) {
+                            Log::error('Failed to send new lead notification to admin', [
+                                'admin_id' => $admin->id,
+                                'error' => $e->getMessage()
+                            ]);
+                        }
+                    }
+
+                    // Send push notification if enabled
+                    if ($settings->in_app_notifications && $settings->notify_new_leads) {
+                        $this->sendPushNotification($admin, [
+                            'title' => 'New Lead Created',
+                            'body' => 'A new lead "' . $lead->name . '" has been created',
+                            'type' => 'new_lead',
+                            'data' => [
+                                'lead_id' => $lead->id,
+                                'lead_name' => $lead->name,
+                            ]
                         ]);
                     }
-                }
-
-                // Send push notification if enabled
-                if ($settings->in_app_notifications && $settings->notify_new_leads) {
-                    $this->sendPushNotification($admin, [
-                        'title' => 'New Lead Created',
-                        'body' => 'A new lead "' . $lead->name . '" has been created',
-                        'type' => 'new_lead',
-                        'data' => [
-                            'lead_id' => $lead->id,
-                            'lead_name' => $lead->name,
-                        ]
-                    ]);
                 }
             }
         } catch (\Exception $e) {

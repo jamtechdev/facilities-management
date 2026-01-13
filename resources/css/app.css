@@ -33,6 +33,17 @@
     --shadow-xl: 0 12px 48px rgba(132, 195, 115, 0.25);
 }
 
+/* ============================================
+   Global Font Family - Consistent Throughout
+   ============================================ */
+* {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+
 /* Override Bootstrap Primary Color to Green */
 .btn-primary {
     background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);

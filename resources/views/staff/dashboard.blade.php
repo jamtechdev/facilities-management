@@ -81,7 +81,7 @@
             </div>
         </div>
         <div class="col-md-6 col-lg-3">
-            <div class="staff-stat-card warning">
+            <a href="{{ \App\Helpers\RouteHelper::url('timesheet') }}" class="staff-stat-card warning text-decoration-none">
                 <div class="stat-header">
                     <div class="stat-content">
                         <div class="stat-label">Assigned Clients</div>
@@ -92,7 +92,7 @@
                         <i class="bi bi-building"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 

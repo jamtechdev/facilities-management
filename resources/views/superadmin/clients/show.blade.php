@@ -20,9 +20,6 @@
         :phone="$client->phone"
         type="client">
         <x-slot name="actions">
-            <a href="{{ \App\Helpers\RouteHelper::url('clients.edit', $client) }}" class="btn btn-light me-2">
-                <i class="bi bi-pencil me-2"></i>Edit
-            </a>
             <a href="{{ \App\Helpers\RouteHelper::url('clients.index') }}" class="btn btn-outline-light">
                 <i class="bi bi-arrow-left me-2"></i>Back
             </a>
@@ -54,28 +51,70 @@
                     </h5>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Company Name" :value="$client->company_name" />
+                    <x-editable-info-card
+                        label="Company Name"
+                        :value="$client->company_name"
+                        field="company_name"
+                        entityType="clients"
+                        :entityId="$client->id"
+                        fieldType="text" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Contact Person" :value="$client->contact_person" />
+                    <x-editable-info-card
+                        label="Contact Person"
+                        :value="$client->contact_person"
+                        field="contact_person"
+                        entityType="clients"
+                        :entityId="$client->id"
+                        fieldType="text" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Email" :value="$client->email" :link="'mailto:' . $client->email" />
+                    <x-editable-info-card
+                        label="Email"
+                        :value="$client->email"
+                        :link="'mailto:' . $client->email"
+                        field="email"
+                        entityType="clients"
+                        :entityId="$client->id"
+                        fieldType="email" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Phone" :value="$client->phone ?? '-'" :link="$client->phone ? 'tel:' . $client->phone : null" />
+                    <x-editable-info-card
+                        label="Phone"
+                        :value="$client->phone ?? '-'"
+                        :link="$client->phone ? 'tel:' . $client->phone : null"
+                        field="phone"
+                        entityType="clients"
+                        :entityId="$client->id"
+                        fieldType="text" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="City" :value="$client->city ?? '-'" />
+                    <x-editable-info-card
+                        label="City"
+                        :value="$client->city ?? '-'"
+                        field="city"
+                        entityType="clients"
+                        :entityId="$client->id"
+                        fieldType="text" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Postal Code" :value="$client->postal_code ?? '-'" />
+                    <x-editable-info-card
+                        label="Postal Code"
+                        :value="$client->postal_code ?? '-'"
+                        field="postal_code"
+                        entityType="clients"
+                        :entityId="$client->id"
+                        fieldType="text" />
                 </div>
-                @if($client->address)
-                    <div class="col-12">
-                        <x-info-card label="Address" :value="$client->address" />
-                    </div>
-                @endif
+                <div class="col-12">
+                    <x-editable-info-card
+                        label="Address"
+                        :value="$client->address ?? '-'"
+                        field="address"
+                        entityType="clients"
+                        :entityId="$client->id"
+                        fieldType="textarea" />
+                </div>
 
                 <!-- Status & Settings Section -->
                 <div class="col-12 mt-4">
@@ -90,16 +129,34 @@
                         :badgeColor="$client->is_active ? 'success' : 'secondary'" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card
+                    <x-editable-info-card
                         label="Billing Frequency"
+                        :value="$client->billing_frequency ? ucfirst($client->billing_frequency) : 'Not set'"
                         :badge="$client->billing_frequency ? ucfirst($client->billing_frequency) : 'Not set'"
-                        badgeColor="info" />
+                        badgeColor="info"
+                        field="billing_frequency"
+                        entityType="clients"
+                        :entityId="$client->id"
+                        fieldType="select"
+                        :options="['weekly' => 'Weekly', 'bi-weekly' => 'Bi-Weekly', 'monthly' => 'Monthly', 'quarterly' => 'Quarterly']" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Agreed Weekly Hours" :value="$client->agreed_weekly_hours ? $client->agreed_weekly_hours . ' hours' : '-'" />
+                    <x-editable-info-card
+                        label="Agreed Weekly Hours"
+                        :value="$client->agreed_weekly_hours ? $client->agreed_weekly_hours . ' hours' : '-'"
+                        field="agreed_weekly_hours"
+                        entityType="clients"
+                        :entityId="$client->id"
+                        fieldType="number" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Agreed Monthly Hours" :value="$client->agreed_monthly_hours ? $client->agreed_monthly_hours . ' hours' : '-'" />
+                    <x-editable-info-card
+                        label="Agreed Monthly Hours"
+                        :value="$client->agreed_monthly_hours ? $client->agreed_monthly_hours . ' hours' : '-'"
+                        field="agreed_monthly_hours"
+                        entityType="clients"
+                        :entityId="$client->id"
+                        fieldType="number" />
                 </div>
 
                 <!-- Additional Information Section -->
@@ -122,11 +179,15 @@
                 <div class="col-md-6 col-lg-4">
                     <x-info-card label="Last Updated" :value="$client->updated_at->format('M d, Y h:i A')" />
                 </div>
-                @if($client->notes)
-                    <div class="col-12">
-                        <x-info-card label="Notes" :value="$client->notes" />
-                    </div>
-                @endif
+                <div class="col-12">
+                    <x-editable-info-card
+                        label="Notes"
+                        :value="$client->notes ?? '-'"
+                        field="notes"
+                        entityType="clients"
+                        :entityId="$client->id"
+                        fieldType="textarea" />
+                </div>
             </div>
         </div>
 
@@ -449,5 +510,5 @@
 @endsection
 
 @push('scripts')
-    @vite(['resources/js/entity-details.js'])
+    @vite(['resources/js/entity-details.js', 'resources/js/inline-edit.js'])
 @endpush

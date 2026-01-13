@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Models\Lead;
 use App\Models\Client;
 use App\Models\FollowUpTask;
+use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
@@ -26,13 +28,35 @@ class LeadService
             $data['user_id'] = auth()->id();
             $lead = Lead::create($data);
 
+            // Generate password for lead user account
+            $password = \Illuminate\Support\Str::random(12);
+
+            // Create user account for the lead (if doesn't exist)
+            $user = User::firstOrCreate(
+                ['email' => $lead->email],
+                [
+                    'name' => $lead->name,
+                    'password' => Hash::make($password),
+                ]
+            );
+
+            // Update password if user already exists (to give them new credentials)
+            if (!$user->wasRecentlyCreated) {
+                $user->update(['password' => Hash::make($password)]);
+            }
+
+            // Assign Client role if not already assigned (leads will become clients)
+            if (!$user->hasRole('Client')) {
+                $user->assignRole('Client');
+            }
+
             // Create automated follow-up tasks (30/60/90 days)
             $this->createFollowUpTasks($lead);
 
             // Send notification to admins about new lead (with error handling)
             try {
                 $notificationService = app(NotificationService::class);
-                $notificationService->notifyAdminsNewLead($lead);
+                $notificationService->notifyAdminsNewLead($lead, $user, $password);
             } catch (\Exception $e) {
                 // Log error but don't fail lead creation
                 Log::error('Failed to send lead notification', [
@@ -103,9 +127,31 @@ class LeadService
         }
 
         return DB::transaction(function() use ($lead) {
+            // Generate password for client user account
+            $password = \Illuminate\Support\Str::random(12);
+
+            // Create user account for the client (if doesn't exist)
+            $user = User::firstOrCreate(
+                ['email' => $lead->email],
+                [
+                    'name' => $lead->name,
+                    'password' => Hash::make($password),
+                ]
+            );
+
+            // Update password if user already exists (to give them new credentials)
+            if (!$user->wasRecentlyCreated) {
+                $user->update(['password' => Hash::make($password)]);
+            }
+
+            // Assign Client role if not already assigned
+            if (!$user->hasRole('Client')) {
+                $user->assignRole('Client');
+            }
+
             // Create client from lead data
             $client = Client::create([
-                'user_id' => $lead->user_id, // Assign the user who owns the lead
+                'user_id' => $user->id, // Assign the client's user account (not the admin who created the lead)
                 'company_name' => $lead->company ?? $lead->name,
                 'contact_person' => $lead->name,
                 'email' => $lead->email,
@@ -158,9 +204,30 @@ class LeadService
                 'notes' => null, // Remove notes as they're now in client
             ]);
 
+            // Send credentials email to the client (with error handling)
+            try {
+                $notificationService = app(NotificationService::class);
+                $notificationService->sendUserRegistrationEmail($user, $password, 'client');
+                Log::info('Credentials email sent to client after lead conversion', [
+                    'lead_id' => $lead->id,
+                    'client_id' => $client->id,
+                    'user_id' => $user->id,
+                    'email' => $user->email
+                ]);
+            } catch (\Exception $e) {
+                // Log error but don't fail conversion
+                Log::error('Failed to send credentials email to client after lead conversion', [
+                    'lead_id' => $lead->id,
+                    'client_id' => $client->id,
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
             Log::info('Lead converted to client with all data migrated', [
                 'lead_id' => $lead->id,
                 'client_id' => $client->id,
+                'user_id' => $user->id,
                 'communications_migrated' => $lead->communications->count(),
                 'documents_migrated' => $lead->documents->count(),
                 'feedback_migrated' => $lead->feedback->count(),

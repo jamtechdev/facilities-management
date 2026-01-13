@@ -73,6 +73,10 @@
     height: 100%;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
 }
 
 .client-stat-card::before {

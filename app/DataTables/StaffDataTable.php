@@ -40,33 +40,17 @@ class StaffDataTable extends DataTable
             })
             ->addColumn('action', function (Staff $staff) {
             $user = auth()->user();
-            $actions = '<div class="btn-group btn-group-sm" role="group">';
+            $actions = '';
 
-            // View button - requires view staff details permission
-            if ($user->can('view staff details')) {
-                $actions .= '<a href="' . RouteHelper::url('staff.show', $staff) . '" class="btn btn-outline-primary" title="View">
-                        <i class="bi bi-eye"></i>
-                    </a>';
-            }
-
-            // Edit button
-            if ($user->can('edit staff')) {
-                $actions .= '<a href="' . RouteHelper::url('staff.edit', $staff) . '" class="btn btn-outline-secondary" title="Edit">
-                        <i class="bi bi-pencil"></i>
-                    </a>';
-            }
-
-            // Delete button
+            // Delete button only
             if ($user->can('delete staff')) {
-                $actions .= '<button type="button" class="btn btn-outline-danger delete-staff" data-id="' . $staff->id . '" title="Delete">
+                $actions = '<button type="button" class="btn btn-outline-danger btn-sm delete-staff" data-id="' . $staff->id . '" title="Delete">
                         <i class="bi bi-trash"></i>
                     </button>';
             }
 
-            $actions .= '</div>';
-
             // If no actions available, return a dash
-            if (strlen($actions) <= strlen('<div class="btn-group btn-group-sm" role="group"></div>')) {
+            if (empty($actions)) {
                 return new HtmlString('<span class="text-muted">-</span>');
             }
 

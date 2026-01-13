@@ -23,9 +23,6 @@ use Illuminate\Support\Facades\Storage;
         :phone="$staff->mobile"
         type="lead">
         <x-slot name="actions">
-            <a href="{{ \App\Helpers\RouteHelper::url('staff.edit', $staff) }}" class="btn btn-light me-2">
-                <i class="bi bi-pencil me-2"></i>Edit
-            </a>
             <a href="{{ \App\Helpers\RouteHelper::url('staff.index') }}" class="btn btn-outline-light">
                 <i class="bi bi-arrow-left me-2"></i>Back
             </a>
@@ -56,19 +53,43 @@ use Illuminate\Support\Facades\Storage;
                     </h5>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Name" :value="$staff->name" />
+                    <x-editable-info-card
+                        label="Name"
+                        :value="$staff->name"
+                        field="name"
+                        entityType="staff"
+                        :entityId="$staff->id"
+                        fieldType="text" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Email" :value="$staff->email" :link="'mailto:' . $staff->email" />
+                    <x-editable-info-card
+                        label="Email"
+                        :value="$staff->email"
+                        :link="'mailto:' . $staff->email"
+                        field="email"
+                        entityType="staff"
+                        :entityId="$staff->id"
+                        fieldType="email" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Mobile" :value="$staff->mobile ?? '-'" :link="$staff->mobile ? 'tel:' . $staff->mobile : null" />
+                    <x-editable-info-card
+                        label="Mobile"
+                        :value="$staff->mobile ?? '-'"
+                        :link="$staff->mobile ? 'tel:' . $staff->mobile : null"
+                        field="mobile"
+                        entityType="staff"
+                        :entityId="$staff->id"
+                        fieldType="text" />
                 </div>
-                @if($staff->address)
-                    <div class="col-12">
-                        <x-info-card label="Address" :value="$staff->address" />
-                    </div>
-                @endif
+                <div class="col-12">
+                    <x-editable-info-card
+                        label="Address"
+                        :value="$staff->address ?? '-'"
+                        field="address"
+                        entityType="staff"
+                        :entityId="$staff->id"
+                        fieldType="textarea" />
+                </div>
 
                 <!-- Work Details Section -->
                 <div class="col-12 mt-4">
@@ -77,13 +98,31 @@ use Illuminate\Support\Facades\Storage;
                     </h5>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Hourly Rate" :value="$staff->hourly_rate ? '£' . number_format($staff->hourly_rate, 2) : '-'" />
+                    <x-editable-info-card
+                        label="Hourly Rate"
+                        :value="$staff->hourly_rate ? '£' . number_format($staff->hourly_rate, 2) : '-'"
+                        field="hourly_rate"
+                        entityType="staff"
+                        :entityId="$staff->id"
+                        fieldType="number" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Assigned Weekly Hours" :value="$staff->assigned_weekly_hours ? $staff->assigned_weekly_hours . ' hours' : '-'" />
+                    <x-editable-info-card
+                        label="Assigned Weekly Hours"
+                        :value="$staff->assigned_weekly_hours ? $staff->assigned_weekly_hours . ' hours' : '-'"
+                        field="assigned_weekly_hours"
+                        entityType="staff"
+                        :entityId="$staff->id"
+                        fieldType="number" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card label="Assigned Monthly Hours" :value="$staff->assigned_monthly_hours ? $staff->assigned_monthly_hours . ' hours' : '-'" />
+                    <x-editable-info-card
+                        label="Assigned Monthly Hours"
+                        :value="$staff->assigned_monthly_hours ? $staff->assigned_monthly_hours . ' hours' : '-'"
+                        field="assigned_monthly_hours"
+                        entityType="staff"
+                        :entityId="$staff->id"
+                        fieldType="number" />
                 </div>
                 <div class="col-md-6 col-lg-4">
                     <x-info-card
@@ -375,12 +414,13 @@ use Illuminate\Support\Facades\Storage;
 @endsection
 
 @push('scripts')
-<script>
-    function openImageModal(imageSrc, title) {
-        const modal = new bootstrap.Modal(document.getElementById('imageModal'));
-        document.getElementById('modalImage').src = imageSrc;
-        document.getElementById('imageModalLabel').textContent = title || 'Job Photo';
-        modal.show();
-    }
-</script>
+    @vite(['resources/js/inline-edit.js'])
+    <script>
+        function openImageModal(imageSrc, title) {
+            const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+            document.getElementById('modalImage').src = imageSrc;
+            document.getElementById('imageModalLabel').textContent = title || 'Job Photo';
+            modal.show();
+        }
+    </script>
 @endpush

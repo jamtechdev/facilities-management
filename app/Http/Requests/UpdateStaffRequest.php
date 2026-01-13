@@ -38,8 +38,8 @@ class UpdateStaffRequest extends FormRequest
         $staffId = $this->route('staff')->id ?? null;
 
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('staff', 'email')->ignore($staffId)],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'email' => ['sometimes', 'required', 'email', 'max:255', Rule::unique('staff', 'email')->ignore($staffId)],
             'password' => ['nullable', 'string', 'min:8'],
             'mobile' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:500'],

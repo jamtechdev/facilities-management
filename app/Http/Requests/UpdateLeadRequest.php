@@ -38,14 +38,14 @@ class UpdateLeadRequest extends FormRequest
         $leadId = $this->route('lead')->id ?? null;
 
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
             'company' => ['nullable', 'string', 'max:255'],
             'designation' => ['nullable', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('leads', 'email')->ignore($leadId)],
+            'email' => ['sometimes', 'required', 'email', 'max:255', Rule::unique('leads', 'email')->ignore($leadId)],
             'phone' => ['nullable', 'string', 'max:20'],
             'city' => ['nullable', 'string', 'max:255'],
             'source' => ['nullable', 'string', 'max:255'],
-            'stage' => ['required', 'in:new_lead,in_progress,qualified,not_qualified,junk'],
+            'stage' => ['sometimes', 'required', 'in:new_lead,in_progress,qualified,not_qualified,junk'],
             'assigned_staff_id' => ['nullable', 'exists:staff,id'],
             'notes' => ['nullable', 'string'],
         ];

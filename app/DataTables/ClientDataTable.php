@@ -47,33 +47,17 @@ class ClientDataTable extends DataTable
             })
             ->addColumn('action', function (Client $client) {
             $user = auth()->user();
-            $actions = '<div class="btn-group btn-group-sm" role="group">';
+            $actions = '';
 
-            // View button - requires view client details permission
-            if ($user->can('view client details')) {
-                $actions .= '<a href="' . RouteHelper::url('clients.show', $client) . '" class="btn btn-outline-primary" title="View">
-                        <i class="bi bi-eye"></i>
-                    </a>';
-            }
-
-            // Edit button
-            if ($user->can('edit clients')) {
-                $actions .= '<a href="' . RouteHelper::url('clients.edit', $client) . '" class="btn btn-outline-secondary" title="Edit">
-                        <i class="bi bi-pencil"></i>
-                    </a>';
-            }
-
-            // Delete button
+            // Delete button only
             if ($user->can('delete clients')) {
-                $actions .= '<button type="button" class="btn btn-outline-danger delete-client" data-id="' . $client->id . '" title="Delete">
+                $actions = '<button type="button" class="btn btn-outline-danger btn-sm delete-client" data-id="' . $client->id . '" title="Delete">
                         <i class="bi bi-trash"></i>
                     </button>';
             }
 
-            $actions .= '</div>';
-
             // If no actions available, return a dash
-            if (strlen($actions) <= strlen('<div class="btn-group btn-group-sm" role="group"></div>')) {
+            if (empty($actions)) {
                 return new HtmlString('<span class="text-muted">-</span>');
             }
 
