@@ -55,7 +55,7 @@
         <aside class="sidebar-modern">
             <!-- Sidebar Header -->
             <div class="sidebar-header">
-                <a href="{{ route('admin.dashboard') }}" class="sidebar-logo">
+                <a href="{{ \App\Helpers\RouteHelper::url('dashboard') }}" class="sidebar-logo">
                     <div class="sidebar-logo-icon">
                         <i class="bi bi-building"></i>
                     </div>
@@ -74,7 +74,7 @@
                         <div class="nav-section-title">Main</div>
                         @can('view admin dashboard')
                         <div class="nav-item-modern">
-                            <a class="nav-link-modern {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
+                            <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('dashboard') ? 'active' : '' }}" href="{{ \App\Helpers\RouteHelper::url('dashboard') }}">
                                 <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
                                 <span class="nav-text">Dashboard</span>
                             </a>
@@ -87,7 +87,7 @@
                         <div class="nav-section-title">Business</div>
                         @can('view leads')
                         <div class="nav-item-modern">
-                            <a class="nav-link-modern {{ request()->routeIs('admin.leads.*') ? 'active' : '' }}" href="{{ route('admin.leads.index') }}">
+                            <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('leads.*') ? 'active' : '' }}" href="{{ \App\Helpers\RouteHelper::url('leads.index') }}">
                                 <span class="nav-icon"><i class="bi bi-person-lines-fill"></i></span>
                                 <span class="nav-text">Leads</span>
                             </a>
@@ -96,7 +96,7 @@
 
                         @can('view clients')
                         <div class="nav-item-modern">
-                            <a class="nav-link-modern {{ request()->routeIs('admin.clients.*') ? 'active' : '' }}" href="{{ route('admin.clients.index') }}">
+                            <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('clients.*') ? 'active' : '' }}" href="{{ \App\Helpers\RouteHelper::url('clients.index') }}">
                                 <span class="nav-icon"><i class="bi bi-building"></i></span>
                                 <span class="nav-text">Clients</span>
                             </a>
@@ -105,7 +105,7 @@
 
                         @can('view staff')
                         <div class="nav-item-modern">
-                            <a class="nav-link-modern {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}" href="{{ route('admin.staff.index') }}">
+                            <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('staff.*') ? 'active' : '' }}" href="{{ \App\Helpers\RouteHelper::url('staff.index') }}">
                                 <span class="nav-icon"><i class="bi bi-people"></i></span>
                                 <span class="nav-text">Staff</span>
                             </a>
@@ -118,7 +118,7 @@
                         <div class="nav-section-title">Financial</div>
                         @can('view invoices')
                         <div class="nav-item-modern">
-                            <a class="nav-link-modern {{ request()->routeIs('admin.invoices.*') ? 'active' : '' }}" href="{{ route('admin.invoices.index') }}">
+                            <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('invoices.*') ? 'active' : '' }}" href="{{ \App\Helpers\RouteHelper::url('invoices.index') }}">
                                 <span class="nav-icon"><i class="bi bi-receipt"></i></span>
                                 <span class="nav-text">Invoices</span>
                             </a>
@@ -127,7 +127,7 @@
 
                         @can('view payouts')
                         <div class="nav-item-modern">
-                            <a class="nav-link-modern {{ request()->routeIs('admin.payouts.*') ? 'active' : '' }}" href="{{ route('admin.payouts.index') }}">
+                            <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('payouts.*') ? 'active' : '' }}" href="{{ \App\Helpers\RouteHelper::url('payouts.index') }}">
                                 <span class="nav-icon"><i class="bi bi-cash-coin"></i></span>
                                 <span class="nav-text">Payouts</span>
                             </a>
@@ -140,7 +140,7 @@
                         <div class="nav-section-title">Operations</div>
                         @can('view inventory')
                         <div class="nav-item-modern">
-                            <a class="nav-link-modern {{ request()->routeIs('admin.inventory.*') ? 'active' : '' }}" href="{{ route('admin.inventory.index') }}">
+                            <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('inventory.*') ? 'active' : '' }}" href="{{ \App\Helpers\RouteHelper::url('inventory.index') }}">
                                 <span class="nav-icon"><i class="bi bi-box-seam"></i></span>
                                 <span class="nav-text">Inventory</span>
                             </a>
@@ -153,7 +153,7 @@
                         <div class="nav-section-title">System</div>
                         @can('view roles')
                         <div class="nav-item-modern">
-                            <a class="nav-link-modern {{ request()->routeIs('admin.roles.*') || request()->routeIs('admin.permissions.*') ? 'active' : '' }}" href="{{ route('admin.roles.index') }}">
+                            <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('roles.*') || \App\Helpers\RouteHelper::routeIsAny('permissions.*') ? 'active' : '' }}" href="{{ \App\Helpers\RouteHelper::url('roles.index') }}">
                                 <span class="nav-icon"><i class="bi bi-shield-check"></i></span>
                                 <span class="nav-text">Roles & Permissions</span>
                             </a>
@@ -162,7 +162,7 @@
 
                         @can('view users')
                         <div class="nav-item-modern">
-                            <a class="nav-link-modern {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
+                            <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIsAny('users.*') ? 'active' : '' }}" href="{{ \App\Helpers\RouteHelper::url('users.index') }}">
                                 <span class="nav-icon"><i class="bi bi-person-gear"></i></span>
                                 <span class="nav-text">Users</span>
                             </a>
@@ -175,7 +175,7 @@
                         <div class="nav-section-title">Main</div>
                         @can('view staff dashboard')
                         <div class="nav-item-modern">
-                            <a class="nav-link-modern {{ request()->routeIs('staff.dashboard') ? 'active' : '' }}" href="{{ route('staff.dashboard') }}">
+                            <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIs('dashboard') ? 'active' : '' }}" href="{{ \App\Helpers\RouteHelper::url('dashboard') }}">
                                 <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
                                 <span class="nav-text">Dashboard</span>
                             </a>
@@ -184,7 +184,7 @@
 
                         @can('view timesheets')
                         <div class="nav-item-modern">
-                            <a class="nav-link-modern {{ request()->routeIs('staff.timesheet*') ? 'active' : '' }}" href="{{ route('staff.timesheet') }}">
+                            <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIs('timesheet*') ? 'active' : '' }}" href="{{ \App\Helpers\RouteHelper::url('timesheet') }}">
                                 <span class="nav-icon"><i class="bi bi-clock-history"></i></span>
                                 <span class="nav-text">Timesheet</span>
                             </a>
@@ -192,14 +192,14 @@
                         @endcan
 
                         <div class="nav-item-modern">
-                            <a class="nav-link-modern {{ request()->routeIs('staff.profile*') ? 'active' : '' }}" href="{{ route('staff.profile') }}">
+                            <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIs('profile*') ? 'active' : '' }}" href="{{ \App\Helpers\RouteHelper::url('profile') }}">
                                 <span class="nav-icon"><i class="bi bi-person"></i></span>
                                 <span class="nav-text">Profile</span>
                             </a>
                         </div>
 
                         <div class="nav-item-modern">
-                            <a class="nav-link-modern {{ request()->routeIs('staff.activity') ? 'active' : '' }}" href="{{ route('staff.activity') }}">
+                            <a class="nav-link-modern {{ \App\Helpers\RouteHelper::routeIs('activity') ? 'active' : '' }}" href="{{ \App\Helpers\RouteHelper::url('activity') }}">
                                 <span class="nav-icon"><i class="bi bi-activity"></i></span>
                                 <span class="nav-text">Activity Log</span>
                             </a>

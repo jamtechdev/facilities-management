@@ -8,6 +8,10 @@
     padding: 2.5rem 1.5rem;
     padding-bottom: 3rem;
     position: relative;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 .admin-dashboard-content::before,
@@ -642,7 +646,37 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1400px) and (min-width: 1201px) {
+    .admin-dashboard-content,
+    .superadmin-dashboard-content {
+        padding: 2rem 1.25rem;
+        padding-bottom: 2.5rem;
+    }
+
+    .admin-stat-card,
+    .superadmin-stat-card {
+        padding: 1.5rem 1.75rem;
+        min-height: 150px;
+    }
+
+    .stat-value {
+        font-size: 2.25rem;
+    }
+
+    .stat-icon-wrapper {
+        width: 60px;
+        height: 60px;
+        font-size: 26px;
+    }
+}
+
 @media (max-width: 1200px) {
+    .admin-dashboard-content,
+    .superadmin-dashboard-content {
+        padding: 2rem 1.25rem;
+        padding-bottom: 2.5rem;
+    }
+
     .admin-stat-card,
         .superadmin-stat-card {
             padding: 1.5rem 1.75rem;
@@ -661,6 +695,12 @@
 }
 
 @media (max-width: 992px) {
+    .admin-dashboard-content,
+    .superadmin-dashboard-content {
+        padding: 1.75rem 1rem;
+        padding-bottom: 2rem;
+    }
+
     .admin-stat-card,
         .superadmin-stat-card {
             min-height: 140px;
@@ -686,8 +726,11 @@
 @media (max-width: 768px) {
     .admin-dashboard-content,
         .superadmin-dashboard-content {
-            padding: 1.5rem 1rem;
-            padding-bottom: 2rem;
+            padding: 1rem 0.75rem;
+            padding-bottom: 1.5rem;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
     }
 
                                                                                                                                 .admin-dashboard-content .row>[class*="col-"],
@@ -770,8 +813,11 @@
 @media (max-width: 576px) {
     .admin-dashboard-content,
         .superadmin-dashboard-content {
-            padding: 1rem 0.75rem;
-            padding-bottom: 1.5rem;
+            padding: 0.75rem 0.5rem;
+            padding-bottom: 1rem;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
     }
 
 .admin-dashboard-content .row>[class*="col-"],

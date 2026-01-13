@@ -7,6 +7,7 @@ use App\Models\Inventory;
 use App\Models\Staff;
 use App\Models\Client;
 use App\DataTables\InventoryDataTable;
+use App\Helpers\RouteHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -83,7 +84,7 @@ class InventoryController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Inventory item created successfully.',
-                'redirect' => route('superadmin.inventory.index')
+                'redirect' => RouteHelper::url('inventory.index')
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -123,7 +124,7 @@ class InventoryController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Inventory item updated successfully.',
-                'redirect' => route('superadmin.inventory.index')
+                'redirect' => RouteHelper::url('inventory.index')
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

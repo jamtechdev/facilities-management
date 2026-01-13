@@ -20,32 +20,14 @@ class ActivityLogController extends Controller
             return redirect()->route('welcome')->with('error', 'Staff profile not found.');
         }
 
-        $activities = Timesheet::where('staff_id', $staff->id)
+        // Get timesheets with all related data
+        $timesheets = Timesheet::where('staff_id', $staff->id)
             ->where('work_date', '>=', Carbon::now()->subMonths(3))
+            ->with(['client', 'jobPhotos'])
             ->orderBy('work_date', 'desc')
             ->orderBy('clock_in_time', 'desc')
-            ->get()
-            ->flatMap(function ($timesheet) {
-                return [
-                    [
-                        'type' => 'clock_in',
-                        'client_name' => $timesheet->client->company_name ?? 'Unknown',
-                        'timestamp' => $timesheet->clock_in_time,
-                        'work_date' => $timesheet->work_date,
-                    ],
-                    [
-                        'type' => 'clock_out',
-                        'client_name' => $timesheet->client->company_name ?? 'Unknown',
-                        'timestamp' => $timesheet->clock_out_time,
-                        'work_date' => $timesheet->work_date,
-                    ],
-                ];
-            })
-            ->filter(fn ($event) => $event['timestamp'])
-            ->sortByDesc('timestamp')
-            ->values();
+            ->get();
 
-        return view('staff.activity', compact('staff', 'activities'));
+        return view('staff.activity', compact('staff', 'timesheets'));
     }
 }
-

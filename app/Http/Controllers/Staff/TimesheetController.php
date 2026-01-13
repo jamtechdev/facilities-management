@@ -118,18 +118,21 @@ class TimesheetController extends Controller
                 ], 403);
             }
 
-            // Check if there's already an active clock-in for today
+            // Check if there's already an active clock-in for today (any client)
+            // Staff must clock out from previous session before clocking in again
             $today = Carbon::today();
             $existingTimesheet = Timesheet::where('staff_id', $staff->id)
-                ->where('client_id', $request->client_id)
                 ->where('work_date', $today)
                 ->whereNull('clock_out_time')
                 ->first();
 
             if ($existingTimesheet) {
+                $clientName = $existingTimesheet->client->company_name ?? 'a client';
                 return response()->json([
                     'success' => false,
-                    'message' => 'You are already clocked in for this client today.'
+                    'message' => "You are already clocked in for {$clientName} today. Please clock out first before clocking in again.",
+                    'has_active_session' => true,
+                    'active_timesheet_id' => $existingTimesheet->id
                 ], 400);
             }
 
@@ -141,6 +144,7 @@ class TimesheetController extends Controller
                 'hours_worked' => 0,
                 'payable_hours' => 0,
                 'is_approved' => false,
+                'status' => Timesheet::STATUS_PENDING, // Status pending when clock in
             ]);
 
             $photo = $request->file('photo');
@@ -222,6 +226,7 @@ class TimesheetController extends Controller
                 'hours_worked' => round($hoursWorked, 2),
                 'payable_hours' => round($payableHours, 2),
                 'notes' => $request->notes,
+                'status' => Timesheet::STATUS_COMPLETED, // Status completed when clock out
             ]);
 
             $photo = $request->file('photo');

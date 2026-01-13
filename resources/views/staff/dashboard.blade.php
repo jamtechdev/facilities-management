@@ -21,7 +21,7 @@
                     <div class="clock-welcome-name">{{ auth()->user()->name }}</div>
                 </div>
             </div>
-            
+
             <!-- Clock Section (Right Side) -->
             <div class="clock-time-section">
                 <div class="clock-icon-wrapper">
@@ -99,7 +99,7 @@
     <!-- Main Content -->
     <div class="row g-4">
         <!-- Today's Tasks -->
-        <div class="col-lg-7">
+        <div class="col-lg-12">
             <div class="task-card">
                 <div class="task-card-header">
                     <i class="bi bi-calendar-check"></i>
@@ -156,8 +156,8 @@
             </div>
         </div>
 
-        <!-- Profile Card -->
-        <div class="col-lg-5">
+        {{-- Profile Card - Removed as per requirements --}}
+        {{-- <div class="col-lg-5">
             <div class="profile-card">
                 <div class="profile-card-header">
                     <i class="bi bi-person-circle"></i>
@@ -186,7 +186,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
 </div>
 @endsection
@@ -196,31 +196,31 @@
     // Real-time Clock with Running Seconds
     function updateClock() {
         const now = new Date();
-        
+
         // Time
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
         const seconds = String(now.getSeconds()).padStart(2, '0');
-        
+
         // Date
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        
+
         const dayName = days[now.getDay()];
         const monthName = months[now.getMonth()];
         const day = now.getDate();
         const year = now.getFullYear();
-        
+
         // Update elements
         const timeElement = document.getElementById('clock-time');
         const dateElement = document.getElementById('clock-date');
         const dayElement = document.getElementById('clock-day');
-        
+
         if (timeElement) timeElement.textContent = `${hours}:${minutes}:${seconds}`;
         if (dateElement) dateElement.textContent = `${monthName} ${day}, ${year}`;
         if (dayElement) dayElement.textContent = dayName;
     }
-    
+
     // Update immediately and then every second
     updateClock();
     setInterval(updateClock, 1000);

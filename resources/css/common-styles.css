@@ -80,6 +80,37 @@
     overflow: hidden;
 }
 
+/* Card Scrollbar Styling - Green Theme */
+.card,
+.card-body {
+    scrollbar-width: thin;
+    scrollbar-color: #84c373 #f1f5f9;
+}
+
+.card::-webkit-scrollbar,
+.card-body::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.card::-webkit-scrollbar-track,
+.card-body::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.card::-webkit-scrollbar-thumb,
+.card-body::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
+    border-radius: 10px;
+    box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.3);
+}
+
+.card::-webkit-scrollbar-thumb:hover,
+.card-body::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #6ba85a 0%, #5a8a4d 100%);
+}
+
 /* Badge Styles */
 .badge-large {
     font-size: 1.1rem;
@@ -285,6 +316,106 @@
 /* Background Images - Applied via inline style in auth views only */
 /* Note: Background images are kept inline in auth views as they use dynamic asset paths */
 
+/* ============================================
+   Container Responsive Styles - All Screen Sizes
+   ============================================ */
+
+/* Base Container Styles */
+.container,
+.container-fluid {
+    width: 100%;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+    box-sizing: border-box;
+}
+
+/* Extra Large Screens (1400px and above) */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1320px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .container-fluid {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+}
+
+/* Large Screens (1200px - 1399px) */
+@media (min-width: 1200px) and (max-width: 1399px) {
+    .container {
+        max-width: 1140px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .container-fluid {
+        padding-left: 25px;
+        padding-right: 25px;
+    }
+}
+
+/* Medium Screens / Tablets (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .container {
+        max-width: 960px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .container-fluid {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+
+/* Small Screens / Tablets (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .container {
+        max-width: 720px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .container-fluid {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}
+
+/* Extra Small Screens / Mobile (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+    .container {
+        max-width: 540px;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .container-fluid {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+}
+
+/* Very Small Screens / Mobile (below 576px) */
+@media (max-width: 575px) {
+    .container {
+        max-width: 100%;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .container-fluid {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .chart-container {
@@ -312,6 +443,12 @@
     .icon-4rem {
         font-size: 3rem;
     }
+
+    /* Container adjustments for tablets */
+    .container,
+    .container-fluid {
+        overflow-x: hidden;
+    }
 }
 
 @media (max-width: 576px) {
@@ -328,6 +465,47 @@
         height: 60px;
         font-size: 2rem;
     }
+
+    /* Container adjustments for mobile */
+    .container,
+    .container-fluid {
+        overflow-x: hidden;
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Additional responsive utilities for containers */
+@media (max-width: 1400px) {
+    .container-xl {
+        max-width: 100%;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .container-lg {
+        max-width: 100%;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}
+
+@media (max-width: 992px) {
+    .container-md {
+        max-width: 100%;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container-sm {
+        max-width: 100%;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
 }
 
 /* Image Not Found Styling */
@@ -342,4 +520,3 @@ img.image-not-found {
 img.image-not-found:hover {
     opacity: 0.9;
 }
-

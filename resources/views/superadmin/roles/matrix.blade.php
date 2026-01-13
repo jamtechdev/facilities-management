@@ -574,7 +574,7 @@ document.getElementById('createPermissionForm')?.addEventListener('submit', asyn
     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
 
     try {
-        const response = await fetch('{{ route("superadmin.permissions.store") }}', {
+        const response = await fetch('{{ \App\Helpers\RouteHelper::url("permissions.store") }}', {
             method: 'POST',
             body: formData,
             headers: {

@@ -29,9 +29,35 @@
                         <h5>Submit New Feedback</h5>
                     </div>
                     <div class="service-card-body">
-                        <form id="feedbackForm" method="POST" action="{{ route('client.feedback.store') }}">
+                        <form id="feedbackForm" method="POST" action="{{ \App\Helpers\RouteHelper::url('feedback.store') }}">
                             @csrf
                             <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="timesheet_id" class="form-label">
+                                        <i class="bi bi-clock-history me-1"></i>Select Work Session <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select @error('timesheet_id') is-invalid @enderror" id="timesheet_id" name="timesheet_id" required>
+                                        <option value="">Choose a completed work session...</option>
+                                        @foreach($completedTimesheets as $timesheet)
+                                            <option value="{{ $timesheet->id }}">
+                                                {{ $timesheet->work_date->format('M d, Y') }} -
+                                                {{ $timesheet->staff->name ?? 'Staff' }} -
+                                                {{ $timesheet->clock_in_time->format('h:i A') }} to {{ $timesheet->clock_out_time->format('h:i A') }}
+                                                ({{ number_format($timesheet->hours_worked, 2) }}h)
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <small class="form-text text-muted">Select the specific work session you want to provide feedback for</small>
+                                    @error('timesheet_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    @if($completedTimesheets->count() == 0)
+                                        <div class="alert alert-info mt-2 mb-0">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            No completed work sessions available yet. Feedback can only be given for completed work sessions.
+                                        </div>
+                                    @endif
+                                </div>
                                 <div class="col-md-12 mb-3">
                                     <label for="rating" class="form-label">Rating <span class="text-danger">*</span></label>
                                     <div class="rating-input">
@@ -88,6 +114,22 @@
                                 </div>
                             </div>
                             <div class="feedback-card-body">
+                                @if($feedback->timesheet)
+                                    <div class="mb-2">
+                                        <small class="text-muted d-block">
+                                            <i class="bi bi-clock-history me-1"></i>
+                                            Work Session: {{ $feedback->timesheet->work_date->format('M d, Y') }}
+                                        </small>
+                                        <small class="text-muted d-block">
+                                            <i class="bi bi-person me-1"></i>
+                                            Staff: {{ $feedback->timesheet->staff->name ?? 'N/A' }}
+                                        </small>
+                                        <small class="text-muted d-block">
+                                            <i class="bi bi-hourglass-split me-1"></i>
+                                            Hours: {{ number_format($feedback->timesheet->hours_worked, 2) }}h
+                                        </small>
+                                    </div>
+                                @endif
                                 <p class="feedback-message">{{ $feedback->message }}</p>
                                 <p class="feedback-meta">
                                     <i class="bi bi-calendar3 me-1"></i> {{ $feedback->created_at->format('d M Y') }}
@@ -152,6 +194,6 @@
 
     <script>
         // Pass route to JS
-        window.feedbackRoute = '{{ route("client.feedback.store") }}';
+        window.feedbackRoute = '{{ \App\Helpers\RouteHelper::url("feedback.store") }}';
     </script>
 @endsection

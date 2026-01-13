@@ -172,87 +172,91 @@ class UserRoleAndPermissionSeeder extends Seeder
             $admin->assignRole('Admin');
         }
 
-        // Create staff user
-        $staffUser = User::firstOrCreate(
-            ['email' => 'staff@keystone.com'],
-            [
-                'name' => 'Staff User',
-                'password' => Hash::make('password'),
-            ]
-        );
+        // Staff and Client users creation commented out - only admin and superadmin will be created
+        // // Create staff user
+        // $staffUser = User::firstOrCreate(
+        //     ['email' => 'staff@keystone.com'],
+        //     [
+        //         'name' => 'Staff User',
+        //         'password' => Hash::make('password'),
+        //     ]
+        // );
 
-        // Assign staff role if not already assigned
-        if (!$staffUser->hasRole('Staff')) {
-            $staffUser->assignRole('Staff');
-        }
+        // // Assign staff role if not already assigned
+        // if (!$staffUser->hasRole('Staff')) {
+        //     $staffUser->assignRole('Staff');
+        // }
 
-        // Create staff profile if it doesn't exist
-        if (!$staffUser->staff) {
-            Staff::firstOrCreate(
-                ['user_id' => $staffUser->id],
-                [
-                    'name' => 'Staff User',
-                    'email' => 'staff@keystone.com',
-                    'is_active' => true,
-                ]
-            );
-        }
+        // // Create staff profile if it doesn't exist
+        // if (!$staffUser->staff) {
+        //     Staff::firstOrCreate(
+        //         ['user_id' => $staffUser->id],
+        //         [
+        //             'name' => 'Staff User',
+        //             'email' => 'staff@keystone.com',
+        //             'is_active' => true,
+        //         ]
+        //     );
+        // }
 
-        // Create client user
-        $clientUser = User::firstOrCreate(
-            ['email' => 'client@keystone.com'],
-            [
-                'name' => 'Client User',
-                'password' => Hash::make('password'),
-            ]
-        );
+        // // Create client user
+        // $clientUser = User::firstOrCreate(
+        //     ['email' => 'client@keystone.com'],
+        //     [
+        //         'name' => 'Client User',
+        //         'password' => Hash::make('password'),
+        //     ]
+        // );
 
-        // Assign client role if not already assigned
-        if (!$clientUser->hasRole('Client')) {
-            $clientUser->assignRole('Client');
-        }
+        // // Assign client role if not already assigned
+        // if (!$clientUser->hasRole('Client')) {
+        //     $clientUser->assignRole('Client');
+        // }
 
-        // Create client profile if it doesn't exist
-        if (!$clientUser->client) {
-            Client::firstOrCreate(
-                ['user_id' => $clientUser->id],
-                [
-                    'company_name' => 'Client Company',
-                    'contact_person' => 'Client User',
-                    'email' => 'client@keystone.com',
-                    'is_active' => true,
-                ]
-            );
-        }
+        // // Create client profile if it doesn't exist
+        // if (!$clientUser->client) {
+        //     Client::firstOrCreate(
+        //         ['user_id' => $clientUser->id],
+        //         [
+        //             'company_name' => 'Client Company',
+        //             'contact_person' => 'Client User',
+        //             'email' => 'client@keystone.com',
+        //             'is_active' => true,
+        //         ]
+        //     );
+        // }
 
-        // Create lead user
-        $leadUser = User::firstOrCreate(
-            ['email' => 'lead@keystone.com'],
-            [
-                'name' => 'Lead User',
-                'password' => Hash::make('password'),
-            ]
-        );
+        // Lead user and Lead record creation commented out
+        // Leads should be 0 - they will be created dynamically through the application
+        //
+        // // Create lead user
+        // $leadUser = User::firstOrCreate(
+        //     ['email' => 'lead@keystone.com'],
+        //     [
+        //         'name' => 'Lead User',
+        //         'password' => Hash::make('password'),
+        //     ]
+        // );
+        //
+        // // Assign lead role if not already assigned
+        // if (!$leadUser->hasRole('Lead')) {
+        //     $leadUser->assignRole('Lead');
+        // }
+        //
+        // // Create lead profile if it doesn't exist
+        // if (!$leadUser->lead) {
+        //     Lead::firstOrCreate(
+        //         ['user_id' => $leadUser->id],
+        //         [
+        //             'name' => 'Lead User',
+        //             'email' => 'lead@keystone.com',
+        //             'stage' => Lead::STAGE_NEW_LEAD,
+        //         ]
+        //     );
+        // }
 
-        // Assign lead role if not already assigned
-        if (!$leadUser->hasRole('Lead')) {
-            $leadUser->assignRole('Lead');
-        }
-
-        // Create lead profile if it doesn't exist
-        if (!$leadUser->lead) {
-            Lead::firstOrCreate(
-                ['user_id' => $leadUser->id],
-                [
-                    'name' => 'Lead User',
-                    'email' => 'lead@keystone.com',
-                    'stage' => Lead::STAGE_NEW_LEAD,
-                ]
-            );
-        }
-
-        // Fix all existing users - create missing model records
-        $this->fixExistingUsers();
+        // Fix existing users - commented out to prevent creating users
+        // $this->fixExistingUsers();
 
         $this->command->info('Permissions, roles, and users created successfully!');
         $this->command->info('');
@@ -262,10 +266,6 @@ class UserRoleAndPermissionSeeder extends Seeder
         $this->command->info('');
         $this->command->info('Admin credentials (has ALL permissions):');
         $this->command->info('Email: admin@keystone.com');
-        $this->command->info('Password: password');
-        $this->command->info('');
-        $this->command->info('Staff credentials:');
-        $this->command->info('Email: staff@keystone.com');
         $this->command->info('Password: password');
         $this->command->info('');
         $this->command->info('Note: Both SuperAdmin and Admin roles have all permissions by default.');
@@ -309,20 +309,23 @@ class UserRoleAndPermissionSeeder extends Seeder
             }
         }
 
-        // Fix Lead users
-        $leadUsers = User::role('Lead')->get();
-        foreach ($leadUsers as $user) {
-            if (!$user->lead) {
-                Lead::firstOrCreate(
-                    ['user_id' => $user->id],
-                    [
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'stage' => Lead::STAGE_NEW_LEAD,
-                    ]
-                );
-                $this->command->info("Created Lead record for: {$user->email}");
-            }
-        }
+        // Fix Lead users - Commented out to keep leads at 0
+        // Leads should be created dynamically through the application, not from seeders
+        //
+        // // Fix Lead users
+        // $leadUsers = User::role('Lead')->get();
+        // foreach ($leadUsers as $user) {
+        //     if (!$user->lead) {
+        //         Lead::firstOrCreate(
+        //             ['user_id' => $user->id],
+        //             [
+        //                 'name' => $user->name,
+        //                 'email' => $user->email,
+        //                 'stage' => Lead::STAGE_NEW_LEAD,
+        //             ]
+        //         );
+        //         $this->command->info("Created Lead record for: {$user->email}");
+        //     }
+        // }
     }
 }

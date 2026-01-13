@@ -171,10 +171,10 @@
                                         </small>
                                     </div>
                                     <div class="document-item-actions">
-                                        <a href="{{ route('admin.profile.documents.download', $document) }}" class="btn btn-light" title="Download">
+                                        <a href="{{ \App\Helpers\RouteHelper::url('profile.documents.download', $document) }}" class="btn btn-light" title="Download">
                                             <i class="bi bi-download"></i>
                                         </a>
-                                        <button class="btn btn-light text-danger delete-document-btn" data-delete-url="{{ route('admin.profile.documents.destroy', $document) }}">
+                                        <button class="btn btn-light text-danger delete-document-btn" data-delete-url="{{ \App\Helpers\RouteHelper::url('profile.documents.destroy', $document) }}">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
@@ -196,28 +196,33 @@
 @push('scripts')
 <script>
     (function() {
-        let isSubmitting = false;
+        // Prevent duplicate event listeners
         const profileForm = document.getElementById('profileForm');
-        
-        if (!profileForm) return;
-        
+        if (!profileForm || profileForm.dataset.listenerAttached) {
+            return;
+        }
+        profileForm.dataset.listenerAttached = 'true';
+
+        let isSubmitting = false;
+
         profileForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
+            // Prevent duplicate submissions
             if (isSubmitting) {
                 return;
             }
-            
+
             isSubmitting = true;
             const formData = new FormData(this);
             const btn = this.querySelector('button[type="submit"]');
             const originalText = btn.innerHTML;
-            
+
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
 
         try {
-            const response = await fetch('{{ route("admin.profile.update") }}', {
+            const response = await fetch('{{ \App\Helpers\RouteHelper::url("profile.update") }}', {
                 method: 'PUT',
                 body: formData,
                 headers: {
@@ -266,7 +271,7 @@
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
 
             try {
-                const response = await fetch('{{ route("admin.profile.documents.store") }}', {
+                const response = await fetch('{{ \App\Helpers\RouteHelper::url("profile.documents.store") }}', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -338,4 +343,3 @@
 </script>
 @endpush
 @endsection
-

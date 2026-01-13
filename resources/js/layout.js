@@ -11,6 +11,7 @@
         initSidebarToggle();
         initBootstrapTooltips();
         initNavbarScrollEffect();
+        initDataTablesResize();
     });
 
     /**
@@ -22,17 +23,29 @@
 
         if (!sidebarToggleIcon || !sidebar) return;
 
-        if (sidebar.classList.contains('collapsed')) {
-            sidebarToggleIcon.classList.remove('bi-chevron-left');
-            sidebarToggleIcon.classList.add('bi-chevron-right');
+        // On mobile, icon should show based on mobile-open state, not collapsed
+        if (window.innerWidth <= 992) {
+            if (sidebar.classList.contains('mobile-open')) {
+                sidebarToggleIcon.classList.remove('bi-chevron-right');
+                sidebarToggleIcon.classList.add('bi-chevron-left');
+            } else {
+                sidebarToggleIcon.classList.remove('bi-chevron-left');
+                sidebarToggleIcon.classList.add('bi-chevron-right');
+            }
         } else {
-            sidebarToggleIcon.classList.remove('bi-chevron-right');
-            sidebarToggleIcon.classList.add('bi-chevron-left');
+            // Desktop: use collapsed state
+            if (sidebar.classList.contains('collapsed')) {
+                sidebarToggleIcon.classList.remove('bi-chevron-left');
+                sidebarToggleIcon.classList.add('bi-chevron-right');
+            } else {
+                sidebarToggleIcon.classList.remove('bi-chevron-right');
+                sidebarToggleIcon.classList.add('bi-chevron-left');
+            }
         }
     }
 
     /**
-     * Sidebar Toggle (Collapsible)
+     * Sidebar Toggle (Collapsible on Desktop, Open/Close on Mobile)
      */
     function initSidebarToggle() {
         const sidebarToggle = document.getElementById('sidebarToggle');
@@ -40,28 +53,27 @@
 
         if (!sidebarToggle || !sidebar) return;
 
-        // Load saved state from localStorage
-        const savedState = localStorage.getItem('sidebarCollapsed');
-        if (savedState === 'true') {
-            sidebar.classList.add('collapsed');
+        // Load saved state from localStorage (only for desktop)
+        if (window.innerWidth > 992) {
+            const savedState = localStorage.getItem('sidebarCollapsed');
+            if (savedState === 'true') {
+                sidebar.classList.add('collapsed');
+            }
+        } else {
+            // On mobile, remove collapsed state if present
+            sidebar.classList.remove('collapsed');
         }
 
         // Update icon based on initial state
         updateSidebarToggleIcon();
 
         sidebarToggle.addEventListener('click', function() {
-            // Toggle collapsed state
-            sidebar.classList.toggle('collapsed');
-
-            // Update icon
-            updateSidebarToggleIcon();
-
-            // Save state to localStorage
-            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
-
-            // On mobile, also handle mobile-open class
+            // On mobile: only toggle mobile-open, don't collapse
             if (window.innerWidth <= 992) {
                 sidebar.classList.toggle('mobile-open');
+
+                // Remove collapsed state on mobile if present
+                sidebar.classList.remove('collapsed');
 
                 // Add overlay for mobile
                 if (sidebar.classList.contains('mobile-open')) {
@@ -69,12 +81,42 @@
                 } else {
                     removeMobileOverlay();
                 }
+            } else {
+                // On desktop: toggle collapsed state
+                sidebar.classList.toggle('collapsed');
+
+                // Remove mobile-open state on desktop
+                sidebar.classList.remove('mobile-open');
+                removeMobileOverlay();
+
+                // Save state to localStorage
+                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+
+                // Adjust DataTables columns after sidebar transition
+                adjustDataTablesColumns();
             }
+
+            // Update icon
+            updateSidebarToggleIcon();
         });
 
         // Update icon on window resize
         window.addEventListener('resize', function() {
+            // On mobile, remove collapsed state
+            if (window.innerWidth <= 992) {
+                sidebar.classList.remove('collapsed');
+            }
+
+            // On desktop, remove mobile-open state
+            if (window.innerWidth > 992) {
+                sidebar.classList.remove('mobile-open');
+                removeMobileOverlay();
+            }
+
             updateSidebarToggleIcon();
+
+            // Adjust DataTables columns on resize
+            adjustDataTablesColumns();
         });
 
         // Close sidebar when clicking outside on mobile
@@ -86,15 +128,8 @@
                 if (!isClickInsideSidebar && !isClickOnToggle && sidebar.classList.contains('mobile-open')) {
                     sidebar.classList.remove('mobile-open');
                     removeMobileOverlay();
+                    updateSidebarToggleIcon();
                 }
-            }
-        });
-
-        // Close sidebar on window resize if desktop
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 992) {
-                sidebar.classList.remove('mobile-open');
-                removeMobileOverlay();
             }
         });
     }
@@ -193,6 +228,63 @@
                 ticking = true;
             }
         });
+    }
+
+    /**
+     * Adjust DataTables columns when sidebar is toggled or window is resized
+     */
+    function adjustDataTablesColumns() {
+        // Wait for CSS transition to complete (300ms) plus a small buffer
+        setTimeout(function() {
+            if (typeof window.$ !== 'undefined' && typeof window.$.fn.DataTable !== 'undefined') {
+                // Find all DataTables instances on the page
+                window.$('.dataTable').each(function() {
+                    const table = window.$(this);
+
+                    try {
+                        // Check if DataTable is initialized
+                        if (table.length && window.$.fn.DataTable.isDataTable(table[0])) {
+                            const dataTable = table.DataTable();
+
+                            if (dataTable && typeof dataTable.columns !== 'undefined') {
+                                // Recalculate column widths
+                                dataTable.columns.adjust();
+                                // Redraw the table to apply changes (false = don't reset pagination)
+                                dataTable.draw(false);
+                            }
+                        }
+                    } catch (e) {
+                        // Silently fail if DataTable is not fully initialized
+                        console.debug('DataTable adjust skipped:', e);
+                    }
+                });
+            }
+        }, 350); // 300ms transition + 50ms buffer
+    }
+
+    /**
+     * Initialize DataTables resize handler
+     */
+    function initDataTablesResize() {
+        // Also listen for window resize events with debouncing
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                adjustDataTablesColumns();
+            }, 250);
+        });
+
+        // Adjust on initial load if sidebar is collapsed
+        if (window.innerWidth > 992) {
+            const sidebar = document.querySelector('.sidebar-modern');
+            if (sidebar && sidebar.classList.contains('collapsed')) {
+                // Wait for page to fully load
+                setTimeout(function() {
+                    adjustDataTablesColumns();
+                }, 500);
+            }
+        }
     }
 
 })();

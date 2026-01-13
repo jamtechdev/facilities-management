@@ -339,8 +339,10 @@ use Illuminate\Support\Facades\Storage;
                                                                     @endif
                                                                 </td>
                                                                 <td>
-                                                                    @if($timesheet->is_approved)
+                                                                    @if($timesheet->status === 'approved' || $timesheet->is_approved)
                                                                         <span class="badge bg-success">Approved</span>
+                                                                    @elseif($timesheet->status === 'completed')
+                                                                        <span class="badge bg-info">Completed</span>
                                                                     @else
                                                                         <span class="badge bg-warning">Pending</span>
                                                                     @endif

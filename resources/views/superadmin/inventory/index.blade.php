@@ -44,5 +44,11 @@
 
 @push('scripts')
 {!! $dataTable->scripts(attributes: ['type' => 'module']) !!}
+<script>
+    // Pass delete route to JS for delete operations
+    if (typeof window.deleteInventoryRoute === 'undefined') {
+        window.deleteInventoryRoute = '{{ \App\Helpers\RouteHelper::url("inventory.destroy", ":id") }}';
+    }
+</script>
 @endpush
 @endsection
