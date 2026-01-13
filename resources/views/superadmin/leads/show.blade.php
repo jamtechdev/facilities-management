@@ -9,7 +9,7 @@
 @section('content')
 <div class="container-fluid">
     <!-- Lead Header -->
-    <x-header-card 
+    <x-header-card
         :title="$lead->name"
         :company="$lead->company"
         :email="$lead->email"
@@ -33,7 +33,7 @@
     <x-convert-switcher :lead="$lead" :canConvert="$canConvert" />
 
     <!-- Tabs Navigation -->
-    <x-tab-navigation 
+    <x-tab-navigation
         :tabs="[
             ['id' => 'info', 'label' => 'Information', 'icon' => 'bi-info-circle'],
             ['id' => 'communications', 'label' => 'Communications', 'icon' => 'bi-chat-dots', 'badge' => $lead->communications->count()],
@@ -80,9 +80,9 @@
                     </h5>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card 
-                        label="Source" 
-                        :badge="$lead->source ?? null" 
+                    <x-info-card
+                        label="Source"
+                        :badge="$lead->source ?? null"
                         badgeColor="info" />
                 </div>
                 @php
@@ -96,14 +96,14 @@
                     $stageColor = $stageColors[$lead->stage] ?? 'secondary';
                 @endphp
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card 
-                        label="Stage" 
-                        :badge="ucfirst(str_replace('_', ' ', $lead->stage))" 
+                    <x-info-card
+                        label="Stage"
+                        :badge="ucfirst(str_replace('_', ' ', $lead->stage))"
                         :badgeColor="$stageColor" />
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <x-info-card 
-                        label="Assigned Staff" 
+                    <x-info-card
+                        label="Assigned Staff"
                         :value="$lead->assignedStaff ? $lead->assignedStaff->name : 'Unassigned'" />
                 </div>
 
@@ -115,9 +115,9 @@
                 </div>
                 @if($lead->convertedToClient)
                     <div class="col-md-6 col-lg-4">
-                        <x-info-card 
-                            label="Converted To Client" 
-                            :value="$lead->convertedToClient->company_name" 
+                        <x-info-card
+                            label="Converted To Client"
+                            :value="$lead->convertedToClient->company_name"
                             :link="\App\Helpers\RouteHelper::url('clients.show', $lead->convertedToClient)" />
                     </div>
                 @endif
@@ -145,7 +145,7 @@
                     <i class="bi bi-plus-circle me-2"></i>Add Communication
                 </button>
             </div>
-            
+
             @if($lead->communications->count() > 0)
                 @foreach($lead->communications->sortByDesc('created_at') as $communication)
                     <div class="communication-item">
@@ -187,7 +187,7 @@
                     <i class="bi bi-upload me-2"></i>Upload Document
                 </button>
             </div>
-            
+
             @if($lead->documents->count() > 0)
                 @foreach($lead->documents as $document)
                     <div class="document-item">
@@ -216,7 +216,7 @@
         <!-- Follow-up Tasks Tab -->
         <div class="tab-pane fade" id="followup" role="tabpanel">
             <h5 class="mb-4">Automated Follow-up Tasks</h5>
-            
+
             @if($lead->followUpTasks->count() > 0)
                 @foreach($lead->followUpTasks->sortBy('reminder_day') as $task)
                     <div class="task-item {{ $task->is_completed ? 'completed' : '' }}">
@@ -252,7 +252,7 @@
         <!-- Feedback Tab -->
         <div class="tab-pane fade" id="feedback" role="tabpanel">
             <h5 class="mb-4">Customer Feedback</h5>
-            
+
             @if($lead->feedback->count() > 0)
                 @foreach($lead->feedback->sortByDesc('created_at') as $fb)
                     <div class="communication-item">

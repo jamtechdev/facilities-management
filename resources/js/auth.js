@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const roleStaff = document.getElementById('role_staff');
     const clientFields = document.getElementById('clientFields');
     const companyNameInput = document.querySelector('input[name="company_name"]');
-    const roleSelection = document.getElementById('roleSelection');
-    const registerFormContainer = document.getElementById('registerFormContainer');
+    let roleSelection = document.getElementById('roleSelection');
+    let registerFormContainer = document.getElementById('registerFormContainer');
     const selectedRoleInput = document.getElementById('selectedRole');
     const selectedRoleText = document.getElementById('selectedRoleText');
     const backToRoleBtn = document.getElementById('backToRole');

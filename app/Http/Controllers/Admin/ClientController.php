@@ -43,10 +43,36 @@ class ClientController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    // public function store(StoreClientRequest $request): JsonResponse
+    // {
+    //     try {
+    //         $client = $this->clientService->create($request->validated());
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Client created successfully.',
+    //             'redirect' => RouteHelper::url('clients.index')
+    //         ], 201);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Failed to create client: ' . $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(StoreClientRequest $request): JsonResponse
     {
         try {
-            $client = $this->clientService->create($request->validated());
+
+            $data = $request->validated();
+
+            $data['is_active'] = $request->has('is_active');
+
+            $client = $this->clientService->create($data);
 
             return response()->json([
                 'success' => true,
@@ -98,10 +124,36 @@ class ClientController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    // public function update(UpdateClientRequest $request, Client $client): JsonResponse
+    // {
+    //     try {
+    //         $this->clientService->update($client, $request->validated());
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Client updated successfully.',
+    //             'redirect' => RouteHelper::url('clients.index')
+    //         ], 200);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Failed to update client: ' . $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(UpdateClientRequest $request, Client $client): JsonResponse
     {
         try {
-            $this->clientService->update($client, $request->validated());
+
+            $data = $request->validated();
+
+            $data['is_active'] = $request->has('is_active');
+
+            $this->clientService->update($client, $data);
 
             return response()->json([
                 'success' => true,

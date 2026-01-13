@@ -42,16 +42,48 @@ class StaffController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    // public function store(StoreStaffRequest $request): JsonResponse
+    // {
+    //     try {
+    //         $data = $request->validated();
+    //         $clientId = $data['client_id'] ?? null;
+    //         unset($data['client_id']);
+
+    //         $staff = $this->staffService->create($data);
+
+    //         // Assign to client if provided
+    //         if ($clientId) {
+    //             $this->staffService->assignToClient($staff, $clientId, [
+    //                 'assigned_weekly_hours' => $data['assigned_weekly_hours'] ?? 0,
+    //                 'assigned_monthly_hours' => $data['assigned_monthly_hours'] ?? 0,
+    //             ]);
+    //         }
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Staff created successfully.',
+    //             'redirect' => RouteHelper::url('staff.index')
+    //         ], 201);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Failed to create staff: ' . $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
     public function store(StoreStaffRequest $request): JsonResponse
     {
         try {
             $data = $request->validated();
+
+            $data['is_active'] = $request->has('is_active');
+
             $clientId = $data['client_id'] ?? null;
             unset($data['client_id']);
 
             $staff = $this->staffService->create($data);
 
-            // Assign to client if provided
             if ($clientId) {
                 $this->staffService->assignToClient($staff, $clientId, [
                     'assigned_weekly_hours' => $data['assigned_weekly_hours'] ?? 0,
@@ -105,16 +137,48 @@ class StaffController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    // public function update(UpdateStaffRequest $request, Staff $staff): JsonResponse
+    // {
+    //     try {
+    //         $data = $request->validated();
+    //         $clientId = $data['client_id'] ?? null;
+    //         unset($data['client_id']);
+
+    //         $this->staffService->update($staff, $data);
+
+    //         // Handle client assignment
+    //         if ($clientId) {
+    //             $this->staffService->assignToClient($staff, $clientId, [
+    //                 'assigned_weekly_hours' => $data['assigned_weekly_hours'] ?? 0,
+    //                 'assigned_monthly_hours' => $data['assigned_monthly_hours'] ?? 0,
+    //             ]);
+    //         }
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Staff updated successfully.',
+    //             'redirect' => RouteHelper::url('staff.index')
+    //         ], 200);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Failed to update staff: ' . $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
     public function update(UpdateStaffRequest $request, Staff $staff): JsonResponse
     {
         try {
             $data = $request->validated();
+
+            $data['is_active'] = $request->has('is_active');
+
             $clientId = $data['client_id'] ?? null;
             unset($data['client_id']);
 
             $this->staffService->update($staff, $data);
 
-            // Handle client assignment
             if ($clientId) {
                 $this->staffService->assignToClient($staff, $clientId, [
                     'assigned_weekly_hours' => $data['assigned_weekly_hours'] ?? 0,
