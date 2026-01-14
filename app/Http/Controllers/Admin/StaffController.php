@@ -172,7 +172,14 @@ class StaffController extends Controller
         try {
             $data = $request->validated();
 
-            $data['is_active'] = $request->has('is_active');
+            // $data['is_active'] = $request->has('is_active');
+
+            if ($request->has('is_active')) {
+
+                $data['is_active'] = (bool) $request->is_active;
+            } else {
+                unset($data['is_active']);
+            }
 
             $clientId = $data['client_id'] ?? null;
             unset($data['client_id']);

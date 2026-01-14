@@ -58,7 +58,7 @@ class InvoiceController extends Controller
         }
 
         try {
-            return DB::transaction(function() use ($request) {
+            return DB::transaction(function () use ($request) {
                 $client = Client::findOrFail($request->client_id);
 
                 // Calculate total hours from timesheets in the billing period
@@ -122,6 +122,72 @@ class InvoiceController extends Controller
     /**
      * Update the specified invoice
      */
+    // public function update(Request $request, Invoice $invoice): JsonResponse
+    // {
+    //     // Check permission
+    //     if (!auth()->user()->can('edit invoices')) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'You do not have permission to edit invoices.'
+    //         ], 403);
+    //     }
+
+    //     $validator = Validator::make($request->all(), [
+    //         'notes' => ['nullable', 'string'],
+    //         'hourly_rate' => ['nullable', 'numeric', 'min:0'],
+    //         'tax' => ['nullable', 'numeric', 'min:0'],
+    //         'total_hours' => ['nullable', 'numeric', 'min:0'],
+    //         'invoice_number' => ['nullable', 'string', 'max:255'],
+    //         'billing_period_start' => ['nullable', 'date'],
+    //         'billing_period_end' => ['nullable', 'date'],
+    //         'due_date' => ['nullable', 'date'],
+    //         'description' => ['nullable', 'string', 'max:255'],
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Validation failed',
+    //             'errors' => $validator->errors()
+    //         ], 422);
+    //     }
+
+    //     try {
+    //         $data = $validator->validated();
+
+    //         // Recalculate subtotal and total if hourly_rate, tax, or total_hours changed
+    //         $hourlyRate = $data['hourly_rate'] ?? $invoice->hourly_rate;
+    //         $totalHours = $data['total_hours'] ?? $invoice->total_hours;
+    //         $subtotal = $totalHours * $hourlyRate;
+
+    //         // Calculate tax - if tax is provided, use it; otherwise calculate from existing tax
+    //         // For now, keep backward compatibility - tax is stored as amount
+    //         $tax = $data['tax'] ?? $invoice->tax;
+
+    //         $totalAmount = $subtotal + $tax;
+
+    //         $data['subtotal'] = $subtotal;
+    //         $data['total_amount'] = $totalAmount;
+
+    //         // Auto-set status to draft when invoice is edited
+    //         if ($invoice->status !== 'draft') {
+    //             $data['status'] = Invoice::STATUS_DRAFT;
+    //         }
+
+    //         $invoice->update($data);
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Invoice updated successfully.',
+    //         ], 200);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Failed to update invoice: ' . $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
     public function update(Request $request, Invoice $invoice): JsonResponse
     {
         // Check permission
@@ -142,6 +208,7 @@ class InvoiceController extends Controller
             'billing_period_end' => ['nullable', 'date'],
             'due_date' => ['nullable', 'date'],
             'description' => ['nullable', 'string', 'max:255'],
+            'status' => ['nullable', 'string'], // optional, but not auto-overridden
         ]);
 
         if ($validator->fails()) {
@@ -155,26 +222,24 @@ class InvoiceController extends Controller
         try {
             $data = $validator->validated();
 
-            // Recalculate subtotal and total if hourly_rate, tax, or total_hours changed
+            // Recalculate totals if needed
             $hourlyRate = $data['hourly_rate'] ?? $invoice->hourly_rate;
             $totalHours = $data['total_hours'] ?? $invoice->total_hours;
             $subtotal = $totalHours * $hourlyRate;
-
-            // Calculate tax - if tax is provided, use it; otherwise calculate from existing tax
-            // For now, keep backward compatibility - tax is stored as amount
             $tax = $data['tax'] ?? $invoice->tax;
-
             $totalAmount = $subtotal + $tax;
 
             $data['subtotal'] = $subtotal;
             $data['total_amount'] = $totalAmount;
 
-            // Auto-set status to draft when invoice is edited
-            if ($invoice->status !== 'draft') {
-                $data['status'] = Invoice::STATUS_DRAFT;
+            // ⚡ Remove auto-draft logic here
+            // status will only change if 'status' key is explicitly sent
+            if (isset($data['status'])) {
+                $invoice->update($data);
+            } else {
+                // Update everything except status
+                $invoice->update(array_merge($data, ['status' => $invoice->status]));
             }
-
-            $invoice->update($data);
 
             return response()->json([
                 'success' => true,
@@ -187,6 +252,7 @@ class InvoiceController extends Controller
             ], 500);
         }
     }
+
 
     /**
      * Update invoice status

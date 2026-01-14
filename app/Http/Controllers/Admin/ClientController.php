@@ -151,7 +151,12 @@ class ClientController extends Controller
 
             $data = $request->validated();
 
-            $data['is_active'] = $request->has('is_active');
+            // $data['is_active'] = $request->has('is_active');
+            if ($request->has('is_active')) {
+                $data['is_active'] = $request->is_active;
+            } else {
+                unset($data['is_active']);
+            }
 
             $this->clientService->update($client, $data);
 
