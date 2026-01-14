@@ -81,7 +81,25 @@
             </div>
         </div>
         <div class="col-md-6 col-lg-3">
-            <a href="{{ \App\Helpers\RouteHelper::url('timesheet') }}" class="staff-stat-card warning text-decoration-none">
+            <div class="staff-stat-card warning">
+                <div class="stat-header">
+                    <div class="stat-content">
+                        <div class="stat-label">Days Worked</div>
+                        <div class="stat-value">{{ $daysWorked }}</div>
+                        <p class="stat-description">This month</p>
+                    </div>
+                    <div class="stat-icon-wrapper">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Stats Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6 col-lg-3">
+            <a href="{{ \App\Helpers\RouteHelper::url('timesheet') }}" class="staff-stat-card secondary text-decoration-none">
                 <div class="stat-header">
                     <div class="stat-content">
                         <div class="stat-label">Assigned Clients</div>
@@ -150,6 +168,82 @@
                                 <i class="bi bi-inbox"></i>
                             </div>
                             <p class="empty-state-text">No tasks scheduled for today.<br>Enjoy your day off! 🎉</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="col-lg-12">
+            <div class="task-card">
+                <div class="task-card-header">
+                    <i class="bi bi-activity"></i>
+                    <h5>Recent Activity</h5>
+                </div>
+                <div class="task-card-body">
+                    @if($recentActivity->isNotEmpty())
+                        <div class="table-responsive">
+                            <table class="table task-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Client</th>
+                                        <th>Clock In</th>
+                                        <th>Clock Out</th>
+                                        <th>Hours</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($recentActivity as $activity)
+                                        <tr>
+                                            <td>
+                                                <div class="work-date">{{ $activity->work_date->format('M d, Y') }}</div>
+                                            </td>
+                                            <td>
+                                                <div class="client-name">{{ $activity->client?->company_name ?? 'N/A' }}</div>
+                                            </td>
+                                            <td>
+                                                @if($activity->clock_in_time)
+                                                    <span class="text-muted">{{ $activity->clock_in_time->format('h:i A') }}</span>
+                                                @else
+                                                    <span class="text-muted">—</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($activity->clock_out_time)
+                                                    <span class="text-muted">{{ $activity->clock_out_time->format('h:i A') }}</span>
+                                                @else
+                                                    <span class="text-warning">In Progress</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <span class="hours-badge">
+                                                    <i class="bi bi-clock"></i>
+                                                    {{ number_format($activity->hours_worked ?? 0, 2) }}h
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if($activity->is_approved)
+                                                    <span class="status-badge-modern approved">Approved</span>
+                                                @elseif($activity->clock_out_time)
+                                                    <span class="status-badge-modern pending">Pending</span>
+                                                @else
+                                                    <span class="status-badge-modern in-progress">In Progress</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-inbox"></i>
+                            </div>
+                            <p class="empty-state-text">No recent activity found.</p>
                         </div>
                     @endif
                 </div>

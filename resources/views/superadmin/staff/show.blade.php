@@ -195,6 +195,8 @@
                                     <th>Clock In</th>
                                     <th>Clock Out</th>
                                     <th>Hours</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -216,11 +218,50 @@
                                         </td>
                                         <td>
                                             @if ($timesheet->clock_out_time)
-                                                {{ number_format($timesheet->clock_in_time->diffInHours($timesheet->clock_out_time), 2) }}
+                                                {{ number_format($timesheet->hours_worked ?? $timesheet->clock_in_time->diffInHours($timesheet->clock_out_time), 2) }}
                                                 hrs
                                             @else
                                                 <span class="badge bg-warning">In Progress</span>
                                             @endif
+                                        </td>
+                                        <td>
+                                            @if ($timesheet->status === 'approved' || $timesheet->is_approved)
+                                                <span class="badge bg-success">Approved</span>
+                                            @elseif($timesheet->status === 'completed')
+                                                <span class="badge bg-info">Completed</span>
+                                            @else
+                                                <span class="badge bg-warning">Pending</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @can('approve timesheets')
+                                                @if($timesheet->clock_out_time)
+                                                    <div class="btn-group">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            Change
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                            <li>
+                                                                <a class="dropdown-item change-timesheet-status" href="#" data-timesheet-id="{{ $timesheet->id }}" data-status="pending">
+                                                                    <span class="badge bg-warning me-2">Pending</span> Set to Pending
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item change-timesheet-status" href="#" data-timesheet-id="{{ $timesheet->id }}" data-status="completed">
+                                                                    <span class="badge bg-info me-2">Completed</span> Set to Completed
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item change-timesheet-status" href="#" data-timesheet-id="{{ $timesheet->id }}" data-status="approved">
+                                                                    <span class="badge bg-success me-2">Approved</span> Approve
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            @endcan
                                         </td>
                                     </tr>
                                 @endforeach
@@ -414,5 +455,53 @@
             document.getElementById('imageModalLabel').textContent = title || 'Job Photo';
             modal.show();
         }
+
+        // Timesheet Status Change Handler
+        document.querySelectorAll('.change-timesheet-status').forEach(link => {
+            link.addEventListener('click', async function(e) {
+                e.preventDefault();
+
+                const timesheetId = this.dataset.timesheetId;
+                const status = this.dataset.status;
+
+                if (!confirm(`Are you sure you want to change this timesheet status to "${status}"?`)) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`{{ \App\Helpers\RouteHelper::url('timesheets.update-status', 'TIMESHEET_ID') }}`.replace('TIMESHEET_ID', timesheetId), {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ status: status })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Show success message
+                        if (typeof showToast !== 'undefined') {
+                            showToast('success', data.message);
+                        } else {
+                            alert(data.message);
+                        }
+
+                        // Reload page to show updated status
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        throw new Error(data.message || 'Failed to update status');
+                    }
+                } catch (error) {
+                    if (typeof showToast !== 'undefined') {
+                        showToast('danger', 'Failed to update timesheet status: ' + error.message);
+                    } else {
+                        alert('Failed to update timesheet status: ' + error.message);
+                    }
+                }
+            });
+        });
     </script>
 @endpush

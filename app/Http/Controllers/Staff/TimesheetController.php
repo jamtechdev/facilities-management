@@ -210,7 +210,12 @@ class TimesheetController extends Controller
                 ->firstOrFail();
 
             $clockOutTime = now();
-            $hoursWorked = $timesheet->clock_in_time->diffInMinutes($clockOutTime) / 60;
+
+            // Calculate hours worked using Carbon's diffInSeconds for better precision
+            $clockIn = Carbon::parse($timesheet->clock_in_time);
+            $clockOut = Carbon::parse($clockOutTime);
+            $secondsWorked = $clockIn->diffInSeconds($clockOut);
+            $hoursWorked = round($secondsWorked / 3600, 2); // Convert seconds to hours with 2 decimal places
 
             // Calculate payable hours (if works more than assigned, only assigned hours are paid)
             $client = $timesheet->client;

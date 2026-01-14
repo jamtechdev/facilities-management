@@ -80,13 +80,18 @@ class LeadService
             FollowUpTask::DAY_90 => 'Send helpful content or schedule a 10-minute discovery call',
         ];
 
+        // Use lead creation date as base for calculating due dates
+        $leadCreatedAt = $lead->created_at ?? Carbon::now();
+
         foreach ($reminderDays as $day => $suggestion) {
+            // Cast day to integer and calculate from lead creation date
+            $daysToAdd = (int)$day;
 
             FollowUpTask::create([
                 'lead_id' => $lead->id,
                 'reminder_day' => $day,
                 'suggestion' => $suggestion,
-                'due_date' => Carbon::now()->addDays($day),
+                'due_date' => $leadCreatedAt->copy()->addDays($daysToAdd),
                 'is_completed' => false,
             ]);
         }
@@ -94,12 +99,13 @@ class LeadService
 
     /**
      * Update an existing lead
+     * Note: If stage changes to "qualified", lead will automatically convert to client via observer
      */
     public function update(Lead $lead, array $data): Lead
     {
         return DB::transaction(function() use ($lead, $data) {
-            // Only update the lead - do NOT auto-convert to client
-            // Conversion should be done manually via the "Convert to Client" button
+            // Update the lead - observer will handle automatic conversion if stage becomes "qualified"
+            // Manual conversion via "Convert to Client" button is still available as fallback
             $lead->update($data);
 
             return $lead->fresh();

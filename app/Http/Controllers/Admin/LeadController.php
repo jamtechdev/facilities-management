@@ -140,7 +140,7 @@ class LeadController extends Controller
 
     /**
      * Update lead stage (for inline editing in DataTable)
-     * Only updates stage, does NOT convert to client
+     * Automatically converts to client if stage becomes "qualified" (via observer)
      */
     public function updateStage(Request $request, Lead $lead): JsonResponse
     {
@@ -159,17 +159,20 @@ class LeadController extends Controller
         ]);
 
         try {
-            // Only update stage field - do NOT trigger conversion
-            // Use updateQuietly to bypass model events and observers
-            // This ensures no auto-conversion happens when stage changes from DataTable
-            $lead->updateQuietly(['stage' => $validated['stage']]);
+            // Update stage field - observer will automatically convert if stage becomes "qualified"
+            $lead->update(['stage' => $validated['stage']]);
 
-            // Refresh the model to get updated data
+            // Refresh the model to get updated data (including conversion status)
             $lead->refresh();
+
+            $message = 'Lead stage updated successfully.';
+            if ($lead->stage === 'qualified' && $lead->converted_to_client_id) {
+                $message = 'Lead stage updated and automatically converted to client.';
+            }
 
             return response()->json([
                 'success' => true,
-                'message' => 'Lead stage updated successfully.',
+                'message' => $message,
                 'stage' => $lead->stage,
                 'is_qualified' => $lead->stage === 'qualified',
                 'is_converted' => (bool)$lead->converted_to_client_id

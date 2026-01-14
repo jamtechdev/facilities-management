@@ -53,10 +53,24 @@ class DashboardController extends Controller
         // Get assigned companies count
         $assignedCompanies = $staff->clients()->wherePivot('is_active', true)->count();
 
+        // Get days worked this month
+        $daysWorked = Timesheet::where('staff_id', $staff->id)
+            ->whereBetween('work_date', [$monthStart, $today])
+            ->distinct('work_date')
+            ->count('work_date');
+
         // Get today's tasks
         $todayTasks = Timesheet::where('staff_id', $staff->id)
             ->where('work_date', $today)
             ->with('client')
+            ->get();
+
+        // Get recent activity (last 10 timesheet entries)
+        $recentActivity = Timesheet::where('staff_id', $staff->id)
+            ->with('client')
+            ->orderBy('work_date', 'desc')
+            ->orderBy('clock_in_time', 'desc')
+            ->take(10)
             ->get();
 
         return view('staff.dashboard', compact(
@@ -65,7 +79,9 @@ class DashboardController extends Controller
             'weekHours',
             'monthHours',
             'assignedCompanies',
-            'todayTasks'
+            'daysWorked',
+            'todayTasks',
+            'recentActivity'
         ));
     }
 }

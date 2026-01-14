@@ -221,13 +221,41 @@
                                         <strong class="text-primary">{{ number_format($timesheet->hours_worked, 2) }}
                                             hours</strong>
                                     </div>
-                                    @if ($timesheet->status === 'approved' || $timesheet->is_approved)
-                                        <span class="badge bg-success">Approved</span>
-                                    @elseif($timesheet->status === 'completed')
-                                        <span class="badge bg-info">Completed</span>
-                                    @else
-                                        <span class="badge bg-warning">Pending</span>
-                                    @endif
+                                    <div class="d-flex align-items-center gap-2 justify-content-end">
+                                        @if ($timesheet->status === 'approved' || $timesheet->is_approved)
+                                            <span class="badge bg-success">Approved</span>
+                                        @elseif($timesheet->status === 'completed')
+                                            <span class="badge bg-info">Completed</span>
+                                        @else
+                                            <span class="badge bg-warning">Pending</span>
+                                        @endif
+                                        @can('approve timesheets')
+                                            @if($timesheet->clock_out_time)
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        Change Status
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li>
+                                                            <a class="dropdown-item change-timesheet-status" href="#" data-timesheet-id="{{ $timesheet->id }}" data-status="pending">
+                                                                <span class="badge bg-warning me-2">Pending</span> Set to Pending
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item change-timesheet-status" href="#" data-timesheet-id="{{ $timesheet->id }}" data-status="completed">
+                                                                <span class="badge bg-info me-2">Completed</span> Set to Completed
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item change-timesheet-status" href="#" data-timesheet-id="{{ $timesheet->id }}" data-status="approved">
+                                                                <span class="badge bg-success me-2">Approved</span> Approve
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            @endif
+                                        @endcan
+                                    </div>
                                 </div>
                             </div>
 
@@ -537,4 +565,53 @@ Best regards,
 
 @push('scripts')
     @vite(['resources/js/entity-details.js', 'resources/js/inline-edit.js'])
+    <script>
+        // Timesheet Status Change Handler
+        document.querySelectorAll('.change-timesheet-status').forEach(link => {
+            link.addEventListener('click', async function(e) {
+                e.preventDefault();
+
+                const timesheetId = this.dataset.timesheetId;
+                const status = this.dataset.status;
+
+                if (!confirm(`Are you sure you want to change this timesheet status to "${status}"?`)) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`{{ \App\Helpers\RouteHelper::url('timesheets.update-status', 'TIMESHEET_ID') }}`.replace('TIMESHEET_ID', timesheetId), {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ status: status })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Show success message
+                        if (typeof showToast !== 'undefined') {
+                            showToast('success', data.message);
+                        } else {
+                            alert(data.message);
+                        }
+
+                        // Reload page to show updated status
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        throw new Error(data.message || 'Failed to update status');
+                    }
+                } catch (error) {
+                    if (typeof showToast !== 'undefined') {
+                        showToast('danger', 'Failed to update timesheet status: ' + error.message);
+                    } else {
+                        alert('Failed to update timesheet status: ' + error.message);
+                    }
+                }
+            });
+        });
+    </script>
 @endpush

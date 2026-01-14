@@ -216,6 +216,11 @@ Route::middleware(['access:view roles'])->prefix('superadmin')->name('superadmin
         Route::get('/payouts/download', [\App\Http\Controllers\Admin\PayoutController::class, 'downloadPdf'])->name('payouts.download');
     });
 
+    // Timesheet Management
+    Route::middleware('access:approve timesheets')->group(function () {
+        Route::put('/timesheets/{timesheet}/status', [\App\Http\Controllers\Admin\TimesheetController::class, 'updateStatus'])->name('timesheets.update-status');
+    });
+
     // Operations
     Route::middleware('access:view inventory')->group(function () {
         Route::resource('inventory', \App\Http\Controllers\Admin\InventoryController::class);
@@ -372,6 +377,11 @@ Route::middleware(['access:view admin dashboard'])->prefix('admin')->name('admin
         Route::get('/payouts', [\App\Http\Controllers\Admin\PayoutController::class, 'index'])->name('payouts.index');
         Route::post('/payouts/calculate', [\App\Http\Controllers\Admin\PayoutController::class, 'calculate'])->name('payouts.calculate');
         Route::get('/payouts/download', [\App\Http\Controllers\Admin\PayoutController::class, 'downloadPdf'])->name('payouts.download');
+    });
+
+    // Timesheet Management
+    Route::middleware('access:approve timesheets')->group(function () {
+        Route::put('/timesheets/{timesheet}/status', [\App\Http\Controllers\Admin\TimesheetController::class, 'updateStatus'])->name('timesheets.update-status');
     });
 
     // Operations

@@ -17,7 +17,7 @@ class ServiceHistoryController extends Controller
         }
 
         $serviceHistory = $client->timesheets()
-            ->with(['staff', 'jobPhotos'])
+            ->with(['staff', 'jobPhotos', 'feedback'])
             ->latest()
             ->get();
 

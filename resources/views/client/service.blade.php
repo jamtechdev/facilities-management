@@ -123,6 +123,37 @@
                                                             <i class="bi bi-camera"></i> No photos attached for this session
                                                         </div>
                                                     @endif
+
+                                                    <!-- Customer Feedback Section -->
+                                                    @if ($timesheet->feedback->count() > 0)
+                                                        <div class="customer-feedback mt-4">
+                                                            <div class="d-flex align-items-center gap-3 mb-3">
+                                                                <i class="bi bi-chat-left-text-fill text-primary timeline-icon-1-5rem"></i>
+                                                                <div>
+                                                                    <strong class="timeline-date-text">Customer Feedback</strong>
+                                                                    <span class="service-photo-badge primary ms-2">
+                                                                        {{ $timesheet->feedback->count() }}
+                                                                        feedback{{ $timesheet->feedback->count() != 1 ? 's' : '' }}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            @foreach ($timesheet->feedback as $feedback)
+                                                                <div class="bg-light p-3 rounded mb-2 timeline-note-box">
+                                                                    @if ($feedback->rating)
+                                                                        <div class="mb-2">
+                                                                            @for ($i = 1; $i <= 5; $i++)
+                                                                                <i class="bi bi-star{{ $i <= $feedback->rating ? '-fill' : '' }} text-warning"></i>
+                                                                            @endfor
+                                                                        </div>
+                                                                    @endif
+                                                                    <p class="mb-0 text-dark">{{ $feedback->message }}</p>
+                                                                    @if ($feedback->name)
+                                                                        <small class="text-muted">— {{ $feedback->name }}</small>
+                                                                    @endif
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
                                                 </div>
 
                                                 <div class="text-end">
