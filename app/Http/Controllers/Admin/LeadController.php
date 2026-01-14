@@ -72,6 +72,7 @@ class LeadController extends Controller
             abort(403, 'You do not have permission to view lead details.');
         }
         $lead->load([
+            'user',
             'assignedStaff',
             'convertedToClient',
             'communications.user',

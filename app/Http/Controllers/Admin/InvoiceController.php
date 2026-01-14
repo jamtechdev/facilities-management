@@ -45,7 +45,7 @@ class InvoiceController extends Controller
             'billing_period_start' => 'required|date',
             'billing_period_end' => 'required|date|after_or_equal:billing_period_start',
             'hourly_rate' => 'required|numeric|min:0',
-            'tax' => 'nullable|numeric|min:0',
+            'tax_rate' => 'nullable|numeric|min:0|max:100',
             'notes' => 'nullable|string',
         ]);
 
@@ -69,7 +69,8 @@ class InvoiceController extends Controller
 
                 $totalHours = $timesheets->sum('payable_hours');
                 $subtotal = $totalHours * $request->hourly_rate;
-                $tax = $request->tax ?? 0;
+                $taxRate = $request->tax_rate ?? 0; // Tax rate as percentage
+                $tax = $subtotal * ($taxRate / 100); // Calculate tax from percentage
                 $totalAmount = $subtotal + $tax;
 
                 // Generate invoice number
@@ -156,10 +157,13 @@ class InvoiceController extends Controller
 
             // Recalculate subtotal and total if hourly_rate, tax, or total_hours changed
             $hourlyRate = $data['hourly_rate'] ?? $invoice->hourly_rate;
-            $tax = $data['tax'] ?? $invoice->tax;
             $totalHours = $data['total_hours'] ?? $invoice->total_hours;
-
             $subtotal = $totalHours * $hourlyRate;
+
+            // Calculate tax - if tax is provided, use it; otherwise calculate from existing tax
+            // For now, keep backward compatibility - tax is stored as amount
+            $tax = $data['tax'] ?? $invoice->tax;
+
             $totalAmount = $subtotal + $tax;
 
             $data['subtotal'] = $subtotal;

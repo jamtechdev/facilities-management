@@ -83,10 +83,9 @@ class NotificationService
     }
 
     /**
-     * Send welcome email to lead and notify opposite role
-     * - Always sends email to lead contact (with credentials)
-     * - If Admin creates lead: notifies SuperAdmin only
-     * - If SuperAdmin creates lead: notifies Admin only
+     * Send welcome email to lead and FCM push notifications to admins/superadmins
+     * - Sends email to lead contact (with credentials)
+     * - Sends FCM push notifications to all admins/superadmins (no email notifications)
      */
     public function notifyAdminsNewLead(Lead $lead, $user = null, $password = null): void
     {
@@ -107,52 +106,17 @@ class NotificationService
                 ]);
             }
 
-            // 2. Get the user who created the lead
-            $creator = $lead->user_id ? User::find($lead->user_id) : null;
+            // 2. Send FCM push notifications to all admins and superadmins
+            try {
+                $admins = User::whereHas('roles', function($query) {
+                    $query->whereIn('name', ['Admin', 'SuperAdmin']);
+                })->get();
 
-            // 3. Determine which role to notify (opposite of creator's role)
-            $roleToNotify = null;
-            if ($creator) {
-                if ($creator->hasRole('Admin')) {
-                    // If Admin created, notify SuperAdmin
-                    $roleToNotify = 'SuperAdmin';
-                } elseif ($creator->hasRole('SuperAdmin')) {
-                    // If SuperAdmin created, notify Admin
-                    $roleToNotify = 'Admin';
-                }
-            }
-
-            // If creator is null or doesn't have Admin/SuperAdmin role, don't notify anyone
-            // (only the lead welcome email was already sent)
-
-            // 4. Send notifications to the opposite role (excluding the creator)
-            if ($roleToNotify) {
-                $adminsToNotify = User::whereHas('roles', function($query) use ($roleToNotify) {
-                    $query->where('name', $roleToNotify);
-                })->where('id', '!=', $lead->user_id)->get();
-
-                foreach ($adminsToNotify as $admin) {
-                    // Check if admin has email notifications enabled
+                foreach ($admins as $admin) {
+                    // Check if admin has push notifications enabled
                     $settings = UserSetting::getOrCreateForUser($admin->id);
 
-                    if ($settings->email_notifications && $settings->notify_new_leads) {
-                        try {
-                            Mail::to($admin->email)->send(new NewLeadNotificationMail($lead));
-                            Log::info('New lead notification sent to admin', [
-                                'admin_id' => $admin->id,
-                                'lead_id' => $lead->id,
-                                'role' => $roleToNotify
-                            ]);
-                        } catch (\Exception $e) {
-                            Log::error('Failed to send new lead notification to admin', [
-                                'admin_id' => $admin->id,
-                                'error' => $e->getMessage()
-                            ]);
-                        }
-                    }
-
-                    // Send push notification if enabled
-                    if ($settings->in_app_notifications && $settings->notify_new_leads) {
+                    if ($settings->push_notifications && $settings->notify_new_leads) {
                         $this->sendPushNotification($admin, [
                             'title' => 'New Lead Created',
                             'body' => 'A new lead "' . $lead->name . '" has been created',
@@ -164,6 +128,11 @@ class NotificationService
                         ]);
                     }
                 }
+            } catch (\Exception $e) {
+                Log::error('Failed to send FCM push notifications for new lead', [
+                    'lead_id' => $lead->id,
+                    'error' => $e->getMessage()
+                ]);
             }
         } catch (\Exception $e) {
             Log::error('Failed to notify admins about new lead', [

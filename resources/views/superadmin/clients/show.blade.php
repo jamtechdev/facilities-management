@@ -20,6 +20,11 @@
         :phone="$client->phone"
         type="client">
         <x-slot name="actions">
+            @if(auth()->user()->can('view admin dashboard'))
+                <button class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#sendEmailModal">
+                    <i class="bi bi-envelope me-2"></i>Send Email
+                </button>
+            @endif
             <a href="{{ \App\Helpers\RouteHelper::url('clients.index') }}" class="btn btn-outline-light">
                 <i class="bi bi-arrow-left me-2"></i>Back
             </a>
@@ -485,6 +490,53 @@
         </div>
     </div>
 </div>
+
+<!-- Send Email Modal -->
+@if(auth()->user()->can('view admin dashboard'))
+<div class="modal fade" id="sendEmailModal" tabindex="-1" aria-labelledby="sendEmailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sendEmailModalLabel">
+                    <i class="bi bi-envelope me-2"></i>Send Email to Client
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="sendEmailForm" action="{{ \App\Helpers\RouteHelper::url('communications.store') }}">
+                @csrf
+                <input type="hidden" name="communicable_type" value="{{ get_class($client) }}">
+                <input type="hidden" name="communicable_id" value="{{ $client->id }}">
+                <input type="hidden" name="type" value="email">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="send_email_to" class="form-label">Email To <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="send_email_to" name="email_to" value="{{ $client->email }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="send_email_subject" class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="send_email_subject" name="subject" value="Follow-up: {{ $client->company_name }}" placeholder="Enter email subject">
+                    </div>
+                    <div class="mb-3">
+                        <label for="send_email_message" class="form-label">Message <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="send_email_message" name="message" rows="8" required placeholder="Enter your message...">Dear {{ $client->contact_person ?? $client->company_name }},
+
+Thank you for your business. We would like to follow up with you regarding your account.
+
+Best regards,
+{{ auth()->user()->name }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send me-2"></i>Send Email
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
 
 <!-- Add Communication Modal -->
 @include('superadmin.communications.modal', ['communicable' => $client])

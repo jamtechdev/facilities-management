@@ -104,12 +104,12 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label for="tax" class="form-label">
-                                        <i class="bi bi-percent me-1"></i>Tax Amount
+                                    <label for="tax_rate" class="form-label">
+                                        <i class="bi bi-percent me-1"></i>Tax Rate (%)
                                     </label>
-                                    <input type="number" step="0.01" class="form-control" id="tax" name="tax"
-                                        value="{{ old('tax', 0) }}" placeholder="0.00">
-                                    @error('tax')
+                                    <input type="number" step="0.01" class="form-control" id="tax_rate" name="tax_rate"
+                                        value="{{ old('tax_rate', 0) }}" placeholder="0.00">
+                                    @error('tax_rate')
                                         <small class="text-danger">{{ $message }}</small>
                                     @enderror
                                 </div>

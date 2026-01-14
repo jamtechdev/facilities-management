@@ -147,16 +147,11 @@
                     ];
                 @endphp
                 <div class="col-md-6 col-lg-4">
-                    <x-editable-info-card
+                    <x-info-card
                         label="Stage"
                         :value="ucfirst(str_replace('_', ' ', $lead->stage))"
                         :badge="ucfirst(str_replace('_', ' ', $lead->stage))"
-                        :badgeColor="$stageColor"
-                        field="stage"
-                        entityType="leads"
-                        :entityId="$lead->id"
-                        fieldType="select"
-                        :options="$stageOptions" />
+                        :badgeColor="$stageColor" />
                 </div>
                 <div class="col-md-6 col-lg-4">
                     <x-info-card
@@ -181,6 +176,11 @@
                 <div class="col-md-6 col-lg-4">
                     <x-info-card label="Created" :value="$lead->created_at->format('M d, Y h:i A')" />
                 </div>
+                @if($lead->user)
+                    <div class="col-md-6 col-lg-4">
+                        <x-info-card label="Created By" :value="$lead->user->name" />
+                    </div>
+                @endif
                 @if($lead->converted_at)
                     <div class="col-md-6 col-lg-4">
                         <x-info-card label="Converted At" :value="$lead->converted_at->format('M d, Y h:i A')" />

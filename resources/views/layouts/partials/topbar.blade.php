@@ -81,13 +81,6 @@
                 </div>
             </div>
 
-            <div class="navbar-icon-wrapper" data-bs-toggle="tooltip" title="Messages">
-                <button class="navbar-icon-btn" type="button" id="messagesBtn">
-                    <i class="bi bi-envelope"></i>
-                    <span class="navbar-badge">5</span>
-                </button>
-            </div>
-
             <div class="navbar-user-dropdown">
                 <button class="navbar-user-btn" type="button" id="userDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
                     <div class="navbar-user-avatar">

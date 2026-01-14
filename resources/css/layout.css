@@ -1118,8 +1118,23 @@ body {
     }
 
     .navbar-top-right {
-        gap: 8px;
+        gap: 6px;
         flex-shrink: 0;
+    }
+
+    .navbar-icon-wrapper {
+        flex-shrink: 0;
+    }
+
+    .navbar-icon-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .notification-dropdown {
+        max-width: calc(100vw - 20px);
+        width: 320px;
     }
 
     .navbar-user-avatar {
