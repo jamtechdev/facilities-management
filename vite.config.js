@@ -37,6 +37,7 @@ export default defineConfig({
                 'resources/js/datatables-handlers.js',
                 'resources/js/entity-details.js',
                 'resources/js/global-loader.js',
+                'resources/js/inline-edit.js',
                 'resources/js/preloader.js',
                 'resources/js/navbar-collapse-fix.js',
                 'resources/js/dashboard-charts.js',
