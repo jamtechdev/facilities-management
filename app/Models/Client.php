@@ -29,10 +29,19 @@ class Client extends Model
         'lead_id',
         'notes',
         'is_active',
+        'type',
+        'converted_by',
+        'converted_at',
+        'lead_name',
+        'lead_company',
+        'lead_email',
+        'lead_phone',
+        'lead_avatar',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'converted_at' => 'datetime',
     ];
 
     // Relationships
@@ -43,7 +52,12 @@ class Client extends Model
 
     public function lead(): BelongsTo
     {
-        return $this->belongsTo(Lead::class);
+        return $this->belongsTo(Lead::class)->withTrashed();
+    }
+
+    public function convertedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'converted_by');
     }
 
     public function staff(): BelongsToMany

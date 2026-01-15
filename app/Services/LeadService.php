@@ -135,6 +135,29 @@ class LeadService
         }
 
         return DB::transaction(function() use ($lead) {
+            // Get current user who is converting (admin/superadmin)
+            $convertedBy = auth()->user();
+
+            // Get lead user if exists (to transfer avatar)
+            $leadUser = User::where('email', $lead->email)->first();
+            $leadAvatar = $leadUser ? $leadUser->avatar : null;
+
+            // Store lead data before any deletion
+            $leadData = [
+                'id' => $lead->id,
+                'name' => $lead->name,
+                'company' => $lead->company,
+                'email' => $lead->email,
+                'phone' => $lead->phone,
+                'avatar' => $leadAvatar,
+            ];
+
+            // Store counts for logging
+            $communicationsCount = $lead->communications->count();
+            $documentsCount = $lead->documents->count();
+            $feedbackCount = $lead->feedback->count();
+            $leadId = $lead->id;
+
             // Generate password for client user account
             $password = \Illuminate\Support\Str::random(12);
 
@@ -144,12 +167,22 @@ class LeadService
                 [
                     'name' => $lead->name,
                     'password' => Hash::make($password),
+                    'avatar' => $leadAvatar, // Transfer avatar from lead user
                 ]
             );
 
-            // Update password if user already exists (to give them new credentials)
+            // If user already exists, update password and transfer avatar if not set
             if (!$user->wasRecentlyCreated) {
-                $user->update(['password' => Hash::make($password)]);
+                $updateData = ['password' => Hash::make($password)];
+                if ($leadAvatar && !$user->avatar) {
+                    $updateData['avatar'] = $leadAvatar;
+                }
+                $user->update($updateData);
+            } else {
+                // If new user created, ensure avatar is set
+                if ($leadAvatar && !$user->avatar) {
+                    $user->update(['avatar' => $leadAvatar]);
+                }
             }
 
             // Assign Client role if not already assigned
@@ -157,9 +190,9 @@ class LeadService
                 $user->assignRole('Client');
             }
 
-            // Create client from lead data
+            // Create client from lead data with conversion details
             $client = Client::create([
-                'user_id' => $user->id, // Assign the client's user account (not the admin who created the lead)
+                'user_id' => $user->id,
                 'company_name' => $lead->company ?? $lead->name,
                 'contact_person' => $lead->name,
                 'email' => $lead->email,
@@ -168,6 +201,14 @@ class LeadService
                 'lead_id' => $lead->id,
                 'notes' => $lead->notes,
                 'is_active' => true,
+                'type' => 'from_lead',
+                'converted_by' => $convertedBy->id,
+                'converted_at' => now(),
+                'lead_name' => $lead->name,
+                'lead_company' => $lead->company,
+                'lead_email' => $lead->email,
+                'lead_phone' => $lead->phone,
+                'lead_avatar' => $leadAvatar,
             ]);
 
             // Assign staff from lead to client if staff is assigned to lead
@@ -178,7 +219,7 @@ class LeadService
                 ]);
             }
 
-            // Migrate all communications
+            // Migrate all communications from lead to client
             foreach ($lead->communications as $communication) {
                 $communication->update([
                     'communicable_type' => Client::class,
@@ -186,7 +227,7 @@ class LeadService
                 ]);
             }
 
-            // Migrate all documents
+            // Migrate all documents from lead to client
             foreach ($lead->documents as $document) {
                 $document->update([
                     'documentable_type' => Client::class,
@@ -194,7 +235,7 @@ class LeadService
                 ]);
             }
 
-            // Migrate all feedback
+            // Migrate all feedback from lead to client
             foreach ($lead->feedback as $feedback) {
                 $feedback->update([
                     'client_id' => $client->id,
@@ -205,19 +246,12 @@ class LeadService
             // Delete follow-up tasks (lead-specific, not needed for client)
             $lead->followUpTasks()->delete();
 
-            // Update lead to mark as converted and remove data
-            $lead->update([
-                'converted_to_client_id' => $client->id,
-                'converted_at' => now(),
-                'notes' => null, // Remove notes as they're now in client
-            ]);
-
             // Send credentials email to the client (with error handling)
             try {
                 $notificationService = app(NotificationService::class);
                 $notificationService->sendUserRegistrationEmail($user, $password, 'client');
                 Log::info('Credentials email sent to client after lead conversion', [
-                    'lead_id' => $lead->id,
+                    'lead_id' => $leadId,
                     'client_id' => $client->id,
                     'user_id' => $user->id,
                     'email' => $user->email
@@ -225,20 +259,60 @@ class LeadService
             } catch (\Exception $e) {
                 // Log error but don't fail conversion
                 Log::error('Failed to send credentials email to client after lead conversion', [
-                    'lead_id' => $lead->id,
+                    'lead_id' => $leadId,
                     'client_id' => $client->id,
                     'user_id' => $user->id,
                     'error' => $e->getMessage()
                 ]);
             }
 
-            Log::info('Lead converted to client with all data migrated', [
-                'lead_id' => $lead->id,
+            // Send notification to admins/superadmins about the conversion
+            try {
+                $notificationService = app(NotificationService::class);
+                $notificationService->notifyAdminsLeadConverted([
+                    'id' => $lead->id,
+                    'name' => $lead->name,
+                    'company' => $lead->company,
+                    'email' => $lead->email,
+                    'phone' => $lead->phone,
+                ], $client);
+            } catch (\Exception $e) {
+                // Log error but don't fail conversion
+                Log::error('Failed to send conversion notification to admins', [
+                    'lead_id' => $leadId,
+                    'client_id' => $client->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            // NOW DELETE LEAD USER if same email (only after all data is migrated)
+            if ($leadUser && $leadUser->email === $lead->email) {
+                // Check if this user has other relationships before deleting
+                $hasOtherRelations = $leadUser->staff ||
+                                    ($leadUser->client && $leadUser->client->id !== $client->id) ||
+                                    ($leadUser->lead && $leadUser->lead->id !== $lead->id);
+
+                if (!$hasOtherRelations) {
+                    // Delete lead user only if no other relationships
+                    $leadUser->delete();
+                    Log::info('Lead user deleted after conversion', [
+                        'user_id' => $leadUser->id,
+                        'email' => $leadUser->email,
+                        'client_id' => $client->id
+                    ]);
+                }
+            }
+
+            // FINALLY DELETE THE LEAD from the lead table (after everything is migrated)
+            $lead->delete();
+
+            Log::info('Lead converted to client with all data migrated and lead deleted', [
+                'lead_id' => $leadId,
                 'client_id' => $client->id,
                 'user_id' => $user->id,
-                'communications_migrated' => $lead->communications->count(),
-                'documents_migrated' => $lead->documents->count(),
-                'feedback_migrated' => $lead->feedback->count(),
+                'communications_migrated' => $communicationsCount,
+                'documents_migrated' => $documentsCount,
+                'feedback_migrated' => $feedbackCount,
             ]);
 
             return $client;

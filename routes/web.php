@@ -290,6 +290,7 @@ Route::middleware(['access:view admin dashboard'])->prefix('admin')->name('admin
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/update-image', [ProfileController::class, 'updateImage'])->name('profile.update-image');
     Route::post('/profile/documents', [\App\Http\Controllers\Admin\ProfileController::class, 'uploadDocument'])->name('profile.documents.store');
     Route::delete('/profile/documents/{document}', [\App\Http\Controllers\Admin\ProfileController::class, 'deleteDocument'])->name('profile.documents.destroy');
     Route::get('/profile/documents/{document}/download', [\App\Http\Controllers\Admin\ProfileController::class, 'downloadDocument'])->name('profile.documents.download');

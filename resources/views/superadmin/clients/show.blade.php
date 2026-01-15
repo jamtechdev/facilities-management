@@ -132,10 +132,36 @@
                             <i class="bi bi-info-circle me-2"></i>Additional Information
                         </h5>
                     </div>
-                    @if ($client->lead)
+                    <div class="col-md-6 col-lg-4">
+                        <x-info-card label="Client Type" :value="ucfirst(str_replace('_', ' ', $client->type ?? 'direct'))" :badge="$client->type ?? 'direct'" />
+                    </div>
+                    @if ($client->type === 'from_lead')
                         <div class="col-md-6 col-lg-4">
-                            <x-info-card label="Converted From Lead" :value="$client->lead->name" :link="\App\Helpers\RouteHelper::url('leads.show', $client->lead)" />
+                            <x-info-card label="Converted From Lead" :value="$client->lead_name ?? 'N/A'" />
                         </div>
+                        @if ($client->converted_by)
+                            <div class="col-md-6 col-lg-4">
+                                <x-info-card label="Converted By" :value="$client->convertedBy->name ?? 'N/A'" />
+                            </div>
+                        @endif
+                        @if ($client->converted_at)
+                            <div class="col-md-6 col-lg-4">
+                                <x-info-card label="Converted On" :value="$client->converted_at->format('M d, Y')" />
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <x-info-card label="Converted At" :value="$client->converted_at->format('h:i A')" />
+                            </div>
+                        @endif
+                        @if ($client->lead_avatar)
+                            <div class="col-md-6 col-lg-4">
+                                <div class="info-card">
+                                    <div class="info-card-label">Lead Image</div>
+                                    <div class="info-card-value">
+                                        <img src="{{ asset('storage/' . $client->lead_avatar) }}" alt="Lead Image" class="img-thumbnail" style="max-width: 100px; max-height: 100px; object-fit: cover;">
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     @endif
                     <div class="col-md-6 col-lg-4">
                         <x-info-card label="Created" :value="$client->created_at->format('M d, Y h:i A')" />

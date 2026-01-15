@@ -43,6 +43,11 @@ class ClientService
                 $data['user_id'] = $user->id;
             }
 
+            // Set type as 'direct' if not already set (for direct client creation)
+            if (!isset($data['type'])) {
+                $data['type'] = 'direct';
+            }
+
             return Client::create($data);
         });
     }

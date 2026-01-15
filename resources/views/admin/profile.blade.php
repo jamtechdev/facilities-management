@@ -11,11 +11,22 @@
     <!-- Profile Header -->
     <div class="profile-header">
         <div class="profile-header-content">
-            <div class="profile-avatar">
-                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+            <div class="profile-avatar position-relative">
+                <div id="avatar-container" class="w-100 h-100">
+                    @if ($user->avatar)
+                        <img id="profile-preview" src="{{ asset('storage/' . $user->avatar) }}" class="rounded-circle">
+                    @else
+                        <span id="avatar-initial">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                    @endif
+                </div>
+
+                <label for="profile_image_input" class="profile-image-edit-btn">
+                    <i class="bi bi-camera-fill"></i>
+                </label>
+                <input type="file" id="profile_image_input" class="d-none" accept="image/*">
             </div>
             <div class="profile-info">
-                <h1>{{ auth()->user()->name }}</h1>
+                <h1>{{ $user->name }}</h1>
                 <p>Update your personal information and manage your documents</p>
             </div>
         </div>
@@ -51,11 +62,11 @@
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label for="name" class="form-label">Name</label>
-                                        <input type="text" class="form-control" id="name" name="name" value="{{ auth()->user()->name }}" required>
+                                        <input type="text" class="form-control" id="name" name="name" value="{{ $user->name }}" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="email" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="email" name="email" value="{{ auth()->user()->email }}" required>
+                                        <input type="email" class="form-control" id="email" name="email" value="{{ $user->email }}" required>
                                     </div>
                                     <div class="col-12">
                                         <hr>
@@ -96,7 +107,7 @@
                             <div class="account-details-item">
                                 <p class="account-details-label">Email Verified</p>
                                 <p class="account-details-value">
-                                    @if(auth()->user()->email_verified_at)
+                                    @if ($user->email_verified_at)
                                         <span class="status-badge active">Verified</span>
                                     @else
                                         <span class="status-badge inactive">Not Verified</span>
@@ -105,7 +116,7 @@
                             </div>
                             <div class="account-details-item">
                                 <p class="account-details-label">Member Since</p>
-                                <p class="account-details-value">{{ auth()->user()->created_at->format('M d, Y') }}</p>
+                                <p class="account-details-value">{{ $user->created_at->format('M d, Y') }}</p>
                             </div>
                         </div>
                     </div>
@@ -195,6 +206,18 @@
 
 @push('scripts')
 <script>
+    // Alert function for displaying messages
+    function showAlert(type, message) {
+        if (typeof showToast !== 'undefined') {
+            showToast(type, message);
+        } else if (typeof toastr !== 'undefined') {
+            const toastType = type === 'danger' ? 'error' : type;
+            toastr[toastType](message);
+        } else {
+            alert(message);
+        }
+    }
+
     (function() {
         // Prevent duplicate event listeners
         const profileForm = document.getElementById('profileForm');
@@ -238,18 +261,12 @@
             const data = await response.json();
 
             if (data.success) {
-                if (typeof showToast !== 'undefined') {
-                    showToast('success', data.message);
-                }
+                showAlert('success', data.message);
             } else {
-                if (typeof showToast !== 'undefined') {
-                    showToast('error', data.message || 'Failed to update profile');
-                }
+                showAlert('danger', data.message || 'Failed to update profile');
             }
         } catch (error) {
-            if (typeof showToast !== 'undefined') {
-                showToast('error', 'Failed to update profile: ' + (error.message || 'Unknown error'));
-            }
+            showAlert('danger', 'Failed to update profile: ' + (error.message || 'Unknown error'));
         } finally {
             isSubmitting = false;
             btn.disabled = false;
@@ -286,19 +303,13 @@
 
                 const data = await response.json();
                 if (data.success) {
-                    if (typeof showToast !== 'undefined') {
-                    showToast('success', data.message);
-                }
+                    showAlert('success', data.message);
                     setTimeout(() => location.reload(), 1000);
                 } else {
-                    if (typeof showToast !== 'undefined') {
-                        showToast('error', data.message || 'Failed to upload document');
-                    }
+                    showAlert('danger', data.message || 'Failed to upload document');
                 }
             } catch (error) {
-                if (typeof showToast !== 'undefined') {
-                    showToast('error', 'Failed to upload document: ' + (error.message || 'Unknown error'));
-                }
+                showAlert('danger', 'Failed to upload document: ' + (error.message || 'Unknown error'));
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalText;
@@ -324,22 +335,66 @@
                 });
                 const data = await response.json();
                 if (data.success) {
-                    if (typeof showToast !== 'undefined') {
-                    showToast('success', data.message);
-                }
+                    showAlert('success', data.message);
                     setTimeout(() => location.reload(), 500);
                 } else {
-                    if (typeof showToast !== 'undefined') {
-                    showToast('error', data.message);
-                }
+                    showAlert('danger', data.message);
                 }
             } catch (error) {
-                if (typeof showToast !== 'undefined') {
-                    showToast('error', 'Failed to delete document: ' + error.message);
-                }
+                showAlert('danger', 'Failed to delete document: ' + error.message);
             }
         });
     });
+
+    // Profile Image Upload Logic
+    const profileImageInput = document.getElementById('profile_image_input');
+    if (profileImageInput) {
+        profileImageInput.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('profile_image', file);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            // UI change to show loading
+            const avatarContainer = document.getElementById('avatar-container');
+            const originalContent = avatarContainer.innerHTML;
+            avatarContainer.innerHTML = '<div class="spinner-border text-light" role="status"></div>';
+
+            try {
+                const response = await fetch('{{ \App\Helpers\RouteHelper::url('profile.update-image') }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Image preview update
+                    avatarContainer.innerHTML = `<img id="profile-preview" src="${data.image_url}"
+                        class="rounded-circle shadow-sm"
+                        style="width: 100%; height: 100%; object-fit: cover;">`;
+
+                    // Header ya Sidebar ki mini-profile image update karne ke liye (agar koi class/ID hai)
+                    const miniAvatars = document.querySelectorAll(
+                        '.header-avatar-img'); // header wali class change karein
+                    miniAvatars.forEach(img => img.src = data.image_url);
+
+                    showAlert('success', 'Profile picture updated successfully!');
+                } else {
+                    avatarContainer.innerHTML = originalContent;
+                    showAlert('danger', data.message || 'Upload failed');
+                }
+            } catch (error) {
+                avatarContainer.innerHTML = originalContent;
+                showAlert('danger', 'Failed to upload image.');
+            }
+        });
+    }
 </script>
 @endpush
 @endsection

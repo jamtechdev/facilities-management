@@ -38,8 +38,10 @@ class DashboardController extends Controller
 
         // Only load stats if user has permission to view the card
         if ($user->can('view dashboard leads card')) {
+            // Count all leads (excluding converted ones - they are deleted now)
             $stats['total_leads'] = Lead::count();
-            $stats['new_leads'] = Lead::whereDate('created_at', $today)->count();
+            // Count new leads by stage (not by date)
+            $stats['new_leads'] = Lead::where('stage', Lead::STAGE_NEW_LEAD)->count();
             $stats['qualified_leads'] = Lead::where('stage', 'qualified')->count();
         }
 

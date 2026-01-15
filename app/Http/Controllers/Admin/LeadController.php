@@ -159,15 +159,42 @@ class LeadController extends Controller
         ]);
 
         try {
+            // Store lead ID before update (in case it gets deleted during conversion)
+            $leadId = $lead->id;
+            $originalStage = $lead->stage;
+
             // Update stage field - observer will automatically convert if stage becomes "qualified"
             $lead->update(['stage' => $validated['stage']]);
 
-            // Refresh the model to get updated data (including conversion status)
-            $lead->refresh();
+            // Check if lead still exists (might be deleted if converted)
+            try {
+                $lead->refresh();
+            } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+                // Lead was deleted during conversion, return success with conversion message
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Lead stage updated and automatically converted to client. The lead has been removed.',
+                    'stage' => $validated['stage'],
+                    'is_qualified' => $validated['stage'] === 'qualified',
+                    'is_converted' => true,
+                    'converted' => true
+                ], 200);
+            }
 
             $message = 'Lead stage updated successfully.';
-            if ($lead->stage === 'qualified' && $lead->converted_to_client_id) {
+            $isConverted = false;
+
+            // Check if lead was converted (it might be soft-deleted)
+            if ($lead->trashed() || $lead->stage === 'qualified') {
+                // Try to find if a client was created from this lead
+                $client = \App\Models\Client::where('lead_id', $leadId)->first();
+                if ($client) {
+                    $message = 'Lead stage updated and automatically converted to client.';
+                    $isConverted = true;
+                }
+            } else if ($lead->converted_to_client_id) {
                 $message = 'Lead stage updated and automatically converted to client.';
+                $isConverted = true;
             }
 
             return response()->json([
@@ -175,7 +202,7 @@ class LeadController extends Controller
                 'message' => $message,
                 'stage' => $lead->stage,
                 'is_qualified' => $lead->stage === 'qualified',
-                'is_converted' => (bool)$lead->converted_to_client_id
+                'is_converted' => $isConverted
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -198,6 +225,31 @@ class LeadController extends Controller
                 'success' => false,
                 'message' => 'You do not have permission to convert leads.'
             ], 403);
+        }
+
+        // Check if lead is already converted (might be soft-deleted)
+        if ($lead->trashed()) {
+            // Lead was already converted and deleted, find the client
+            $client = \App\Models\Client::where('lead_id', $lead->id)->first();
+            if ($client) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Lead was already converted to client.',
+                    'redirect' => RouteHelper::url('clients.show', $client->id)
+                ], 200);
+            }
+        }
+
+        // Check if lead is already converted
+        if ($lead->converted_to_client_id) {
+            $client = \App\Models\Client::find($lead->converted_to_client_id);
+            if ($client) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Lead was already converted to client.',
+                    'redirect' => RouteHelper::url('clients.show', $client->id)
+                ], 200);
+            }
         }
 
         try {

@@ -99,6 +99,7 @@ class ClientController extends Controller
         $client->load([
             'user',
             'lead',
+            'convertedBy',
             'staff',
             'timesheets.staff',
             'jobPhotos.staff',

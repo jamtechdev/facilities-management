@@ -27,13 +27,17 @@ class LeadObserver
             && !$lead->converted_to_client_id) {
 
             try {
+                // Store lead data before conversion (lead will be deleted during conversion)
+                $leadId = $lead->id;
+                $leadStage = $lead->stage;
+
                 // Automatically convert lead to client
                 $client = $this->leadService->convertToClient($lead);
 
                 Log::info('Lead automatically converted to client via observer', [
-                    'lead_id' => $lead->id,
+                    'lead_id' => $leadId,
                     'client_id' => $client->id,
-                    'stage' => $lead->stage
+                    'stage' => $leadStage
                 ]);
             } catch (\Exception $e) {
                 // Log error but don't fail the update

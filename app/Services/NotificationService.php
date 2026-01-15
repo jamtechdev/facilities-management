@@ -8,7 +8,9 @@ use App\Mail\UserRegistrationMail;
 use App\Mail\NewUserNotificationMail;
 use App\Mail\NewLeadNotificationMail;
 use App\Mail\LeadWelcomeMail;
+use App\Mail\LeadConvertedToClientMail;
 use App\Models\Lead;
+use App\Models\Client;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
@@ -137,6 +139,63 @@ class NotificationService
         } catch (\Exception $e) {
             Log::error('Failed to notify admins about new lead', [
                 'lead_id' => $lead->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Send notification to admins/superadmins about lead conversion to client
+     *
+     * @param array $leadData Array containing lead information (id, name, company, email, phone)
+     * @param Client $client The client that was created from the lead
+     */
+    public function notifyAdminsLeadConverted(array $leadData, Client $client): void
+    {
+        try {
+            // Get all admins and superadmins
+            $admins = User::whereHas('roles', function($query) {
+                $query->whereIn('name', ['Admin', 'SuperAdmin']);
+            })->get();
+
+            foreach ($admins as $admin) {
+                // Check if admin has email notifications enabled
+                $settings = UserSetting::getOrCreateForUser($admin->id);
+
+                if ($settings->email_notifications) {
+                    try {
+                        Mail::to($admin->email)->send(new LeadConvertedToClientMail($leadData, $client));
+                        Log::info('Lead conversion notification sent to admin', [
+                            'admin_id' => $admin->id,
+                            'lead_id' => $leadData['id'],
+                            'client_id' => $client->id
+                        ]);
+                    } catch (\Exception $e) {
+                        Log::error('Failed to send lead conversion notification to admin', [
+                            'admin_id' => $admin->id,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                }
+
+                // Send push notification if enabled
+                if ($settings->in_app_notifications) {
+                    $this->sendPushNotification($admin, [
+                        'title' => 'Lead Converted to Client',
+                        'body' => $leadData['name'] . ' has been converted to a client',
+                        'type' => 'lead_converted',
+                        'data' => [
+                            'lead_id' => $leadData['id'],
+                            'client_id' => $client->id,
+                            'lead_name' => $leadData['name'],
+                        ]
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to notify admins about lead conversion', [
+                'lead_id' => $leadData['id'] ?? null,
+                'client_id' => $client->id,
                 'error' => $e->getMessage()
             ]);
         }
