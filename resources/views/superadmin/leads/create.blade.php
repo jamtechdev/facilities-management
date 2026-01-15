@@ -102,7 +102,7 @@
                                 @enderror
                             </div>
 
-                            <div class="col-md-6">
+                            {{-- <div class="col-md-6">
                                 <label for="stage" class="form-label">
                                     <i class="bi bi-diagram-3 me-1"></i>Stage <span class="text-danger">*</span>
                                 </label>
@@ -116,7 +116,7 @@
                                 @error('stage')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                            </div>
+                            </div> --}}
 
                             {{-- Staff assignment from lead page is disabled - Staff should be assigned to clients directly --}}
                             <div class="col-md-6">
