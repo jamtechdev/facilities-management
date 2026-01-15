@@ -9,7 +9,7 @@
 @section('content')
     <div class="container-fluid">
         <!-- Invoice Header -->
-        <x-header-card :title="'Invoice #' . $invoice->invoice_number" :company="$invoice->client->company_name" :email="$invoice->client->email" :phone="$invoice->client->phone" type="client">
+        <x-header-card :title="'Invoice #' . $invoice->invoice_number" :company="$invoice->client->company_name ?? 'Client Not Found'" :email="$invoice->client->email ?? 'N/A'" :phone="$invoice->client->phone ?? 'N/A'" type="client">
             <x-slot name="actions">
                 @if (auth()->user()->can('edit invoices'))
                     <button class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#sendInvoiceEmailModal">
@@ -94,13 +94,13 @@
                         </h5>
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <x-info-card label="Company Name" :value="$invoice->client->company_name" />
+                        <x-info-card label="Company Name" :value="$invoice->client->company_name ?? 'N/A'" />
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <x-info-card label="Contact Person" :value="$invoice->client->contact_person" />
+                        <x-info-card label="Contact Person" :value="$invoice->client->contact_person ?? 'N/A'" />
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <x-info-card label="Email" :value="$invoice->client->email" :link="'mailto:' . $invoice->client->email" />
+                        <x-info-card label="Email" :value="$invoice->client->email ?? 'N/A'" :link="'mailto:' . $invoice->client->email" />
                     </div>
                     <div class="col-md-6 col-lg-4">
                         <x-info-card label="Phone" :value="$invoice->client->phone ?? '-'" :link="$invoice->client->phone ? 'tel:' . $invoice->client->phone : null" />
