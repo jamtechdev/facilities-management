@@ -132,6 +132,33 @@ class ProfileController extends Controller
         }
     }
 
+    public function updateImage(Request $request)
+    {
+        $request->validate([
+            'profile_image' => 'required|image|mimes:jpeg,png,jpg|max:2048'
+        ]);
+
+        $user = auth()->user();
+
+        if ($request->hasFile('profile_image')) {
+            // Purani photo delete karein agar zaruri ho
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+
+            $path = $request->file('profile_image')->store('profile-photos', 'public');
+            $user->update(['avatar' => $path]);
+
+            return response()->json([
+                'success' => true,
+                'image_url' => asset('storage/' . $path),
+                'message' => 'Profile image updated!'
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No file uploaded']);
+    }
+
     /**
      * Delete a document
      */
