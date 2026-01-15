@@ -26,6 +26,8 @@ class LeadService
             }
 
             $data['user_id'] = auth()->id();
+            $data['stage'] = 'new_lead';
+
             $lead = Lead::create($data);
 
             // Generate password for lead user account

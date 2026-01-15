@@ -27,7 +27,7 @@ class LeadDataTable extends DataTable
             ->addIndexColumn()
             ->addColumn('stage_badge', function (Lead $lead) {
                 $user = auth()->user();
-                $canEditStage = $user->can('view roles'); // SuperAdmin can edit directly
+                $canEditStage = $user->can('view roles') || $user->hasRole('Admin') || $user->can('edit leads');
 
                 $stageColors = [
                     'new_lead' => 'primary',

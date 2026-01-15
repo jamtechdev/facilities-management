@@ -186,7 +186,7 @@
                 </div>
 
                 @if ($staff->timesheets->count() > 0)
-                    <div class="table-responsive">
+                    <div class="table-responsive" style="max-height: 800px; min-height: 400px;">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
@@ -243,17 +243,17 @@
                                                         <ul class="dropdown-menu">
                                                             <li>
                                                                 <a class="dropdown-item change-timesheet-status" href="#" data-timesheet-id="{{ $timesheet->id }}" data-status="pending">
-                                                                    <span class="badge bg-warning me-2">Pending</span> Set to Pending
+                                                                    <span class="badge bg-warning me-2">Pending</span>
                                                                 </a>
                                                             </li>
                                                             <li>
                                                                 <a class="dropdown-item change-timesheet-status" href="#" data-timesheet-id="{{ $timesheet->id }}" data-status="completed">
-                                                                    <span class="badge bg-info me-2">Completed</span> Set to Completed
+                                                                    <span class="badge bg-info me-2">Completed</span>
                                                                 </a>
                                                             </li>
                                                             <li>
                                                                 <a class="dropdown-item change-timesheet-status" href="#" data-timesheet-id="{{ $timesheet->id }}" data-status="approved">
-                                                                    <span class="badge bg-success me-2">Approved</span> Approve
+                                                                    <span class="badge bg-success me-2">Approved</span>
                                                                 </a>
                                                             </li>
                                                         </ul>

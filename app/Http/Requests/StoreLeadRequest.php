@@ -43,7 +43,7 @@ class StoreLeadRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:20'],
             'city' => ['nullable', 'string', 'max:255'],
             'source' => ['nullable', 'string', 'max:255'],
-            'stage' => ['required', 'in:new_lead,in_progress,qualified,not_qualified,junk'],
+            // 'stage' => ['required', 'in:new_lead,in_progress,qualified,not_qualified,junk'],
             'assigned_staff_id' => ['nullable', 'exists:staff,id'],
             'notes' => ['nullable', 'string'],
         ];
@@ -61,7 +61,7 @@ class StoreLeadRequest extends FormRequest
             'email.required' => 'The email field is required.',
             'email.email' => 'Please enter a valid email address.',
             'email.unique' => 'This email is already registered as a lead.',
-            'stage.required' => 'Please select a stage.',
+            // 'stage.required' => 'Please select a stage.',
             'stage.in' => 'Invalid stage selected.',
             'assigned_staff_id.exists' => 'Selected staff does not exist.',
         ];

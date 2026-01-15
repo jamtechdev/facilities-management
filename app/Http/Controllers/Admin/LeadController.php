@@ -147,7 +147,7 @@ class LeadController extends Controller
         $user = auth()->user();
 
         // Only SuperAdmin (users with view roles permission) can update stage directly
-        if (!$user->can('view roles')) {
+        if (!$user->can('view roles') && !$user->hasRole('Admin') && !$user->can('edit leads')) {
             return response()->json([
                 'success' => false,
                 'message' => 'You do not have permission to update lead stage.'
