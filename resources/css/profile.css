@@ -516,3 +516,17 @@
     border: 2px solid #fff;
     z-index: 10;
 }
+
+.navbar-user-avatar {
+    width: 38px; /* Container ka size fix karein */
+    height: 38px;
+    border-radius: 50%;
+    overflow: hidden; /* Ye zaroori hai taaki image bahar na nikle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#global-header-img {
+    object-fit: cover; /* Isse face center mein rehta hai */
+}

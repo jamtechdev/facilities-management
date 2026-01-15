@@ -51,10 +51,10 @@
                             <div class="row g-4">
                                 <div class="col-md-6">
                                     <label for="client_id" class="form-label">
-                                        <i class="bi bi-building me-1"></i>Client <span class="text-danger">*</span>
+                                        <i class="bi bi-building me-1"></i>Company <span class="text-danger">*</span>
                                     </label>
                                     <select class="form-select" id="client_id" name="client_id" required>
-                                        <option value="">Select a client...</option>
+                                        <option value="">Select a company...</option>
                                         @foreach ($clients as $client)
                                             <option value="{{ $client->id }}"
                                                 {{ old('client_id') == $client->id ? 'selected' : '' }}>

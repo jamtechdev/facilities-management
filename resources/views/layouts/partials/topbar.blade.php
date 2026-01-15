@@ -11,14 +11,15 @@
 
         <div class="navbar-top-right">
             <div class="navbar-icon-wrapper" data-bs-toggle="tooltip" title="Notifications">
-                <button class="navbar-icon-btn" type="button" id="notificationsBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="navbar-icon-btn" type="button" id="notificationsBtn" data-bs-toggle="dropdown"
+                    aria-expanded="false">
                     <i class="bi bi-bell"></i>
                     @php
                         $notificationCount = \App\Models\FollowUpTask::where('is_completed', false)
                             ->where('due_date', '<=', \Carbon\Carbon::now()->addDays(7))
                             ->count();
                     @endphp
-                    @if($notificationCount > 0)
+                    @if ($notificationCount > 0)
                         <span class="navbar-badge">{{ $notificationCount > 99 ? '99+' : $notificationCount }}</span>
                     @endif
                 </button>
@@ -37,27 +38,33 @@
                                 ->take(10)
                                 ->get();
                         @endphp
-                        @if($notifications->count() > 0)
-                            @foreach($notifications as $notification)
+                        @if ($notifications->count() > 0)
+                            @foreach ($notifications as $notification)
                                 @php
                                     $isOverdue = $notification->due_date->isPast();
                                     $daysUntil = $notification->due_date->diffInDays(\Carbon\Carbon::now(), false);
                                 @endphp
-                                <a href="{{ \App\Helpers\RouteHelper::url('leads.show', $notification->lead) }}" class="dropdown-item notification-item {{ $isOverdue ? 'notification-overdue' : '' }}">
+                                <a href="{{ \App\Helpers\RouteHelper::url('leads.show', $notification->lead) }}"
+                                    class="dropdown-item notification-item {{ $isOverdue ? 'notification-overdue' : '' }}">
                                     <div class="d-flex align-items-start">
                                         <div class="flex-shrink-0">
-                                            <i class="bi bi-calendar-event text-{{ $isOverdue ? 'danger' : 'warning' }}"></i>
+                                            <i
+                                                class="bi bi-calendar-event text-{{ $isOverdue ? 'danger' : 'warning' }}"></i>
                                         </div>
                                         <div class="flex-grow-1 ms-2">
                                             <div class="fw-bold">{{ $notification->lead->name }}</div>
-                                            <small class="text-muted">{{ Str::limit($notification->suggestion, 50) }}</small>
+                                            <small
+                                                class="text-muted">{{ Str::limit($notification->suggestion, 50) }}</small>
                                             <div class="mt-1">
                                                 <small class="text-muted">
-                                                    Day {{ $notification->reminder_day }} - {{ $notification->due_date->format('M d, Y') }}
-                                                    @if($isOverdue)
-                                                        <span class="badge bg-danger ms-1">{{ abs($daysUntil) }}d overdue</span>
+                                                    Day {{ $notification->reminder_day }} -
+                                                    {{ $notification->due_date->format('M d, Y') }}
+                                                    @if ($isOverdue)
+                                                        <span class="badge bg-danger ms-1">{{ abs($daysUntil) }}d
+                                                            overdue</span>
                                                     @elseif($daysUntil <= 3)
-                                                        <span class="badge bg-warning ms-1">{{ $daysUntil }}d left</span>
+                                                        <span class="badge bg-warning ms-1">{{ $daysUntil }}d
+                                                            left</span>
                                                     @endif
                                                 </small>
                                             </div>
@@ -73,18 +80,31 @@
                             </div>
                         @endif
                     </div>
-                    @if($notifications->count() > 10)
+                    @if ($notifications->count() > 10)
                         <div class="dropdown-footer text-center py-2">
-                            <a href="{{ \App\Helpers\RouteHelper::url('dashboard') }}" class="text-decoration-none small">View all notifications</a>
+                            <a href="{{ \App\Helpers\RouteHelper::url('dashboard') }}"
+                                class="text-decoration-none small">View all notifications</a>
                         </div>
                     @endif
                 </div>
             </div>
 
             <div class="navbar-user-dropdown">
-                <button class="navbar-user-btn" type="button" id="userDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                    <div class="navbar-user-avatar">
+                <button class="navbar-user-btn" type="button" id="userDropdownBtn" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    {{-- <div class="navbar-user-avatar">
                         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    </div> --}}
+                    <div class="navbar-user-avatar" id="global-header-avatar-container">
+                        @if (auth()->user()->avatar)
+                            <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Profile"
+                                id="global-header-img"
+                                style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        @else
+                            <span id="global-header-initial">
+                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                            </span>
+                        @endif
                     </div>
                     <div class="navbar-user-info">
                         <div class="navbar-user-name">{{ auth()->user()->name }}</div>
@@ -92,7 +112,7 @@
                             @php
                                 $user = auth()->user();
                                 $role = $user->roles->first();
-                                if($role) {
+                                if ($role) {
                                     $roleName = $role->name;
                                     // Map role names to colors
                                     $roleColorMap = [
@@ -117,8 +137,9 @@
                     <a class="dropdown-item user-dropdown-item" href="{{ \App\Helpers\RouteHelper::url('profile') }}">
                         <i class="bi bi-person-circle me-2"></i>Profile
                     </a>
-                    @if(auth()->user()->can('view admin dashboard'))
-                        <a class="dropdown-item user-dropdown-item {{ \App\Helpers\RouteHelper::routeIsAny('settings') ? 'active' : '' }}" href="{{ \App\Helpers\RouteHelper::url('settings') }}">
+                    @if (auth()->user()->can('view admin dashboard'))
+                        <a class="dropdown-item user-dropdown-item {{ \App\Helpers\RouteHelper::routeIsAny('settings') ? 'active' : '' }}"
+                            href="{{ \App\Helpers\RouteHelper::url('settings') }}">
                             <i class="bi bi-gear me-2"></i>Settings
                         </a>
                     @endif

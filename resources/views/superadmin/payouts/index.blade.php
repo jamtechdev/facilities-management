@@ -12,7 +12,12 @@
         <div class="profile-header">
             <div class="profile-header-content">
                 <div class="profile-avatar">
-                    <i class="bi bi-cash-coin icon-2-5rem"></i>
+                    @if (auth()->user()->avatar)
+                        <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Profile"
+                            style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    @else
+                        <i class="bi bi-person-lines-fill icon-2-5rem"></i>
+                    @endif
                 </div>
                 <div class="profile-info flex-grow-1">
                     <h1>Staff Payouts</h1>
@@ -33,25 +38,27 @@
                             <div class="row g-3">
                                 <div class="col-12">
                                     <label for="staff_id" class="form-label fw-semibold">Select Staff <span
-                                        class="text-danger">*</span></label>
+                                            class="text-danger">*</span></label>
                                     <select class="form-select form-select-lg" id="staff_id" name="staff_id" required>
-                                    <option value="">Choose a staff member...</option>
-                                    @foreach ($staff as $s)
-                                        <option value="{{ $s->id }}" data-rate="{{ $s->hourly_rate }}">
-                                            {{ $s->name }} - ${{ number_format($s->hourly_rate, 2) }}/hr
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                                        <option value="">Choose a staff member...</option>
+                                        @foreach ($staff as $s)
+                                            <option value="{{ $s->id }}" data-rate="{{ $s->hourly_rate }}">
+                                                {{ $s->name }} - ${{ number_format($s->hourly_rate, 2) }}/hr
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <div class="col-md-6">
                                     <label for="start_date" class="form-label fw-semibold">Start Date <span
                                             class="text-danger">*</span></label>
-                                    <input type="date" class="form-control form-control-lg" id="start_date" name="start_date" required>
+                                    <input type="date" class="form-control form-control-lg" id="start_date"
+                                        name="start_date" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="end_date" class="form-label fw-semibold">End Date <span
                                             class="text-danger">*</span></label>
-                                    <input type="date" class="form-control form-control-lg" id="end_date" name="end_date" required>
+                                    <input type="date" class="form-control form-control-lg" id="end_date"
+                                        name="end_date" required>
                                 </div>
                                 <div class="col-12">
                                     <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
@@ -94,8 +101,8 @@
         <script>
             // Pass routes to JS via data attributes - use RouteHelper for correct prefix
             window.payoutRoutes = {
-                calculate: '{{ \App\Helpers\RouteHelper::url("payouts.calculate") }}',
-                download: '{{ \App\Helpers\RouteHelper::url("payouts.download") }}'
+                calculate: '{{ \App\Helpers\RouteHelper::url('payouts.calculate') }}',
+                download: '{{ \App\Helpers\RouteHelper::url('payouts.download') }}'
             };
         </script>
         @vite(['resources/js/pages/payouts.js'])
