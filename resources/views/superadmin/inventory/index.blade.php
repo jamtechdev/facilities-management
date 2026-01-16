@@ -11,9 +11,17 @@
     <!-- Inventory Header -->
     <div class="profile-header">
         <div class="profile-header-content">
-            <div class="profile-avatar">
+            {{-- <div class="profile-avatar">
                 <i class="bi bi-box-seam icon-2-5rem"></i>
-            </div>
+            </div> --}}
+             <div class="profile-avatar">
+                    @if (auth()->user()->avatar)
+                        <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Profile"
+                            style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    @else
+                        <i class="bi bi-person-lines-fill icon-2-5rem"></i>
+                    @endif
+                </div>
             <div class="profile-info flex-grow-1">
                 <h1>Inventory Management</h1>
                 <p>Manage cleaning inventory items</p>

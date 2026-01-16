@@ -220,4 +220,32 @@ class ProfileController extends Controller
 
         return Storage::disk('public')->download($document->file_path, $downloadName);
     }
+
+    public function updateImage(Request $request)
+    {
+        $request->validate([
+            'avatar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $user = auth()->user();
+
+        if ($request->hasFile('avatar')) {
+
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+
+            $path = $request->file('avatar')->store('profile-photos', 'public');
+
+            $user->update(['avatar' => $path]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile image updated successfully',
+                'url' => asset('storage/' . $path)
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No file uploaded'], 400);
+    }
 }

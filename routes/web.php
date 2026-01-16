@@ -59,6 +59,7 @@ Route::middleware(['access:view staff dashboard'])->prefix('staff')->name('staff
     Route::post('/profile/documents', [\App\Http\Controllers\Staff\ProfileController::class, 'uploadDocument'])->name('profile.documents.store');
     Route::delete('/profile/documents/{document}', [\App\Http\Controllers\Staff\ProfileController::class, 'deleteDocument'])->name('profile.documents.destroy');
     Route::get('/profile/documents/{document}/download', [\App\Http\Controllers\Staff\ProfileController::class, 'downloadDocument'])->name('profile.documents.download');
+    Route::post('/profile/image', [\App\Http\Controllers\Staff\ProfileController::class, 'updateImage'])->name('profile.image.update');
     Route::get('/timesheet', [\App\Http\Controllers\Staff\TimesheetController::class, 'index'])->name('timesheet');
     Route::post('/timesheet/clock-in', [\App\Http\Controllers\Staff\TimesheetController::class, 'clockIn'])->name('timesheet.clock-in');
     Route::post('/timesheet/clock-out', [\App\Http\Controllers\Staff\TimesheetController::class, 'clockOut'])->name('timesheet.clock-out');
@@ -85,6 +86,7 @@ Route::middleware(['access:view client dashboard'])->prefix('client')->name('cli
     Route::post('/profile/documents', [\App\Http\Controllers\Client\ProfileController::class, 'uploadDocument'])->name('profile.documents.store');
     Route::get('/profile/documents/{document}/download', [\App\Http\Controllers\Client\ProfileController::class, 'downloadDocument'])->name('profile.documents.download');
     Route::delete('/profile/documents/{document}', [\App\Http\Controllers\Client\ProfileController::class, 'destroyDocument'])->name('profile.documents.destroy');
+    Route::post('/profile/image', [\App\Http\Controllers\Client\ProfileController::class, 'updateImage'])->name('profile.image.update');
     Route::get('/staff', [\App\Http\Controllers\Client\StaffController::class, 'index'])->name('staff.index');
     Route::get('/staff/{staff}', [\App\Http\Controllers\Client\StaffController::class, 'show'])->name('staff.show');
     Route::get('/services', [\App\Http\Controllers\Client\ServiceHistoryController::class, 'index'])->name('services');
