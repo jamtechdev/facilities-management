@@ -11,8 +11,22 @@
         <!-- Profile Header -->
         <div class="profile-header">
             <div class="profile-header-content">
-                <div class="profile-avatar">
+                {{-- <div class="profile-avatar">
                     {{ strtoupper(substr($client->contact_person ?? ($client->company_name ?? 'C'), 0, 1)) }}
+                </div> --}}
+                <div class="profile-avatar position-relative">
+                    <div id="avatar-container" class="w-100 h-100">
+                        @if ($user->avatar)
+                            <img id="profile-preview" src="{{ asset('storage/' . $user->avatar) }}" class="rounded-circle">
+                        @else
+                            <span id="avatar-initial">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                        @endif
+                    </div>
+
+                    <label for="profile_image_input" class="profile-image-edit-btn">
+                        <i class="bi bi-camera-fill"></i>
+                    </label>
+                    <input type="file" id="profile_image_input" class="d-none" accept="image/*">
                 </div>
                 <div class="profile-info">
                     <h1>{{ $client->company_name }}</h1>
@@ -135,7 +149,8 @@
                                     @csrf
 
                                     <div class="mb-3">
-                                        <label class="form-label">Document Title <span class="text-danger">*</span></label>
+                                        <label class="form-label">Document Title <span
+                                                class="text-danger">*</span></label>
                                         <input type="text" class="form-control" name="name"
                                             placeholder="e.g., GST Certificate, Agreement" required>
                                     </div>
@@ -272,7 +287,8 @@
                         } else {
                             let errorMsg = data.message || 'Update failed';
                             if (data.errors) {
-                                errorMsg += '<br><small>' + Object.values(data.errors).flat().join('<br>') + '</small>';
+                                errorMsg += '<br><small>' + Object.values(data.errors).flat().join('<br>') +
+                                    '</small>';
                             }
                             showAlert('danger', errorMsg);
                         }
@@ -299,14 +315,15 @@
                     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
 
                     try {
-                        const response = await fetch('{{ \App\Helpers\RouteHelper::url('profile.documents.store') }}', {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            }
-                        });
+                        const response = await fetch(
+                            '{{ \App\Helpers\RouteHelper::url('profile.documents.store') }}', {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                }
+                            });
 
                         if (!response.ok) {
                             throw new Error(`HTTP error! status: ${response.status}`);
@@ -339,7 +356,7 @@
                 button.addEventListener('click', async function() {
                     if (!confirm(
                             'Are you sure you want to delete this document? This action cannot be undone.'
-                            )) {
+                        )) {
                         return;
                     }
 
@@ -368,7 +385,6 @@
                 });
             });
 
-            // Alert Function - using toastr
             function showAlert(type, message) {
                 if (typeof showToast !== 'undefined') {
                     showToast(type, message);
@@ -380,13 +396,58 @@
                 }
             }
 
-            // Legacy code removed - keeping for reference
             if (false) {
-                    setTimeout(() => {
-                        const alert = container.querySelector('.alert');
-                        if (alert) alert.remove();
-                    }, 5000);
-                }
+                setTimeout(() => {
+                    const alert = container.querySelector('.alert');
+                    if (alert) alert.remove();
+                }, 5000);
+            }
+
+            const imageInput = document.getElementById('profile_image_input');
+            const avatarContainer = document.getElementById('avatar-container');
+
+            if (imageInput) {
+                imageInput.addEventListener('change', async function() {
+                    if (!this.files || !this.files[0]) return;
+
+                    if (this.files[0].size > 2 * 1024 * 1024) {
+                        showAlert('danger', 'File size too large (Max 2MB)');
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('avatar', this.files[0]);
+
+                    try {
+                        avatarContainer.style.opacity = '0.5';
+
+                        const response = await fetch(
+                        '{{ \App\Helpers\RouteHelper::url('profile.image.update') }}', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        });
+
+                        const data = await response.json();
+
+                        if (data.success) {
+
+                            avatarContainer.innerHTML =
+                                `<img id="profile-preview" src="${data.url}" class="rounded-circle" style="width:100px; height:100px; object-fit:cover;">`;
+                            showAlert('success', 'Profile picture updated!');
+                        } else {
+                            showAlert('danger', data.message || 'Upload failed');
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        showAlert('danger', 'Error uploading image');
+                    } finally {
+                        avatarContainer.style.opacity = '1';
+                    }
+                });
             }
         </script>
     @endpush

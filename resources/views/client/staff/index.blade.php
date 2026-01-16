@@ -12,8 +12,16 @@
     <div class="profile-header">
         <div class="profile-header-content">
             <div class="d-flex align-items-center gap-4">
-                <div class="profile-avatar avatar-large">
+                {{-- <div class="profile-avatar avatar-large">
                     <i class="bi bi-people icon-2-5rem"></i>
+                </div> --}}
+                 <div class="profile-avatar">
+                    @if (auth()->user()->avatar)
+                        <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Profile"
+                            style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    @else
+                        <i class="bi bi-person-lines-fill icon-2-5rem"></i>
+                    @endif
                 </div>
                 <div>
                     <h1 class="client-greeting mb-2 heading-2-5rem">
