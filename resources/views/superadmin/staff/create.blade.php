@@ -2,16 +2,24 @@
 
 @section('title', 'Create New Staff')
 
+@push('styles')
+    @vite(['resources/css/profile.css'])
+@endpush
+
 @section('content')
 <div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="h3 mb-0">Create New Staff</h1>
-                    <p class="text-muted">Add a new staff member to your system</p>
-                </div>
-                <a href="{{ \App\Helpers\RouteHelper::url('staff.index') }}" class="btn btn-outline-secondary">
+    <!-- Staff Header -->
+    <div class="profile-header">
+        <div class="profile-header-content">
+            <div class="profile-avatar">
+                <i class="bi bi-person-plus"></i>
+            </div>
+            <div class="profile-info flex-grow-1">
+                <h1>Create New Staff</h1>
+                <p>Add a new staff member to your system</p>
+            </div>
+            <div class="profile-header-actions">
+                <a href="{{ \App\Helpers\RouteHelper::url('staff.index') }}" class="btn btn-outline-light">
                     <i class="bi bi-arrow-left me-2"></i>Back to Staff
                 </a>
             </div>

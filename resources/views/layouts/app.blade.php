@@ -9,6 +9,7 @@
     {{-- Load jQuery first from npm, then other scripts - jQuery will be globally available on all pages --}}
     @vite([
         'resources/js/jquery-global.js',
+        'resources/css/globals.css',
         'resources/css/app.css',
         'resources/css/common-styles.css',
         'resources/css/utilities.css',
@@ -219,16 +220,21 @@
                         <div class="user-role">
                             @php
                                 $authUser = auth()->user();
-                                if($authUser->can('view roles')) {
-                                    $roleName = 'Super Admin';
-                                } elseif($authUser->can('view admin dashboard')) {
-                                    $roleName = 'Admin';
-                                } elseif($authUser->can('view staff dashboard')) {
-                                    $roleName = 'Staff';
-                                } elseif($authUser->can('view client dashboard')) {
-                                    $roleName = 'Client';
+                                $role = $authUser->roles->first();
+                                if ($role) {
+                                    $roleName = \App\Helpers\RoleHelper::getDisplayName($role->name);
                                 } else {
-                                    $roleName = 'User';
+                                    if($authUser->can('view roles')) {
+                                        $roleName = 'Admin';
+                                    } elseif($authUser->can('view admin dashboard')) {
+                                        $roleName = 'Manager';
+                                    } elseif($authUser->can('view staff dashboard')) {
+                                        $roleName = 'Staff';
+                                    } elseif($authUser->can('view client dashboard')) {
+                                        $roleName = 'Client';
+                                    } else {
+                                        $roleName = 'User';
+                                    }
                                 }
                             @endphp
                             {{ $roleName }}

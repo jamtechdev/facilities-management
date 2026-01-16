@@ -13,7 +13,7 @@
 @section('content')
     <div class="container-fluid">
         <!-- Client Header -->
-        <x-header-card :title="$client->company_name" :contactPerson="$client->contact_person" :email="$client->email" :phone="$client->phone" type="client">
+        <x-header-card :title="$client->company_name ?? 'N/A'" :contactPerson="$client->contact_person ?? 'N/A'" :email="$client->email ?? 'N/A'" :phone="$client->phone ?? 'N/A'" type="client">
             <x-slot name="actions">
                 @if (auth()->user()->can('view admin dashboard'))
                     <button class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#sendEmailModal">
@@ -64,15 +64,15 @@
                         </h5>
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <x-editable-info-card label="Company Name" :value="$client->company_name" field="company_name"
+                        <x-editable-info-card label="Company Name" :value="$client->company_name ?? 'N/A'" field="company_name"
                             entityType="clients" :entityId="$client->id" fieldType="text" />
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <x-editable-info-card label="Contact Person" :value="$client->contact_person" field="contact_person"
+                        <x-editable-info-card label="Contact Person" :value="$client->contact_person ?? 'N/A'" field="contact_person"
                             entityType="clients" :entityId="$client->id" fieldType="text" />
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <x-editable-info-card label="Email" :value="$client->email" :link="'mailto:' . $client->email" field="email"
+                        <x-editable-info-card label="Email" :value="$client->email ?? 'N/A'" :link="($client->email ?? null) ? 'mailto:' . $client->email : null" field="email"
                             entityType="clients" :entityId="$client->id" fieldType="email" />
                     </div>
                     <div class="col-md-6 col-lg-4">
@@ -146,10 +146,10 @@
                         @endif
                         @if ($client->converted_at)
                             <div class="col-md-6 col-lg-4">
-                                <x-info-card label="Converted On" :value="$client->converted_at->format('M d, Y')" />
+                                <x-info-card label="Converted On" :value="$client->converted_at ? $client->converted_at->format('M d, Y') : 'N/A'" />
                             </div>
                             <div class="col-md-6 col-lg-4">
-                                <x-info-card label="Converted At" :value="$client->converted_at->format('h:i A')" />
+                                <x-info-card label="Converted At" :value="$client->converted_at ? $client->converted_at->format('h:i A') : 'N/A'" />
                             </div>
                         @endif
                         @if ($client->lead_avatar)
@@ -157,17 +157,17 @@
                                 <div class="info-card">
                                     <div class="info-card-label">Lead Image</div>
                                     <div class="info-card-value">
-                                        <img src="{{ asset('storage/' . $client->lead_avatar) }}" alt="Lead Image" class="img-thumbnail" style="max-width: 100px; max-height: 100px; object-fit: cover;">
+                                        <img src="{{ asset('storage/' . $client->lead_avatar) }}" alt="Lead Image" class="img-thumbnail" loading="lazy" style="max-width: 100px; max-height: 100px; object-fit: cover;">
                                     </div>
                                 </div>
                             </div>
                         @endif
                     @endif
                     <div class="col-md-6 col-lg-4">
-                        <x-info-card label="Created" :value="$client->created_at->format('M d, Y h:i A')" />
+                        <x-info-card label="Created" :value="$client->created_at ? $client->created_at->format('M d, Y h:i A') : 'N/A'" />
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <x-info-card label="Last Updated" :value="$client->updated_at->format('M d, Y h:i A')" />
+                        <x-info-card label="Last Updated" :value="$client->updated_at ? $client->updated_at->format('M d, Y h:i A') : 'N/A'" />
                     </div>
                     <div class="col-12">
                         <x-editable-info-card label="Notes" :value="$client->notes ?? '-'" field="notes" entityType="clients"
@@ -236,7 +236,7 @@
                                 <div>
                                     <h6 class="mb-1">
                                         <i
-                                            class="bi bi-calendar-event me-2"></i>{{ $timesheet->work_date->format('M d, Y') }}
+                                            class="bi bi-calendar-event me-2"></i>{{ $timesheet->work_date ? $timesheet->work_date->format('M d, Y') : 'N/A' }}
                                     </h6>
                                     <p class="mb-1 text-muted">
                                         <i class="bi bi-person me-2"></i>{{ $timesheet->staff->name ?? 'N/A' }}
@@ -244,7 +244,7 @@
                                 </div>
                                 <div class="text-end">
                                     <div class="mb-1">
-                                        <strong class="text-primary">{{ number_format($timesheet->hours_worked, 2) }}
+                                        <strong class="text-primary">{{ number_format($timesheet->hours_worked ?? 0, 2) }}
                                             hours</strong>
                                     </div>
                                     <div class="d-flex align-items-center gap-2 justify-content-end">
@@ -305,7 +305,7 @@
                                 <div class="photo-gallery">
                                     @foreach ($timesheet->jobPhotos as $photo)
                                         <div class="photo-item">
-                                            <img src="{{ asset('storage/' . $photo->photo_path) }}" alt="Job Photo"
+                                            <img src="{{ asset('storage/' . $photo->photo_path) }}" alt="Job Photo" loading="lazy"
                                                 class="job-photo"
                                                 data-image-modal="{{ asset('storage/' . $photo->photo_path) }}"
                                                 data-image-type="{{ $photo->photo_type }}"
@@ -355,12 +355,12 @@
                                         <strong>{{ $communication->subject }}</strong>
                                     @endif
                                 </div>
-                                <small class="text-muted">{{ $communication->created_at->format('M d, Y h:i A') }}</small>
+                                <small class="text-muted">{{ $communication->created_at ? $communication->created_at->format('M d, Y h:i A') : 'N/A' }}</small>
                             </div>
-                            <p class="mb-1">{{ $communication->message }}</p>
+                            <p class="mb-1">{{ $communication->message ?? 'N/A' }}</p>
                             <small class="text-muted">
                                 @if ($communication->user)
-                                    by {{ $communication->user->name }}
+                                    by {{ $communication->user->name ?? 'N/A' }}
                                 @endif
                             </small>
                         </div>
@@ -393,7 +393,7 @@
                                 <i class="bi bi-file-earmark me-2"></i>
                                 <strong>{{ $document->name }}</strong>
                                 <span class="badge bg-secondary ms-2">{{ ucfirst($document->document_type) }}</span>
-                                <small class="text-muted ms-2">{{ $document->created_at->format('M d, Y') }}</small>
+                                <small class="text-muted ms-2">{{ $document->created_at ? $document->created_at->format('M d, Y') : 'N/A' }}</small>
                             </div>
                             <a href="{{ \App\Helpers\RouteHelper::url('documents.download', $document) }}"
                                 class="btn btn-sm btn-outline-primary" target="_blank">
@@ -428,7 +428,7 @@
                                         {{ $fb->rating }}/5
                                     </span>
                                 </div>
-                                <small class="text-muted">{{ $fb->created_at->format('M d, Y h:i A') }}</small>
+                                <small class="text-muted">{{ $fb->created_at ? $fb->created_at->format('M d, Y h:i A') : 'N/A' }}</small>
                             </div>
                             @if ($fb->message)
                                 <p class="mb-1">{{ $fb->message }}</p>
@@ -478,9 +478,9 @@
                                                 {{ $invoice->invoice_number }}
                                             </a>
                                         </td>
-                                        <td>{{ $invoice->billing_period }}</td>
-                                        <td>{{ number_format($invoice->hours_worked, 2) }}</td>
-                                        <td>£{{ number_format($invoice->total_amount, 2) }}</td>
+                                        <td>{{ $invoice->billing_period ?? 'N/A' }}</td>
+                                        <td>{{ number_format($invoice->total_hours ?? 0, 2) }} hrs</td>
+                                        <td>£{{ number_format($invoice->total_amount ?? 0, 2) }}</td>
                                         <td>
                                             <span
                                                 class="badge bg-{{ $invoice->status == 'paid' ? 'success' : ($invoice->status == 'pending' ? 'warning' : 'danger') }}">
@@ -534,18 +534,18 @@
                                 <label for="send_email_to" class="form-label">Email To <span
                                         class="text-danger">*</span></label>
                                 <input type="email" class="form-control" id="send_email_to" name="email_to"
-                                    value="{{ $client->email }}" required>
+                                    value="{{ $client->email ?? '' }}" required>
                             </div>
                             <div class="mb-3">
                                 <label for="send_email_subject" class="form-label">Subject</label>
                                 <input type="text" class="form-control" id="send_email_subject" name="subject"
-                                    value="Follow-up: {{ $client->company_name }}" placeholder="Enter email subject">
+                                    value="Follow-up: {{ $client->company_name ?? 'Client' }}" placeholder="Enter email subject">
                             </div>
                             <div class="mb-3">
                                 <label for="send_email_message" class="form-label">Message <span
                                         class="text-danger">*</span></label>
                                 <textarea class="form-control" id="send_email_message" name="message" rows="8" required
-                                    placeholder="Enter your message...">Dear {{ $client->contact_person ?? $client->company_name }},
+                                    placeholder="Enter your message...">Dear {{ $client->contact_person ?? $client->company_name ?? 'Valued Client' }},
 
 Thank you for your business. We would like to follow up with you regarding your account.
 
@@ -580,7 +580,7 @@ Best regards,
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <img id="modalImage" src="" alt="Job Photo" class="img-fluid modal-image"
+                    <img id="modalImage" src="" alt="Job Photo" class="img-fluid modal-image" loading="lazy"
                         onerror="this.src='/Image-not-found.png'; this.onerror=null;">
                 </div>
             </div>

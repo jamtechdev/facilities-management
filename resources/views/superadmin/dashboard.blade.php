@@ -37,7 +37,7 @@
     </div>
 
     <!-- Primary Stats Cards -->
-    <div class="row g-4 mb-4">
+    <div class="row g-2 mb-3">
         @can('view dashboard leads card')
         <div class="col-xl-3 col-md-6">
             <a href="{{ \App\Helpers\RouteHelper::url('leads.index') }}" class="superadmin-stat-card text-decoration-none">
@@ -45,7 +45,6 @@
                     <div class="stat-content">
                         <div class="stat-label">Total Leads</div>
                         <div class="stat-value">{{ number_format($stats['total_leads'] ?? 0) }}</div>
-                        <p class="stat-description">{{ number_format($stats['new_leads'] ?? 0) }} new today</p>
                     </div>
                     <div class="stat-icon-wrapper">
                         <i class="bi bi-person-lines-fill"></i>
@@ -62,7 +61,6 @@
                     <div class="stat-content">
                         <div class="stat-label">Active Clients</div>
                         <div class="stat-value">{{ number_format($stats['total_clients'] ?? 0) }}</div>
-                        <p class="stat-description">Currently active</p>
                     </div>
                     <div class="stat-icon-wrapper">
                         <i class="bi bi-building"></i>
@@ -79,7 +77,6 @@
                     <div class="stat-content">
                         <div class="stat-label">Active Staff</div>
                         <div class="stat-value">{{ number_format($stats['total_staff'] ?? 0) }}</div>
-                        <p class="stat-description">On duty</p>
                     </div>
                     <div class="stat-icon-wrapper">
                         <i class="bi bi-people"></i>
@@ -96,7 +93,6 @@
                     <div class="stat-content">
                         <div class="stat-label">Total Revenue</div>
                         <div class="stat-value">£{{ number_format($stats['revenue'] ?? 0, 0) }}</div>
-                        <p class="stat-description">{{ number_format($stats['total_invoices'] ?? 0) }} invoices</p>
                     </div>
                     <div class="stat-icon-wrapper">
                         <i class="bi bi-currency-pound"></i>
@@ -108,7 +104,7 @@
     </div>
 
     <!-- Secondary Stats Row -->
-    <div class="row g-4 mb-4">
+    <div class="row g-2 mb-3">
         @can('view dashboard qualified leads card')
         <div class="col-xl-3 col-md-6">
             <a href="{{ \App\Helpers\RouteHelper::url('leads.index') }}?stage=qualified" class="superadmin-stat-card text-decoration-none">
@@ -116,9 +112,6 @@
                     <div class="stat-content">
                         <div class="stat-label">Qualified Leads</div>
                         <div class="stat-value">{{ number_format($stats['qualified_leads'] ?? 0) }}</div>
-                        <span class="stat-link">
-                            View all <i class="bi bi-arrow-right"></i>
-                        </span>
                     </div>
                     <div class="stat-icon-wrapper">
                         <i class="bi bi-star-fill"></i>
@@ -134,9 +127,6 @@
                     <div class="stat-content">
                         <div class="stat-label">New Leads Today</div>
                         <div class="stat-value">{{ number_format($stats['new_leads'] ?? 0) }}</div>
-                        <span class="stat-link">
-                            View all <i class="bi bi-arrow-right"></i>
-                        </span>
                     </div>
                     <div class="stat-icon-wrapper">
                         <i class="bi bi-plus-circle-fill"></i>
@@ -169,7 +159,6 @@
                     <div class="stat-content">
                         <div class="stat-label">Total Invoices</div>
                         <div class="stat-value">{{ number_format($stats['total_invoices'] ?? 0) }}</div>
-                        <span class="stat-link">View All</span>
                     </div>
                     <div class="stat-icon-wrapper">
                         <i class="bi bi-receipt-cutoff"></i>
@@ -183,7 +172,7 @@
     <!-- Charts Section -->
     @canany(['view dashboard leads chart', 'view dashboard lead stages graph'])
     @if((isset($leadsLast7Days) && count($leadsLast7Days) > 0) || (isset($leadStages) && count($leadStages) > 0))
-    <div class="row g-4">
+    <div class="row g-2">
         <!-- Leads Over Time Chart -->
         @can('view dashboard leads chart')
         @if(isset($leadsLast7Days) && count($leadsLast7Days) > 0)
@@ -230,7 +219,7 @@
     @endcanany
 
     <!-- Follow-up Reminders and Recent Activity -->
-    <div class="row g-4">
+    <div class="row g-2">
         <!-- Automated Follow-up Reminders -->
         @can('view dashboard followup reminders card')
         <div class="col-lg-6 col-md-12">

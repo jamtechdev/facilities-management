@@ -12,11 +12,11 @@
         <div class="profile-header">
             <div class="profile-header-content">
                 <div class="profile-avatar">
-                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                    {{ strtoupper(substr($user->name ?? 'U', 0, 1)) }}
                 </div>
                 <div class="profile-info flex-grow-1">
-                    <h1>{{ $user->name }}</h1>
-                    <p>{{ $user->email }}</p>
+                    <h1>{{ $user->name ?? 'N/A' }}</h1>
+                    <p>{{ $user->email ?? 'N/A' }}</p>
                 </div>
                 <div class="profile-header-actions">
                     @can('edit users')
@@ -45,7 +45,7 @@
                                 <strong>Name:</strong>
                             </div>
                             <div class="col-md-8">
-                                {{ $user->name }}
+                                {{ $user->name ?? 'N/A' }}
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -53,7 +53,7 @@
                                 <strong>Email:</strong>
                             </div>
                             <div class="col-md-8">
-                                {{ $user->email }}
+                                {{ $user->email ?? 'N/A' }}
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -62,8 +62,12 @@
                             </div>
                             <div class="col-md-8">
                                 @foreach($user->roles as $role)
-                                    <span class="badge bg-{{ $role->name === 'SuperAdmin' ? 'danger' : 'primary' }} me-1">
-                                        {{ $role->name }}
+                                    @php
+                                        $displayName = \App\Helpers\RoleHelper::getDisplayName($role->name);
+                                        $roleColor = ($role->name === 'SuperAdmin' || $role->name === 'superadmin') ? 'danger' : 'primary';
+                                    @endphp
+                                    <span class="badge bg-{{ $roleColor }} me-1">
+                                        {{ $displayName }}
                                     </span>
                                 @endforeach
                                 @if($user->roles->isEmpty())
@@ -76,7 +80,7 @@
                                 <strong>Created At:</strong>
                             </div>
                             <div class="col-md-8">
-                                {{ $user->created_at->format('M d, Y h:i A') }}
+                                {{ $user->created_at ? $user->created_at->format('M d, Y h:i A') : 'N/A' }}
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -84,7 +88,7 @@
                                 <strong>Updated At:</strong>
                             </div>
                             <div class="col-md-8">
-                                {{ $user->updated_at->format('M d, Y h:i A') }}
+                                {{ $user->updated_at ? $user->updated_at->format('M d, Y h:i A') : 'N/A' }}
                             </div>
                         </div>
                     </div>

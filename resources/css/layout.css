@@ -85,7 +85,7 @@
     gap: 12px;
     color: white;
     text-decoration: none;
-    font-size: 24px;
+    font-size: var(--fs-h4, 20px);
     font-weight: 700;
     letter-spacing: 1px;
 }
@@ -98,7 +98,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: var(--fs-xl, 18px);
     box-shadow: 0 4px 15px rgba(132, 195, 115, 0.5);
 }
 
@@ -127,7 +127,7 @@
 
 .nav-section-title {
     padding: 0 20px 10px;
-    font-size: 11px;
+    font-size: var(--fs-xs, 11px);
     text-transform: uppercase;
     letter-spacing: 1.5px;
     color: rgba(255, 255, 255, 0.4);
@@ -194,19 +194,20 @@
     align-items: center;
     justify-content: center;
     margin-right: 12px;
-    font-size: 18px;
+    font-size: var(--fs-lg, 16px);
 }
 
 .nav-text {
     flex: 1;
     font-weight: 500;
+    font-size: var(--fs-sm, 13px);
 }
 
 .nav-badge {
     background: rgba(255, 255, 255, 0.2);
     padding: 2px 8px;
     border-radius: 12px;
-    font-size: 10px;
+    font-size: var(--fs-xs, 11px);
     font-weight: 600;
 }
 
@@ -258,7 +259,7 @@
 
 .sidebar-modern.collapsed .sidebar-footer .btn i {
     margin: 0 !important;
-    font-size: 20px;
+    font-size: var(--fs-xl, 18px);
     display: block;
 }
 
@@ -316,7 +317,7 @@
     justify-content: center;
     color: white;
     font-weight: 700;
-    font-size: 16px;
+    font-size: var(--fs-base, 14px);
     box-shadow: 0 2px 10px rgba(132, 195, 115, 0.4);
 }
 
@@ -328,7 +329,7 @@
 .user-name {
     color: white;
     font-weight: 600;
-    font-size: 14px;
+    font-size: var(--fs-sm, 13px);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -336,7 +337,7 @@
 
 .user-role {
     color: rgba(255, 255, 255, 0.6);
-    font-size: 11px;
+    font-size: var(--fs-xs, 11px);
     text-transform: uppercase;
 }
 
@@ -405,7 +406,7 @@
 .btn-sidebar-toggle {
     background: transparent;
     border: none;
-    font-size: 24px;
+    font-size: var(--fs-h4, 20px);
     color: #495057;
     padding: 8px 12px;
     border-radius: 8px;
@@ -436,7 +437,7 @@
 }
 
 .navbar-breadcrumb {
-    font-size: 18px;
+    font-size: var(--fs-lg, 16px);
     font-weight: 600;
     color: #1a1f2e;
     letter-spacing: -0.5px;
@@ -465,7 +466,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: var(--fs-lg, 16px);
     color: #6c757d;
     transition: all 0.3s ease;
     position: relative;
@@ -484,7 +485,7 @@
     right: -2px;
     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
     color: white;
-    font-size: 10px;
+    font-size: var(--fs-xs, 11px);
     font-weight: 700;
     padding: 2px 6px;
     border-radius: 10px;
@@ -524,7 +525,7 @@
     justify-content: center;
     color: white;
     font-weight: 700;
-    font-size: 14px;
+    font-size: var(--fs-sm, 13px);
     box-shadow: 0 2px 8px rgba(132, 195, 115, 0.3);
 }
 
@@ -536,19 +537,19 @@
 }
 
 .navbar-user-name {
-    font-size: 14px;
+    font-size: var(--fs-sm, 13px);
     font-weight: 600;
     color: #1a1f2e;
     line-height: 1.2;
 }
 
 .navbar-user-role {
-    font-size: 11px;
+    font-size: var(--fs-xs, 11px);
     margin-top: 2px;
 }
 
 .navbar-user-chevron {
-    font-size: 12px;
+    font-size: var(--fs-xs, 11px);
     color: #6c757d;
     transition: transform 0.3s ease;
 }
@@ -571,7 +572,7 @@
 }
 
 .user-dropdown-menu .dropdown-header {
-    font-size: 11px;
+    font-size: var(--fs-xs, 11px);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1.2px;
@@ -590,7 +591,7 @@
 .user-dropdown-item {
     padding: 12px 16px;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: var(--fs-sm, 13px);
     font-weight: 500;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
@@ -623,7 +624,7 @@
     .user-dropdown-item i {
         width: 22px;
         text-align: center;
-        font-size: 16px;
+        font-size: var(--fs-base, 14px);
         margin-right: 12px;
         display: flex;
         align-items: center;
@@ -1008,7 +1009,7 @@ body {
     }
 
     .navbar-breadcrumb {
-        font-size: 16px;
+        font-size: var(--fs-base, 14px);
     }
 
     .navbar-user-info {
@@ -1022,7 +1023,7 @@ body {
     .navbar-icon-btn {
         width: 38px;
         height: 38px;
-        font-size: 16px;
+        font-size: var(--fs-base, 14px);
     }
     .main-content-area {
         padding-top: 70px !important;
@@ -1110,7 +1111,7 @@ body {
     }
 
     .navbar-breadcrumb {
-        font-size: 14px;
+        font-size: var(--fs-sm, 13px);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -1129,7 +1130,7 @@ body {
     .navbar-icon-btn {
         width: 36px;
         height: 36px;
-        font-size: 16px;
+        font-size: var(--fs-base, 14px);
     }
 
     .notification-dropdown {
@@ -1140,7 +1141,7 @@ body {
     .navbar-user-avatar {
         width: 32px;
         height: 32px;
-        font-size: 12px;
+        font-size: var(--fs-xs, 11px);
     }
 
         .navbar-dropdown-menu,
@@ -1213,13 +1214,13 @@ body {
     }
 
     .sidebar-logo {
-        font-size: 20px;
+        font-size: var(--fs-xl, 18px);
     }
 
     .sidebar-logo-icon {
         width: 36px;
         height: 36px;
-        font-size: 18px;
+        font-size: var(--fs-lg, 16px);
     }
 
         .navbar-top {
@@ -1250,7 +1251,7 @@ body {
     .navbar-icon-btn {
         width: 36px;
         height: 36px;
-        font-size: 14px;
+        font-size: var(--fs-sm, 13px);
     }
 
     .navbar-badge {
@@ -1271,18 +1272,18 @@ body {
 
         .user-dropdown-item i {
             width: 18px;
-            font-size: 14px;
+            font-size: var(--fs-sm, 13px);
             margin-right: 10px;
         }
     .nav-link-modern {
         padding: 10px 12px;
-        font-size: 14px;
+        font-size: var(--fs-sm, 13px);
     }
 
     .nav-icon {
         width: 20px;
         height: 20px;
-        font-size: 16px;
+        font-size: var(--fs-base, 14px);
         margin-right: 10px;
     }
 
@@ -1293,7 +1294,7 @@ body {
     .user-avatar {
         width: 36px;
         height: 36px;
-        font-size: 14px;
+        font-size: var(--fs-sm, 13px);
     }
 
     .user-name {
@@ -1301,7 +1302,7 @@ body {
     }
 
     .user-role {
-        font-size: 10px;
+        font-size: var(--fs-xs, 11px);
     }
 .main-content-wrapper {
     padding-top: 0 !important;
@@ -1709,7 +1710,7 @@ html::-webkit-scrollbar-thumb:hover {
 
 .day-summary-count {
     font-weight: 700;
-    font-size: 18px;
+    font-size: var(--fs-lg, 16px);
     margin-bottom: 4px;
 }
 
@@ -1722,13 +1723,13 @@ html::-webkit-scrollbar-thumb:hover {
 }
 
 .day-summary-day {
-    font-size: 12px;
+    font-size: var(--fs-xs, 11px);
     color: #6c757d;
     margin-bottom: 2px;
 }
 
 .day-summary-date {
-    font-size: 10px;
+    font-size: var(--fs-xs, 11px);
     color: #6c757d;
 }
 
@@ -1738,11 +1739,11 @@ html::-webkit-scrollbar-thumb:hover {
     }
 
     .day-summary-count {
-        font-size: 16px;
+        font-size: var(--fs-base, 14px);
     }
 
     .day-summary-day {
-        font-size: 11px;
+        font-size: var(--fs-xs, 11px);
     }
 
     .day-summary-date {

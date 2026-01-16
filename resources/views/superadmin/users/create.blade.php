@@ -2,12 +2,27 @@
 
 @section('title', 'Create User')
 
+@push('styles')
+    @vite(['resources/css/profile.css'])
+@endpush
+
 @section('content')
     <div class="container-fluid">
-        <div class="row mb-4">
-            <div class="col">
-                <h1 class="h3 mb-0">Create New User</h1>
-                <p class="text-muted">Add a new user to the system</p>
+        <!-- User Header -->
+        <div class="profile-header">
+            <div class="profile-header-content">
+                <div class="profile-avatar">
+                    <i class="bi bi-person-plus"></i>
+                </div>
+                <div class="profile-info flex-grow-1">
+                    <h1>Create New User</h1>
+                    <p>Add a new user to the system</p>
+                </div>
+                <div class="profile-header-actions">
+                    <a href="{{ \App\Helpers\RouteHelper::url('users.index') }}" class="btn btn-outline-light">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Users
+                    </a>
+                </div>
             </div>
         </div>
 

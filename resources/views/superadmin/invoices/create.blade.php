@@ -68,11 +68,23 @@
                                 </div>
 
                                 <div class="col-md-6">
+                                    <label for="hours" class="form-label">
+                                        <i class="bi bi-clock me-1"></i>Hours <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" step="0.5" min="0.1" class="form-control" id="hours"
+                                        name="hours" value="{{ old('hours') }}" placeholder="0.0" required>
+                                    <small class="text-muted">Total hours worked for this invoice</small>
+                                    @error('hours')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-6">
                                     <label for="hourly_rate" class="form-label">
                                         <i class="bi bi-currency-pound me-1"></i>Hourly Rate <span
                                             class="text-danger">*</span>
                                     </label>
-                                    <input type="number" step="0.01" class="form-control" id="hourly_rate"
+                                    <input type="number" step="0.01" min="0.01" class="form-control" id="hourly_rate"
                                         name="hourly_rate" value="{{ old('hourly_rate') }}" placeholder="0.00" required>
                                     @error('hourly_rate')
                                         <small class="text-danger">{{ $message }}</small>
@@ -107,11 +119,28 @@
                                     <label for="tax_rate" class="form-label">
                                         <i class="bi bi-percent me-1"></i>Tax Rate (%)
                                     </label>
-                                    <input type="number" step="0.01" class="form-control" id="tax_rate" name="tax_rate"
+                                    <input type="number" step="0.01" min="0" class="form-control" id="tax_rate" name="tax_rate"
                                         value="{{ old('tax_rate', 0) }}" placeholder="0.00">
                                     @error('tax_rate')
                                         <small class="text-danger">{{ $message }}</small>
                                     @enderror
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        <h6 class="mb-2"><i class="bi bi-calculator me-2"></i>Invoice Summary</h6>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <strong>Subtotal:</strong> <span id="subtotal-display">£0.00</span>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <strong>Tax:</strong> <span id="tax-display">£0.00</span>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <strong>Total:</strong> <span id="total-display" class="text-primary fw-bold">£0.00</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="col-12">
@@ -142,3 +171,47 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hoursInput = document.getElementById('hours');
+            const hourlyRateInput = document.getElementById('hourly_rate');
+            const taxRateInput = document.getElementById('tax_rate');
+            const subtotalDisplay = document.getElementById('subtotal-display');
+            const taxDisplay = document.getElementById('tax-display');
+            const totalDisplay = document.getElementById('total-display');
+
+            function calculateTotal() {
+                const hours = parseFloat(hoursInput.value) || 0;
+                const hourlyRate = parseFloat(hourlyRateInput.value) || 0;
+                const taxRate = parseFloat(taxRateInput.value) || 0;
+
+                // Calculate subtotal
+                const subtotal = hours * hourlyRate;
+
+                // Calculate tax
+                const tax = subtotal * (taxRate / 100);
+
+                // Calculate total
+                const total = subtotal + tax;
+
+                // Update displays
+                subtotalDisplay.textContent = '£' + subtotal.toFixed(2);
+                taxDisplay.textContent = '£' + tax.toFixed(2);
+                totalDisplay.textContent = '£' + total.toFixed(2);
+            }
+
+            // Add event listeners for real-time calculation
+            hoursInput.addEventListener('input', calculateTotal);
+            hoursInput.addEventListener('change', calculateTotal);
+            hourlyRateInput.addEventListener('input', calculateTotal);
+            hourlyRateInput.addEventListener('change', calculateTotal);
+            taxRateInput.addEventListener('input', calculateTotal);
+            taxRateInput.addEventListener('change', calculateTotal);
+
+            // Initial calculation
+            calculateTotal();
+        });
+    </script>
+@endpush

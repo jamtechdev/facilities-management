@@ -48,11 +48,11 @@
                         </h5>
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <x-editable-info-card label="Invoice Number" :value="$invoice->invoice_number" field="invoice_number"
+                        <x-editable-info-card label="Invoice Number" :value="$invoice->invoice_number ?? 'N/A'" field="invoice_number"
                             entityType="invoices" :entityId="$invoice->id" fieldType="text" :editable="auth()->user()->can('edit invoices')" />
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <x-info-card label="Created Date" :value="$invoice->created_at->format('M d, Y h:i A')" />
+                        <x-info-card label="Created Date" :value="$invoice->created_at ? $invoice->created_at->format('M d, Y h:i A') : 'N/A'" />
                     </div>
                     <div class="col-md-6 col-lg-4">
                         <x-editable-info-card label="Due Date" :value="$invoice->due_date ? $invoice->due_date->format('M d, Y') : '-'" field="due_date" entityType="invoices"
@@ -100,7 +100,7 @@
                         <x-info-card label="Contact Person" :value="$invoice->client->contact_person ?? 'N/A'" />
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <x-info-card label="Email" :value="$invoice->client->email ?? 'N/A'" :link="'mailto:' . $invoice->client->email" />
+                        <x-info-card label="Email" :value="$invoice->client->email ?? 'N/A'" :link="($invoice->client->email ?? null) ? 'mailto:' . $invoice->client->email : null" />
                     </div>
                     <div class="col-md-6 col-lg-4">
                         <x-info-card label="Phone" :value="$invoice->client->phone ?? '-'" :link="$invoice->client->phone ? 'tel:' . $invoice->client->phone : null" />
@@ -136,24 +136,24 @@
                                         </td>
                                         <td class="text-end">
                                             @if (auth()->user()->can('edit invoices'))
-                                                <x-editable-info-card label="" :value="number_format($invoice->total_hours, 2)" field="total_hours"
+                                                <x-editable-info-card label="" :value="number_format($invoice->total_hours ?? 0, 2)" field="total_hours"
                                                     entityType="invoices" :entityId="$invoice->id" fieldType="number"
                                                     :editable="true" />
                                             @else
-                                                {{ number_format($invoice->total_hours, 2) }}
+                                                {{ number_format($invoice->total_hours ?? 0, 2) }}
                                             @endif
                                         </td>
                                         <td class="text-end">
                                             @if (auth()->user()->can('edit invoices'))
-                                                <x-editable-info-card label="" :value="number_format($invoice->hourly_rate, 2)" field="hourly_rate"
+                                                <x-editable-info-card label="" :value="number_format($invoice->hourly_rate ?? 0, 2)" field="hourly_rate"
                                                     entityType="invoices" :entityId="$invoice->id" fieldType="number"
                                                     :editable="true" />
                                             @else
-                                                ${{ number_format($invoice->hourly_rate, 2) }}
+                                                ${{ number_format($invoice->hourly_rate ?? 0, 2) }}
                                             @endif
                                         </td>
                                         <td class="text-end">$<span
-                                                id="subtotal-display">{{ number_format($invoice->subtotal, 2) }}</span></td>
+                                                id="subtotal-display">{{ number_format($invoice->subtotal ?? 0, 2) }}</span></td>
                                     </tr>
                                     <tr>
                                         <td>Tax</td>
@@ -173,7 +173,7 @@
                                         <td class="text-end" colspan="2"></td>
                                         <td class="text-end">
                                             <strong>$<span
-                                                    id="total-display">{{ number_format($invoice->total_amount, 2) }}</span></strong>
+                                                    id="total-display">{{ number_format($invoice->total_amount ?? 0, 2) }}</span></strong>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -212,7 +212,7 @@
                                         <strong>{{ $communication->subject }}</strong>
                                     @endif
                                 </div>
-                                <small class="text-muted">{{ $communication->created_at->format('M d, Y h:i A') }}</small>
+                                <small class="text-muted">{{ $communication->created_at ? $communication->created_at->format('M d, Y h:i A') : 'N/A' }}</small>
                             </div>
                             @if ($communication->email_to)
                                 <p class="mb-1">
@@ -224,7 +224,7 @@
                             @endif
                             <small class="text-muted">
                                 @if ($communication->user)
-                                    Sent by {{ $communication->user->name }}
+                                    Sent by {{ $communication->user->name ?? 'N/A' }}
                                 @endif
                                 @if ($communication->is_sent)
                                     <span class="badge bg-success ms-2">Sent</span>
@@ -269,20 +269,20 @@
                                 <label for="invoice_email_to" class="form-label">Email To <span
                                         class="text-danger">*</span></label>
                                 <input type="email" class="form-control" id="invoice_email_to" name="email_to"
-                                    value="{{ $invoice->client->email }}" required>
+                                    value="{{ $invoice->client->email ?? '' }}" required>
                             </div>
                             <div class="mb-3">
                                 <label for="invoice_email_subject" class="form-label">Subject</label>
                                 <input type="text" class="form-control" id="invoice_email_subject" name="subject"
-                                    value="Invoice #{{ $invoice->invoice_number }} - {{ $invoice->client->company_name }}"
+                                    value="Invoice #{{ $invoice->invoice_number ?? 'N/A' }} - {{ $invoice->client->company_name ?? 'N/A' }}"
                                     placeholder="Enter email subject">
                             </div>
                             <div class="mb-3">
                                 <label for="invoice_email_message" class="form-label">Message</label>
                                 <textarea class="form-control" id="invoice_email_message" name="message" rows="5"
-                                    placeholder="Enter your message (optional)">Dear {{ $invoice->client->contact_person }},
+                                    placeholder="Enter your message (optional)">Dear {{ $invoice->client->contact_person ?? 'Valued Client' }},
 
-Please find attached invoice #{{ $invoice->invoice_number }} for your review.
+Please find attached invoice #{{ $invoice->invoice_number ?? 'N/A' }} for your review.
 
 Thank you for your business!
 
@@ -358,9 +358,9 @@ Best regards,
             // Recalculate totals when hourly_rate, tax, or total_hours changes
             function recalculateTotals() {
                 const hourlyRate = parseFloat($('.editable-info-card[data-field="hourly_rate"] .field-display')
-                    .text().replace('$', '').replace(',', '')) || {{ $invoice->hourly_rate }};
+                    .text().replace('$', '').replace(',', '')) || {{ $invoice->hourly_rate ?? 0 }};
                 const totalHours = parseFloat($('.editable-info-card[data-field="total_hours"] .field-display')
-                    .text().replace(',', '')) || {{ $invoice->total_hours }};
+                    .text().replace(',', '')) || {{ $invoice->total_hours ?? 0 }};
                 const tax = parseFloat($('.editable-info-card[data-field="tax"] .field-display').text().replace('$',
                     '').replace(',', '')) || {{ $invoice->tax ?? 0 }};
 

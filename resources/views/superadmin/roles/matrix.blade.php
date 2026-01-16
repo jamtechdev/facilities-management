@@ -20,7 +20,8 @@
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            font-size: 14px;
+            font-size: var(--fs-base, 14px);
+            font-family: var(--font-family-base, 'Inter', sans-serif);
         }
 
         .matrix-table thead {
@@ -37,7 +38,8 @@
             padding: 12px 14px;
             text-align: left;
             font-weight: 600;
-            font-size: 13px;
+            font-size: var(--fs-sm, 13px);
+            font-family: var(--font-family-base, 'Inter', sans-serif);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: white;
@@ -145,7 +147,8 @@
             border-right: 1px solid #e5e7eb;
             vertical-align: middle;
             color: #1e293b;
-            font-size: 14px;
+            font-size: var(--fs-base, 14px);
+            font-family: var(--font-family-base, 'Inter', sans-serif);
             background-color: #ffffff;
         }
 
@@ -153,8 +156,8 @@
             background: #ffffff;
             font-weight: 600;
             color: #1e293b;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
+            font-family: var(--font-family-base, 'Inter', sans-serif);
+            font-size: var(--fs-sm, 13px);
             position: sticky;
             left: 0;
             z-index: 10;
@@ -164,7 +167,8 @@
         .matrix-table td:nth-child(2) {
             background: #ffffff;
             color: #1e293b;
-            font-size: 14px;
+            font-size: var(--fs-base, 14px);
+            font-family: var(--font-family-base, 'Inter', sans-serif);
             font-weight: 500;
             position: sticky;
             left: 220px;

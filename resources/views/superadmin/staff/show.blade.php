@@ -17,7 +17,7 @@
 @section('content')
     <div class="container-fluid">
         <!-- Staff Header -->
-        <x-header-card :title="$staff->name" :email="$staff->email" :phone="$staff->mobile" type="lead">
+        <x-header-card :title="$staff->name ?? 'N/A'" :email="$staff->email ?? 'N/A'" :phone="$staff->mobile ?? 'N/A'" type="lead">
             <x-slot name="actions">
                 <a href="{{ \App\Helpers\RouteHelper::url('staff.index') }}" class="btn btn-outline-light">
                     <i class="bi bi-arrow-left me-2"></i>Back
@@ -72,11 +72,11 @@
                         </h5>
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <x-editable-info-card label="Name" :value="$staff->name" field="name" entityType="staff"
+                        <x-editable-info-card label="Name" :value="$staff->name ?? 'N/A'" field="name" entityType="staff"
                             :entityId="$staff->id" fieldType="text" />
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <x-editable-info-card label="Email" :value="$staff->email" :link="'mailto:' . $staff->email" field="email"
+                        <x-editable-info-card label="Email" :value="$staff->email ?? 'N/A'" :link="($staff->email ?? null) ? 'mailto:' . $staff->email : null" field="email"
                             entityType="staff" :entityId="$staff->id" fieldType="email" />
                     </div>
                     <div class="col-md-6 col-lg-4">
@@ -125,11 +125,11 @@
                         </h5>
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <x-info-card label="Created" :value="$staff->created_at->format('M d, Y h:i A')" />
+                        <x-info-card label="Created" :value="$staff->created_at ? $staff->created_at->format('M d, Y h:i A') : 'N/A'" />
                     </div>
                     @if ($staff->user)
                         <div class="col-md-6 col-lg-4">
-                            <x-info-card label="User Account" :value="$staff->user->name" />
+                            <x-info-card label="User Account" :value="$staff->user->name ?? 'N/A'" />
                         </div>
                     @endif
                 </div>
@@ -202,19 +202,19 @@
                             <tbody>
                                 @foreach ($staff->timesheets->sortByDesc('clock_in_time') as $timesheet)
                                     <tr>
-                                        <td>{{ $timesheet->clock_in_time->format('M d, Y') }}</td>
+                                        <td>{{ $timesheet->clock_in_time ? $timesheet->clock_in_time->format('M d, Y') : 'N/A' }}</td>
                                         <td>
                                             @if ($timesheet->client)
                                                 <a href="{{ \App\Helpers\RouteHelper::url('clients.show', $timesheet->client) }}"
                                                     class="text-decoration-none">
-                                                    {{ $timesheet->client->company_name }}
+                                                    {{ $timesheet->client->company_name ?? 'N/A' }}
                                                 </a>
                                             @else
-                                                -
+                                                N/A
                                             @endif
                                         </td>
-                                        <td>{{ $timesheet->clock_in_time->format('h:i A') }}</td>
-                                        <td>{{ $timesheet->clock_out_time ? $timesheet->clock_out_time->format('h:i A') : '-' }}
+                                        <td>{{ $timesheet->clock_in_time ? $timesheet->clock_in_time->format('h:i A') : 'N/A' }}</td>
+                                        <td>{{ $timesheet->clock_out_time ? $timesheet->clock_out_time->format('h:i A') : 'N/A' }}
                                         </td>
                                         <td>
                                             @if ($timesheet->clock_out_time)
@@ -292,7 +292,7 @@
                             <div class="col-md-4 col-lg-3">
                                 <div class="document-item">
                                     <div class="text-center">
-                                        <img src="{{ $imageUrl }}" alt="Job Photo" class="img-thumbnail"
+                                        <img src="{{ $imageUrl }}" alt="Job Photo" class="img-thumbnail" loading="lazy"
                                             style="max-height: 200px; cursor: pointer; width: 100%; object-fit: cover;"
                                             onclick="openImageModal('{{ $imageUrl }}', '{{ $photo->client ? $photo->client->company_name : 'Job Photo' }}')"
                                             onerror="this.src='/Image-not-found.png'; this.onerror=null;">
@@ -318,7 +318,7 @@
                                                 </span>
                                             @endif
                                             <br>
-                                            <small class="text-muted">{{ $photo->created_at->format('M d, Y') }}</small>
+                                            <small class="text-muted">{{ $photo->created_at ? $photo->created_at->format('M d, Y') : 'N/A' }}</small>
                                         </p>
                                     </div>
                                 </div>
@@ -349,9 +349,9 @@
                                 <i class="bi bi-file-earmark me-2"></i>
                                 <strong>{{ $document->name }}</strong>
                                 <span class="badge bg-secondary ms-2">{{ ucfirst($document->document_type) }}</span>
-                                <small class="text-muted ms-2">{{ $document->created_at->format('M d, Y') }}</small>
+                                            <small class="text-muted ms-2">{{ $document->created_at ? $document->created_at->format('M d, Y') : 'N/A' }}</small>
                                 @if ($document->uploadedBy)
-                                    <small class="text-muted ms-2">by {{ $document->uploadedBy->name }}</small>
+                                    <small class="text-muted ms-2">by {{ $document->uploadedBy->name ?? 'N/A' }}</small>
                                 @endif
                             </div>
                             <a href="{{ \App\Helpers\RouteHelper::url('documents.download', $document) }}"
@@ -437,7 +437,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <img id="modalImage" src="" alt="Job Photo" class="img-fluid modal-image"
+                    <img id="modalImage" src="" alt="Job Photo" class="img-fluid modal-image" loading="lazy"
                         onerror="this.src='/Image-not-found.png'; this.onerror=null;">
                 </div>
             </div>

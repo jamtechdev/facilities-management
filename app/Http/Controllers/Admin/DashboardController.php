@@ -10,6 +10,7 @@ use App\Models\Invoice;
 use App\Models\User;
 use App\Models\FollowUpTask;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -32,106 +33,102 @@ class DashboardController extends Controller
             abort(403, 'You do not have permission to access the admin dashboard.');
         }
 
-        $today = Carbon::today();
+        // Cache key based on user ID and role
+        $cacheKey = 'dashboard_admin_' . $user->id;
 
-        $stats = [];
-
-        // Only load stats if user has permission to view the card
-        if ($user->can('view dashboard leads card')) {
-            // Count all leads (excluding converted ones - they are deleted now)
-            $stats['total_leads'] = Lead::count();
-            // Count new leads by stage (not by date)
-            $stats['new_leads'] = Lead::where('stage', Lead::STAGE_NEW_LEAD)->count();
-            $stats['qualified_leads'] = Lead::where('stage', 'qualified')->count();
-        }
-
-        if ($user->can('view dashboard clients card')) {
-            $stats['total_clients'] = Client::where('is_active', true)->count();
-        }
-
-        if ($user->can('view dashboard staff card')) {
-            $stats['total_staff'] = Staff::where('is_active', true)->count();
-        }
-
-        if ($user->can('view dashboard revenue card')) {
-            $stats['total_invoices'] = Invoice::count();
-            $stats['revenue'] = Invoice::where('status', 'paid')->sum('total_amount');
-        }
-
-        // Total Users card commented out - stats calculation disabled
-        // if ($user->can('view dashboard users card')) {
-        //     $stats['total_users'] = User::count();
-        //     // Count users with admin dashboard permission but not view roles permission
-        //     $stats['total_admins'] = User::permission('view admin dashboard')
-        //         ->whereDoesntHave('permissions', function($q) {
-        //             $q->where('name', 'view roles');
-        //         })->count();
-        //     // Count users with view roles permission (SuperAdmin)
-        //     $stats['total_superadmins'] = User::permission('view roles')->count();
-        // }
-
-        // Lead stages breakdown - only if user can view leads
-        $leadStages = [];
-        if ($user->can('view dashboard lead stages graph')) {
-            $leadStages = Lead::selectRaw('stage, COUNT(*) as count')
-                ->groupBy('stage')
-                ->pluck('count', 'stage')
-                ->toArray();
-        }
-
-        // Leads over the last 7 days - only if user can view leads chart
-        $leadsLast7Days = [];
-        if ($user->can('view dashboard leads chart')) {
+        // Get cached data or compute
+        $dashboardData = Cache::remember($cacheKey, 300, function () use ($user) {
             $today = Carbon::today();
-            for ($i = 6; $i >= 0; $i--) {
-                $date = $today->copy()->subDays($i);
-                $dateStart = $date->copy()->startOfDay();
-                $dateEnd = $date->copy()->endOfDay();
 
-                $count = Lead::whereBetween('created_at', [$dateStart, $dateEnd])->count();
+            $stats = [];
 
-                $leadsLast7Days[] = [
-                    'date' => $date->format('M d'),
-                    'day' => $date->format('D'),
-                    'full_date' => $date->format('Y-m-d'),
-                    'count' => $count
-                ];
+            // Only load stats if user has permission to view the card
+            if ($user->can('view dashboard leads card')) {
+                // Count all leads (excluding converted ones - they are deleted now)
+                $stats['total_leads'] = Lead::count();
+                // Count new leads by stage (not by date)
+                $stats['new_leads'] = Lead::where('stage', Lead::STAGE_NEW_LEAD)->count();
+                $stats['qualified_leads'] = Lead::where('stage', 'qualified')->count();
             }
-        }
 
-        // Automated follow-up reminders - only load if user has permission
-        $followUpReminders = collect();
-        if ($user->can('view dashboard followup reminders card')) {
-            $followUpReminders = FollowUpTask::where('is_completed', false)
-                ->where('due_date', '<=', Carbon::now()->addDays(7))
-                ->with(['lead.assignedStaff'])
-                ->orderBy('due_date', 'asc')
-                ->get();
-        }
+            if ($user->can('view dashboard clients card')) {
+                $stats['total_clients'] = Client::where('is_active', true)->count();
+            }
 
-        // Today's leads
-        $todayLeads = collect();
-        if ($user->can('view dashboard leads card')) {
-            $todayLeads = Lead::whereDate('created_at', Carbon::today())->get();
-        }
+            if ($user->can('view dashboard staff card')) {
+                $stats['total_staff'] = Staff::where('is_active', true)->count();
+            }
 
-        // Recent activity - only load if user has permission
-        $recentActivity = collect();
-        if ($user->can('view dashboard recent activity card')) {
-            $recentActivity = Lead::with('assignedStaff')
-                ->orderBy('created_at', 'desc')
-                ->take(10)
-                ->get();
-        }
+            if ($user->can('view dashboard revenue card')) {
+                $stats['total_invoices'] = Invoice::count();
+                $stats['revenue'] = Invoice::where('status', 'paid')->sum('total_amount');
+            }
+
+            // Lead stages breakdown - only if user can view leads
+            $leadStages = [];
+            if ($user->can('view dashboard lead stages graph')) {
+                $leadStages = Lead::selectRaw('stage, COUNT(*) as count')
+                    ->groupBy('stage')
+                    ->pluck('count', 'stage')
+                    ->toArray();
+            }
+
+            // Leads over the last 7 days - only if user can view leads chart
+            $leadsLast7Days = [];
+            if ($user->can('view dashboard leads chart')) {
+                $today = Carbon::today();
+                for ($i = 6; $i >= 0; $i--) {
+                    $date = $today->copy()->subDays($i);
+                    $dateStart = $date->copy()->startOfDay();
+                    $dateEnd = $date->copy()->endOfDay();
+
+                    $count = Lead::whereBetween('created_at', [$dateStart, $dateEnd])->count();
+
+                    $leadsLast7Days[] = [
+                        'date' => $date->format('M d'),
+                        'day' => $date->format('D'),
+                        'full_date' => $date->format('Y-m-d'),
+                        'count' => $count
+                    ];
+                }
+            }
+
+            // Automated follow-up reminders - only load if user has permission
+            $followUpReminders = collect();
+            if ($user->can('view dashboard followup reminders card')) {
+                $followUpReminders = FollowUpTask::where('is_completed', false)
+                    ->where('due_date', '<=', Carbon::now()->addDays(7))
+                    ->with(['lead.assignedStaff'])
+                    ->orderBy('due_date', 'asc')
+                    ->get();
+            }
+
+            // Today's leads
+            $todayLeads = collect();
+            if ($user->can('view dashboard leads card')) {
+                $todayLeads = Lead::whereDate('created_at', Carbon::today())->get();
+            }
+
+            // Recent activity - only load if user has permission
+            $recentActivity = collect();
+            if ($user->can('view dashboard recent activity card')) {
+                $recentActivity = Lead::with('assignedStaff')
+                    ->orderBy('created_at', 'desc')
+                    ->take(10)
+                    ->get();
+            }
+
+            return [
+                'stats' => $stats,
+                'leadStages' => $leadStages,
+                'leadsLast7Days' => $leadsLast7Days,
+                'followUpReminders' => $followUpReminders,
+                'todayLeads' => $todayLeads,
+                'recentActivity' => $recentActivity
+            ];
+        });
 
         $viewPrefix = \App\Helpers\RouteHelper::getViewPrefix();
-        return view($viewPrefix . '.dashboard', compact(
-            'stats',
-            'leadStages',
-            'leadsLast7Days',
-            'followUpReminders',
-            'todayLeads',
-            'recentActivity'
-        ));
+        return view($viewPrefix . '.dashboard', $dashboardData);
     }
 }

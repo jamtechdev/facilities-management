@@ -44,7 +44,8 @@ class InvoiceController extends Controller
             'client_id' => 'required|exists:clients,id',
             'billing_period_start' => 'required|date',
             'billing_period_end' => 'required|date|after_or_equal:billing_period_start',
-            'hourly_rate' => 'required|numeric|min:0',
+            'hours' => 'nullable|numeric|min:0.1',
+            'hourly_rate' => 'required|numeric|min:0.01',
             'tax_rate' => 'nullable|numeric|min:0|max:100',
             'notes' => 'nullable|string',
         ]);
@@ -61,13 +62,19 @@ class InvoiceController extends Controller
             return DB::transaction(function () use ($request) {
                 $client = Client::findOrFail($request->client_id);
 
-                // Calculate total hours from timesheets in the billing period
-                $timesheets = Timesheet::where('client_id', $client->id)
-                    ->whereBetween('work_date', [$request->billing_period_start, $request->billing_period_end])
-                    ->where('is_approved', true)
-                    ->get();
+                // Use provided hours if given, otherwise calculate from timesheets
+                if ($request->has('hours') && $request->hours > 0) {
+                    $totalHours = $request->hours;
+                } else {
+                    // Calculate total hours from timesheets in the billing period
+                    $timesheets = Timesheet::where('client_id', $client->id)
+                        ->whereBetween('work_date', [$request->billing_period_start, $request->billing_period_end])
+                        ->where('is_approved', true)
+                        ->get();
 
-                $totalHours = $timesheets->sum('payable_hours');
+                    $totalHours = $timesheets->sum('payable_hours');
+                }
+
                 $subtotal = $totalHours * $request->hourly_rate;
                 $taxRate = $request->tax_rate ?? 0; // Tax rate as percentage
                 $tax = $subtotal * ($taxRate / 100); // Calculate tax from percentage

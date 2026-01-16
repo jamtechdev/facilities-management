@@ -280,7 +280,7 @@
 
 /* PDF Styles - Keep minimal inline styles only for PDF */
 .pdf-container {
-    font-family: Arial, sans-serif;
+    font-family: var(--font-family-base, 'Inter', sans-serif) !important;
     padding: 20px;
 }
 

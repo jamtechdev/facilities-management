@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Client as ClientModel;
 use App\Models\Timesheet;
 use App\Models\Feedback;
@@ -30,31 +31,44 @@ class DashboardController extends Controller
             return redirect()->route('welcome')->with('error', 'Client profile not found.');
         }
 
-        // Get recent service history
-        $recentServices = Timesheet::where('client_id', $client->id)
-            ->with(['staff', 'jobPhotos'])
-            ->latest('work_date')
-            ->take(10)
-            ->get();
+        // Cache key based on user ID
+        $cacheKey = 'dashboard_client_' . $user->id;
 
-        // Get recent feedback
-        $recentFeedback = Feedback::where('client_id', $client->id)
-            ->latest()
-            ->take(5)
-            ->get();
+        // Get cached data or compute
+        $dashboardData = Cache::remember($cacheKey, 300, function () use ($client) {
+            // Get recent service history
+            $recentServices = Timesheet::where('client_id', $client->id)
+                ->with(['staff', 'jobPhotos'])
+                ->latest('work_date')
+                ->take(10)
+                ->get();
 
-        // Get assigned staff with all their details
-        $staff = $client->staff()->with([
-            'user',
-            'timesheets' => function ($query) use ($client) {
-                $query->where('client_id', $client->id);
-            },
-            'jobPhotos' => function ($query) use ($client) {
-                $query->where('client_id', $client->id);
-            },
-            'documents'
-        ])->wherePivot('is_active', true)->get();
+            // Get recent feedback
+            $recentFeedback = Feedback::where('client_id', $client->id)
+                ->latest()
+                ->take(5)
+                ->get();
 
-        return view('client.dashboard', compact('client', 'recentServices', 'recentFeedback', 'staff'));
+            // Get assigned staff with all their details
+            $staff = $client->staff()->with([
+                'user',
+                'timesheets' => function ($query) use ($client) {
+                    $query->where('client_id', $client->id);
+                },
+                'jobPhotos' => function ($query) use ($client) {
+                    $query->where('client_id', $client->id);
+                },
+                'documents'
+            ])->wherePivot('is_active', true)->get();
+
+            return [
+                'client' => $client,
+                'recentServices' => $recentServices,
+                'recentFeedback' => $recentFeedback,
+                'staff' => $staff
+            ];
+        });
+
+        return view('client.dashboard', $dashboardData);
     }
 }

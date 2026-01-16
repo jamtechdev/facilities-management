@@ -9,7 +9,7 @@
 @section('content')
     <div class="container-fluid">
         <!-- Lead Header -->
-        <x-header-card :title="$lead->name" :company="$lead->company" :email="$lead->email" :phone="$lead->phone" type="lead">
+        <x-header-card :title="$lead->name ?? 'N/A'" :company="$lead->company ?? 'N/A'" :email="$lead->email ?? 'N/A'" :phone="$lead->phone ?? 'N/A'" type="lead">
             <x-slot name="actions">
                 @if (auth()->user()->can('view admin dashboard'))
                     <button class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#sendEmailModal">
@@ -65,11 +65,11 @@
                         </h5>
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <x-editable-info-card label="Name" :value="$lead->name" field="name" entityType="leads"
+                        <x-editable-info-card label="Name" :value="$lead->name ?? 'N/A'" field="name" entityType="leads"
                             :entityId="$lead->id" fieldType="text" />
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <x-editable-info-card label="Email" :value="$lead->email" :link="'mailto:' . $lead->email" field="email"
+                        <x-editable-info-card label="Email" :value="$lead->email ?? 'N/A'" :link="($lead->email ?? null) ? 'mailto:' . $lead->email : null" field="email"
                             entityType="leads" :entityId="$lead->id" fieldType="email" />
                     </div>
                     <div class="col-md-6 col-lg-4">
@@ -156,20 +156,20 @@
                     </div>
                     @if ($lead->convertedToClient)
                         <div class="col-md-6 col-lg-4">
-                            <x-info-card label="Converted To Client" :value="$lead->convertedToClient->company_name" :link="\App\Helpers\RouteHelper::url('clients.show', $lead->convertedToClient)" />
+                            <x-info-card label="Converted To Client" :value="$lead->convertedToClient->company_name ?? 'N/A'" :link="$lead->convertedToClient ? \App\Helpers\RouteHelper::url('clients.show', $lead->convertedToClient) : null" />
                         </div>
                     @endif
                     <div class="col-md-6 col-lg-4">
-                        <x-info-card label="Created" :value="$lead->created_at->format('M d, Y h:i A')" />
+                        <x-info-card label="Created" :value="$lead->created_at ? $lead->created_at->format('M d, Y h:i A') : 'N/A'" />
                     </div>
                     @if ($lead->user)
                         <div class="col-md-6 col-lg-4">
-                            <x-info-card label="Created By" :value="$lead->user->name" />
+                            <x-info-card label="Created By" :value="$lead->user->name ?? 'N/A'" />
                         </div>
                     @endif
                     @if ($lead->converted_at)
                         <div class="col-md-6 col-lg-4">
-                            <x-info-card label="Converted At" :value="$lead->converted_at->format('M d, Y h:i A')" />
+                            <x-info-card label="Converted At" :value="$lead->converted_at ? $lead->converted_at->format('M d, Y h:i A') : 'N/A'" />
                         </div>
                     @endif
                     <div class="col-12">
@@ -201,12 +201,12 @@
                                         <strong>{{ $communication->subject }}</strong>
                                     @endif
                                 </div>
-                                <small class="text-muted">{{ $communication->created_at->format('M d, Y h:i A') }}</small>
+                                <small class="text-muted">{{ $communication->created_at ? $communication->created_at->format('M d, Y h:i A') : 'N/A' }}</small>
                             </div>
-                            <p class="mb-1">{{ $communication->message }}</p>
+                            <p class="mb-1">{{ $communication->message ?? 'N/A' }}</p>
                             <small class="text-muted">
                                 @if ($communication->user)
-                                    by {{ $communication->user->name }}
+                                    by {{ $communication->user->name ?? 'N/A' }}
                                 @endif
                             </small>
                         </div>
@@ -239,7 +239,7 @@
                                 <i class="bi bi-file-earmark me-2"></i>
                                 <strong>{{ $document->name }}</strong>
                                 <span class="badge bg-secondary ms-2">{{ ucfirst($document->document_type) }}</span>
-                                <small class="text-muted ms-2">{{ $document->created_at->format('M d, Y') }}</small>
+                                <small class="text-muted ms-2">{{ $document->created_at ? $document->created_at->format('M d, Y') : 'N/A' }}</small>
                             </div>
                             <a href="{{ \App\Helpers\RouteHelper::url('documents.download', $document) }}"
                                 class="btn btn-sm btn-outline-primary" target="_blank">
@@ -273,8 +273,8 @@
                                     </h6>
                                     <p class="mb-1">{{ $task->suggestion }}</p>
                                     <small class="text-muted">
-                                        Due: {{ $task->due_date->format('M d, Y') }}
-                                        @if ($task->due_date->isPast() && !$task->is_completed)
+                                        Due: {{ $task->due_date ? $task->due_date->format('M d, Y') : 'N/A' }}
+                                        @if ($task->due_date && $task->due_date->isPast() && !$task->is_completed)
                                             <span class="badge bg-danger ms-2">Overdue</span>
                                         @endif
                                     </small>
@@ -310,7 +310,7 @@
                                         {{ $fb->rating }}/5
                                     </span>
                                 </div>
-                                <small class="text-muted">{{ $fb->created_at->format('M d, Y h:i A') }}</small>
+                                <small class="text-muted">{{ $fb->created_at ? $fb->created_at->format('M d, Y h:i A') : 'N/A' }}</small>
                             </div>
                             @if ($fb->comment)
                                 <p class="mb-1">{{ $fb->comment }}</p>
@@ -349,19 +349,19 @@
                                 <label for="send_email_to" class="form-label">Email To <span
                                         class="text-danger">*</span></label>
                                 <input type="email" class="form-control" id="send_email_to" name="email_to"
-                                    value="{{ $lead->email }}" required>
+                                    value="{{ $lead->email ?? '' }}" required>
                             </div>
                             <div class="mb-3">
                                 <label for="send_email_subject" class="form-label">Subject</label>
                                 <input type="text" class="form-control" id="send_email_subject" name="subject"
-                                    value="Follow-up: {{ $lead->company ?? $lead->name }}"
+                                    value="Follow-up: {{ $lead->company ?? $lead->name ?? 'Lead' }}"
                                     placeholder="Enter email subject">
                             </div>
                             <div class="mb-3">
                                 <label for="send_email_message" class="form-label">Message <span
                                         class="text-danger">*</span></label>
                                 <textarea class="form-control" id="send_email_message" name="message" rows="8" required
-                                    placeholder="Enter your message...">Dear {{ $lead->name }},
+                                    placeholder="Enter your message...">Dear {{ $lead->name ?? 'Valued Lead' }},
 
 Thank you for your interest in our services. We would like to follow up with you regarding your inquiry.
 

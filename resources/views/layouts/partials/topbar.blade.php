@@ -97,7 +97,7 @@
                     </div> --}}
                     <div class="navbar-user-avatar" id="global-header-avatar-container">
                         @if (auth()->user()->avatar)
-                            <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Profile"
+                            <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Profile" loading="lazy"
                                 id="global-header-img"
                                 style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                         @else
@@ -113,16 +113,21 @@
                                 $user = auth()->user();
                                 $role = $user->roles->first();
                                 if ($role) {
-                                    $roleName = $role->name;
-                                    // Map role names to colors
+                                    $roleName = \App\Helpers\RoleHelper::getDisplayName($role->name);
+                                    // Map role names to colors (using original role name for color mapping)
                                     $roleColorMap = [
                                         'SuperAdmin' => 'danger',
+                                        'superadmin' => 'danger',
                                         'Admin' => 'primary',
+                                        'admin' => 'primary',
                                         'Staff' => 'success',
+                                        'staff' => 'success',
                                         'Client' => 'info',
+                                        'client' => 'info',
                                         'Lead' => 'warning',
+                                        'lead' => 'warning',
                                     ];
-                                    $roleColor = $roleColorMap[$roleName] ?? 'secondary';
+                                    $roleColor = $roleColorMap[$role->name] ?? 'secondary';
                                 } else {
                                     $roleName = 'User';
                                     $roleColor = 'secondary';

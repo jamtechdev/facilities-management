@@ -85,32 +85,32 @@
 }
 
 .profile-avatar {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 700;
     border: 3px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .profile-avatar i {
-    font-size: 1.75rem !important;
+    font-size: 1.5rem !important;
 }
 
 .profile-info h1 {
-    font-size: 1.5rem;
+    font-size: var(--fs-h2, 24px);
     font-weight: 700;
     margin-bottom: 0.25rem;
 }
 
 .profile-info p {
-    font-size: 1rem;
+    font-size: var(--fs-base, 14px);
     opacity: 0.9;
     margin: 0;
 }
@@ -485,7 +485,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f0f0f0;
+    /* background-color: #f0f0f0; */
     position: relative;
     border: 3px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);

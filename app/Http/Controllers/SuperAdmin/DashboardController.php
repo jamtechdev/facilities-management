@@ -10,6 +10,7 @@ use App\Models\Invoice;
 use App\Models\User;
 use App\Models\FollowUpTask;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -27,9 +28,14 @@ class DashboardController extends Controller
             abort(403, 'You do not have permission to access the SuperAdmin dashboard.');
         }
 
-        $today = Carbon::today();
+        // Cache key based on user ID and role
+        $cacheKey = 'dashboard_superadmin_' . $user->id;
 
-        $stats = [];
+        // Get cached data or compute
+        $dashboardData = Cache::remember($cacheKey, 300, function () use ($user) {
+            $today = Carbon::today();
+
+            $stats = [];
 
         // Only load stats if user has permission to view the card
         if ($user->can('view dashboard leads card')) {
@@ -114,16 +120,19 @@ class DashboardController extends Controller
             }
         }
 
-        // Today's leads
-        $todayLeads = Lead::whereDate('created_at', Carbon::today())->get();
+            // Today's leads
+            $todayLeads = Lead::whereDate('created_at', Carbon::today())->get();
 
-        return view('superadmin.dashboard', compact(
-            'stats',
-            'leadStages',
-            'leadsLast7Days',
-            'followUpReminders',
-            'recentActivity',
-            'todayLeads'
-        ));
+            return [
+                'stats' => $stats,
+                'leadStages' => $leadStages,
+                'leadsLast7Days' => $leadsLast7Days,
+                'followUpReminders' => $followUpReminders,
+                'recentActivity' => $recentActivity,
+                'todayLeads' => $todayLeads
+            ];
+        });
+
+        return view('superadmin.dashboard', $dashboardData);
     }
 }

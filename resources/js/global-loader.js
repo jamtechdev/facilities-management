@@ -93,6 +93,11 @@
         isPreloaderActive = isPreloaderVisible();
     }
 
+    // Listen for preloader hidden event
+    window.addEventListener('preloaderHidden', function() {
+        isPreloaderActive = false;
+    });
+
     // Initialize on page load
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {

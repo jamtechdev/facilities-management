@@ -19,13 +19,13 @@
     color: var(--primary-dark);
     font-weight: 700;
     margin: 0;
-    font-size: 24px;
+    font-size: var(--fs-h4, 20px);
 }
 
 .form-header p {
     color: #6c757d;
     margin: 5px 0 0 0;
-    font-size: 14px;
+    font-size: var(--fs-base, 14px);
 }
 
 /* Form Labels */
@@ -33,7 +33,7 @@
     font-weight: 600;
     color: #2d4a25;
     margin-bottom: 8px;
-    font-size: 14px;
+    font-size: var(--fs-sm, 13px);
     display: flex;
     align-items: center;
     gap: 5px;
@@ -49,8 +49,8 @@
 .form-select {
     border: 2px solid var(--border-color);
     border-radius: 8px;
-    padding: 12px 15px;
-    font-size: 14px;
+    padding: 10px 12px;
+    font-size: var(--fs-base, 14px);
     transition: all 0.3s ease;
     background: white;
 }
@@ -86,7 +86,7 @@
 
 .invalid-feedback {
     color: #dc3545;
-    font-size: 13px;
+    font-size: var(--fs-xs, 11px);
     margin-top: 5px;
     font-weight: 500;
     display: flex;
@@ -402,7 +402,7 @@ select.form-select {
     color: var(--primary-dark);
     font-weight: 700;
     margin: 0;
-    font-size: 18px;
+    font-size: var(--fs-lg, 16px);
 }
 
 .form-card-body {
@@ -473,15 +473,15 @@ select.form-select {
         padding: 20px;
         overflow: visible;
     }
-    
+
     .form-actions {
         flex-direction: column;
     }
-    
+
     .form-actions .btn {
         width: 100%;
     }
-    
+
     .form-select {
         font-size: 16px; /* Prevents zoom on iOS */
         padding: 14px 40px 14px 15px;
@@ -493,10 +493,9 @@ select.form-select {
     .form-select {
         transition: all 0.2s ease;
     }
-    
+
     .form-select:hover {
         transform: translateY(-1px);
         box-shadow: 0 2px 8px rgba(132, 195, 115, 0.15);
     }
 }
-

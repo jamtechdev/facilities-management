@@ -53,7 +53,21 @@ function handleFormSubmit(form, submitBtn) {
 
     // Disable submit button
     submitBtn.disabled = true;
+    const originalBtnText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+
+    // Show global loader (only if preloader is not visible)
+    if (typeof window.showGlobalLoader === 'function') {
+        const preloader = document.getElementById('preloader');
+        const isPreloaderVisible = preloader &&
+            !preloader.classList.contains('hide') &&
+            preloader.style.display !== 'none' &&
+            window.getComputedStyle(preloader).display !== 'none';
+
+        if (!isPreloaderVisible) {
+            window.showGlobalLoader('Processing...');
+        }
+    }
 
     // Clear previous validation errors
     clearValidationErrors(form);
@@ -85,6 +99,10 @@ function handleFormSubmit(form, submitBtn) {
                     window.toastr.success(successMessage);
                 }
 
+                // Hide global loader before redirect
+                if (typeof window.hideGlobalLoader === 'function') {
+                    window.hideGlobalLoader();
+                }
                 // Redirect or reload after a short delay to show toast
                 setTimeout(function () {
                     if (response.data.redirect) {
@@ -104,6 +122,10 @@ function handleFormSubmit(form, submitBtn) {
                 } else {
                     alert(errorMessage);
                 }
+                // Hide global loader
+                if (typeof window.hideGlobalLoader === 'function') {
+                    window.hideGlobalLoader();
+                }
                 // Re-enable submit button
                 form.dataset.submitting = 'false';
                 submitBtn.disabled = false;
@@ -111,6 +133,10 @@ function handleFormSubmit(form, submitBtn) {
             }
         })
         .catch(function(error) {
+            // Hide global loader
+            if (typeof window.hideGlobalLoader === 'function') {
+                window.hideGlobalLoader();
+            }
             // Re-enable submit button
             form.dataset.submitting = 'false';
             submitBtn.disabled = false;
