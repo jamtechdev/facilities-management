@@ -78,6 +78,7 @@
     text-decoration: none;
     color: inherit;
     display: block;
+    margin-bottom: 0.5rem;
 }
 
 .client-stat-card::before {
@@ -689,7 +690,9 @@
 
     .client-stat-card {
         padding: 1rem 1rem;
-        margin-bottom: 0;
+        margin-bottom: 0.75rem;
+        max-width: 100%;
+        width: 100%;
     }
 
     .stat-header {
@@ -734,12 +737,28 @@
 
     .client-stat-card {
         padding: 0.875rem 0.875rem;
+        margin-bottom: 0.5rem;
+        max-width: 100%;
+        width: 100%;
     }
 
     .stat-icon-wrapper {
-        width: 45px;
-        height: 45px;
-        font-size: 22px;
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .stat-header {
+        gap: 0.5rem;
     }
 
     .stat-value {

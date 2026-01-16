@@ -211,15 +211,28 @@ table.dataTable thead th {
     background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
     color: white;
     font-weight: 600;
-    padding: 18px 16px;
+    padding: 16px 14px;
     text-align: left;
     border-bottom: none;
     position: relative;
     white-space: nowrap;
-    font-size: var(--fs-sm, 13px);
+    font-size: 13px;
     font-family: var(--font-family-base, 'Inter', sans-serif);
     letter-spacing: 0.3px;
     text-transform: uppercase;
+    min-width: 100px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+}
+
+/* Action column header - fixed width */
+table.dataTable thead th:last-child,
+table.dataTable thead th.text-center {
+    min-width: 120px;
+    max-width: 150px;
+    text-align: center;
 }
 
 table.dataTable tbody tr {
@@ -252,8 +265,11 @@ table.dataTable tbody td {
     vertical-align: middle;
     border-bottom: none;
     color: #495057;
-    font-size: var(--fs-base, 14px);
+    font-size: 14px;
     font-family: var(--font-family-base, 'Inter', sans-serif);
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Action column styling - Fix height issues for all DataTables */
@@ -577,8 +593,10 @@ table.dataTable tbody td.text-center {
     }
 
     table.dataTable thead th {
-        padding: 18px 16px;
-        font-size: 0.95rem;
+        padding: 16px 14px;
+        font-size: 13px;
+        min-width: 100px;
+        max-width: 200px;
     }
 
     table.dataTable tbody td {
@@ -602,8 +620,10 @@ table.dataTable tbody td.text-center {
     }
 
     table.dataTable thead th {
-        padding: 16px 14px;
-        font-size: 0.9rem;
+        padding: 14px 12px;
+        font-size: 12px;
+        min-width: 90px;
+        max-width: 180px;
     }
 
     table.dataTable tbody td {
@@ -630,8 +650,10 @@ table.dataTable tbody td.text-center {
     }
 
     table.dataTable thead th {
-        padding: 14px 12px;
-        font-size: 0.85rem;
+        padding: 12px 10px;
+        font-size: 11px;
+        min-width: 80px;
+        max-width: 150px;
     }
 
     table.dataTable tbody td {
@@ -998,8 +1020,8 @@ table.dataTable tbody td.text-center {
     }
 
     table.dataTable thead th {
-        padding: 14px 10px;
-        font-size: 12px;
+        padding: 12px 8px;
+        font-size: 11px;
         position: sticky;
         top: 0;
         background: linear-gradient(135deg, #84c373 0%, #6ba85a 100%);
@@ -1007,6 +1029,8 @@ table.dataTable tbody td.text-center {
         z-index: 10;
         font-weight: 600;
         letter-spacing: 0.2px;
+        min-width: 70px;
+        max-width: 120px;
     }
 
     table.dataTable tbody td {
@@ -1114,9 +1138,11 @@ table.dataTable tbody td.text-center {
     }
 
     table.dataTable thead th {
-        padding: 12px 8px;
-        font-size: 11px;
+        padding: 10px 6px;
+        font-size: 10px;
         font-weight: 600;
+        min-width: 60px;
+        max-width: 100px;
     }
 
     table.dataTable tbody td {
